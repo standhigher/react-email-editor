@@ -23,7 +23,7 @@ export function typographyCss(style: EmailBlockStyle | undefined): string {
   return parts.join(";");
 }
 
-/** 区块外层 cell 的样式（padding + 背景），用于邮件输出。 */
+/** Block outer cell style (padding + background), used for email output. */
 export function blockCellCss(style: EmailBlockStyle | undefined): string {
   const s = style ?? {};
   const padding = s.dimension?.padding ?? "0";
@@ -31,58 +31,72 @@ export function blockCellCss(style: EmailBlockStyle | undefined): string {
   return `padding:${esc(padding)};background-color:${esc(background)};`;
 }
 
-// 通用样式字段（供各区块声明自己暴露哪些）
+// Shared style fields (blocks declare which ones they expose)
 const PADDING: StyleFieldConfig = {
   id: "dimension.padding",
   group: "dimension",
-  label: "内边距",
-  control: "text",
+  label: "Padding",
+  control: "range",
+  unit: "px",
+  min: 0,
+  max: 64,
+  step: 4,
 };
 const FONT_SIZE: StyleFieldConfig = {
   id: "typography.fontSize",
   group: "typography",
-  label: "字号",
-  control: "text",
+  label: "Font size",
+  control: "number",
+  unit: "px",
+  min: 8,
+  max: 72,
 };
 const FONT_WEIGHT: StyleFieldConfig = {
   id: "typography.fontWeight",
   group: "typography",
-  label: "字重",
+  label: "Weight",
   control: "select",
   options: [
-    { label: "常规", value: "normal" },
-    { label: "加粗", value: "bold" },
+    { label: "Regular", value: "normal" },
+    { label: "Bold", value: "bold" },
   ],
 };
 const LINE_HEIGHT: StyleFieldConfig = {
   id: "typography.lineHeight",
   group: "typography",
-  label: "行高",
-  control: "text",
+  label: "Line height",
+  control: "range",
+  min: 1,
+  max: 2,
+  step: 0.05,
 };
 const TEXT_COLOR: StyleFieldConfig = {
   id: "typography.color",
   group: "typography",
-  label: "文字颜色",
+  label: "Text color",
   control: "color",
 };
 const TEXT_ALIGN: StyleFieldConfig = {
   id: "typography.textAlign",
   group: "typography",
-  label: "对齐",
+  label: "Align",
   control: "alignment",
 };
 const BG_COLOR: StyleFieldConfig = {
   id: "decorations.backgroundColor",
   group: "decorations",
-  label: "背景色",
+  label: "Background",
   control: "color",
 };
 const BORDER_RADIUS: StyleFieldConfig = {
   id: "decorations.borderRadius",
   group: "decorations",
-  label: "圆角",
-  control: "text",
+  label: "Corner radius",
+  control: "range",
+  unit: "px",
+  min: 0,
+  max: 32,
+  step: 2,
 };
 
 const ICON_TEXT =
@@ -103,35 +117,36 @@ const ICON_HTML =
 export const DEFAULT_BLOCKS: BlockDefinition[] = [
   {
     type: "heading",
-    title: "标题",
+    title: "Heading",
     icon: ICON_HEADING,
-    description: "大号标题文字",
+    description: "Large section heading",
     inlineEdit: true,
-    defaultFields: { html: "<p>标题文字</p>" },
+    defaultFields: { html: "<p>Heading</p>" },
     defaultStyle: {
       typography: {
         fontSize: "26px",
         fontWeight: "bold",
-        color: "#1a1a1a",
+        lineHeight: "1.25",
+        color: "#202223",
         textAlign: "left",
       },
     },
-    styleFields: [FONT_SIZE, FONT_WEIGHT, TEXT_COLOR, TEXT_ALIGN, PADDING],
+    styleFields: [FONT_SIZE, FONT_WEIGHT, LINE_HEIGHT, TEXT_COLOR, TEXT_ALIGN, PADDING],
     render: ({ fields, style }) =>
       `<div style="${typographyCss(style)}">${String(fields.html ?? "")}</div>`,
   },
   {
     type: "text",
-    title: "文本",
+    title: "Text",
     icon: ICON_TEXT,
-    description: "正文段落",
+    description: "Paragraph of body text",
     inlineEdit: true,
-    defaultFields: { html: "<p>在这里输入正文内容…</p>" },
+    defaultFields: { html: "<p>Type your paragraph here…</p>" },
     defaultStyle: {
       typography: {
         fontSize: "15px",
         lineHeight: "1.6",
-        color: "#333333",
+        color: "#303030",
         textAlign: "left",
       },
     },
@@ -141,35 +156,35 @@ export const DEFAULT_BLOCKS: BlockDefinition[] = [
   },
   {
     type: "button",
-    title: "按钮",
+    title: "Button",
     icon: ICON_BUTTON,
-    description: "可点击的 CTA 按钮",
+    description: "Clickable CTA button",
     fields: [
-      { type: "text", name: "label", label: "文案", defaultValue: "立即购买" },
-      { type: "url", name: "href", label: "链接", defaultValue: "https://example.com" },
+      { type: "text", name: "label", label: "Label", defaultValue: "Buy now" },
+      { type: "url", name: "href", label: "Link", defaultValue: "https://example.com" },
       {
         type: "select",
         name: "variant",
-        label: "样式",
+        label: "Style",
         defaultValue: "filled",
         options: [
-          { label: "实心", value: "filled" },
-          { label: "描边", value: "outline" },
+          { label: "Filled", value: "filled" },
+          { label: "Outline", value: "outline" },
         ],
       },
     ],
     defaultStyle: {
       typography: { fontSize: "16px", color: "#ffffff", textAlign: "center" },
-      decorations: { backgroundColor: "#005bd3", borderRadius: "4px" },
+      decorations: { backgroundColor: "#005bd3", borderRadius: "8px" },
     },
     styleFields: [FONT_SIZE, TEXT_COLOR, BG_COLOR, BORDER_RADIUS, PADDING],
     render: ({ fields, style }) => {
-      const label = String(fields.label ?? "按钮");
+      const label = String(fields.label ?? "Button");
       const href = String(fields.href ?? "#");
       const variant = String(fields.variant ?? "filled");
       const bg = style.decorations?.backgroundColor ?? "#005bd3";
       const color = style.typography?.color ?? "#ffffff";
-      const radius = style.decorations?.borderRadius ?? "4px";
+      const radius = style.decorations?.borderRadius ?? "8px";
       const fontSize = style.typography?.fontSize ?? "16px";
       const bgVal = variant === "outline" ? "transparent" : bg;
       const colorVal = variant === "outline" ? bg : color;
@@ -178,31 +193,31 @@ export const DEFAULT_BLOCKS: BlockDefinition[] = [
   },
   {
     type: "image",
-    title: "图片",
+    title: "Image",
     icon: ICON_IMAGE,
-    description: "插入图片",
+    description: "Insert an image",
     fields: [
       {
         type: "url",
         name: "src",
-        label: "图片地址",
+        label: "Image URL",
         defaultValue: "https://placehold.co/560x200?text=Image",
       },
-      { type: "text", name: "alt", label: "替代文本", defaultValue: "图片" },
-      { type: "url", name: "link", label: "点击链接", defaultValue: "" },
+      { type: "text", name: "alt", label: "Alt text", defaultValue: "Image" },
+      { type: "url", name: "link", label: "Link", defaultValue: "" },
       {
         type: "select",
         name: "align",
-        label: "对齐",
+        label: "Align",
         defaultValue: "center",
         options: [
-          { label: "左", value: "left" },
-          { label: "中", value: "center" },
-          { label: "右", value: "right" },
+          { label: "Left", value: "left" },
+          { label: "Center", value: "center" },
+          { label: "Right", value: "right" },
         ],
       },
     ],
-    defaultStyle: { dimension: { padding: "8px 0" } },
+    defaultStyle: { dimension: { padding: "8px" } },
     styleFields: [PADDING],
     render: ({ fields }) => {
       const src = String(fields.src ?? "");
@@ -218,26 +233,26 @@ export const DEFAULT_BLOCKS: BlockDefinition[] = [
   },
   {
     type: "divider",
-    title: "分割线",
+    title: "Divider",
     icon: ICON_DIVIDER,
-    description: "水平分割线",
+    description: "Horizontal divider line",
     fields: [
-      { type: "color", name: "color", label: "颜色", defaultValue: "#e3e3e3" },
+      { type: "color", name: "color", label: "Color", defaultValue: "#e3e3e5" },
     ],
-    defaultStyle: { dimension: { padding: "12px 0" } },
+    defaultStyle: { dimension: { padding: "12px" } },
     styleFields: [PADDING],
     render: ({ fields }) => {
-      const color = String(fields.color ?? "#e3e3e3");
+      const color = String(fields.color ?? "#e3e3e5");
       return `<hr style="border:0;border-top:1px solid ${esc(color)};margin:0;" />`;
     },
   },
   {
     type: "spacer",
-    title: "间隔",
+    title: "Spacer",
     icon: ICON_SPACER,
-    description: "垂直留白",
+    description: "Vertical whitespace",
     fields: [
-      { type: "number", name: "height", label: "高度(px)", defaultValue: 16 },
+      { type: "number", name: "height", label: "Height (px)", defaultValue: 16 },
     ],
     render: ({ fields }) => {
       const height = String(fields.height ?? "16");
@@ -246,20 +261,20 @@ export const DEFAULT_BLOCKS: BlockDefinition[] = [
   },
   {
     type: "html",
-    title: "HTML 代码",
+    title: "HTML",
     icon: ICON_HTML,
-    description: "粘贴任意 HTML",
+    description: "Paste raw HTML",
     fields: [
       {
         type: "html",
         name: "html",
-        label: "HTML 代码",
-        defaultValue: '<p style="margin:0;">自定义 HTML 区块</p>',
+        label: "HTML",
+        defaultValue: '<p style="margin:0;">Custom HTML block</p>',
         rows: 10,
-        placeholder: "粘贴任意 HTML…",
+        placeholder: "Paste raw HTML…",
       },
     ],
-    defaultStyle: { dimension: { padding: "8px 0" } },
+    defaultStyle: { dimension: { padding: "8px" } },
     styleFields: [PADDING, BG_COLOR],
     render: ({ fields }) => String(fields.html ?? ""),
   },

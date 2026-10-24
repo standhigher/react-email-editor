@@ -22,6 +22,7 @@ export type {
   BlockRenderContext,
   FieldConfig,
   StyleFieldConfig,
+  StyleControlType,
   FieldType,
   StyleGroup,
   Variable,

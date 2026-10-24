@@ -205,14 +205,14 @@ function BlockWrapper(props: BlockWrapperProps) {
             className="ree-block-btn ree-grip"
             {...attributes}
             {...listeners}
-            title="拖动排序"
+            title="Drag to reorder"
           >
             ⠿
           </button>
           <button
             type="button"
             className="ree-block-btn"
-            title="上移"
+            title="Move up"
             onClick={() => onMove(-1)}
           >
             ↑
@@ -220,7 +220,7 @@ function BlockWrapper(props: BlockWrapperProps) {
           <button
             type="button"
             className="ree-block-btn"
-            title="下移"
+            title="Move down"
             onClick={() => onMove(1)}
           >
             ↓
@@ -228,7 +228,7 @@ function BlockWrapper(props: BlockWrapperProps) {
           <button
             type="button"
             className="ree-block-btn"
-            title="复制"
+            title="Duplicate"
             onClick={onDuplicate}
           >
             ⧉
@@ -236,7 +236,7 @@ function BlockWrapper(props: BlockWrapperProps) {
           <button
             type="button"
             className="ree-block-btn ree-danger"
-            title="删除"
+            title="Delete"
             onClick={onRemove}
           >
             ×
@@ -285,7 +285,7 @@ function VariablesDropdown({
         type="button"
         className="ree-var-btn"
         onClick={() => setOpen((v) => !v)}
-        title="插入变量"
+        title="Insert variable"
       >
         {"{ }"}
       </button>
@@ -396,14 +396,7 @@ function FieldControl({
               onChange={(e) => onChange(e.target.value)}
               className="ree-color-input"
             />
-            <input
-              ref={(el) => {
-                ref.current = el;
-              }}
-              value={stringValue}
-              onChange={(e) => onChange(e.target.value)}
-              className="ree-input"
-            />
+            <span className="ree-color-value">{stringValue || "–"}</span>
           </div>
         </div>
       );
@@ -432,9 +425,19 @@ function StyleControl({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const numeric = parseFloat(value);
+  const hasNumeric = Number.isFinite(numeric);
+  const numValue = hasNumeric ? numeric : (cfg.min ?? 0);
+  const format = (n: number) => (cfg.unit ? `${n}${cfg.unit}` : String(n));
+  const readout = cfg.control === "range" ? `${numValue}${cfg.unit ?? ""}` : null;
+
   return (
     <div className="ree-field">
-      <label className="ree-field-label">{cfg.label}</label>
+      <div className="ree-field-label">
+        <span>{cfg.label}</span>
+        {readout ? <span className="ree-field-value">{readout}</span> : null}
+      </div>
+
       {cfg.control === "color" ? (
         <div className="ree-color-row">
           <input
@@ -443,11 +446,7 @@ function StyleControl({
             onChange={(e) => onChange(e.target.value)}
             className="ree-color-input"
           />
-          <input
-            className="ree-input"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-          />
+          <span className="ree-color-value">{value || "–"}</span>
         </div>
       ) : cfg.control === "alignment" ? (
         <div className="ree-align-row">
@@ -457,6 +456,7 @@ function StyleControl({
               type="button"
               className={`ree-align-btn${value === a ? " is-active" : ""}`}
               onClick={() => onChange(a)}
+              title={a.charAt(0).toUpperCase() + a.slice(1)}
             >
               {a === "left" ? "⇤" : a === "center" ? "⇔" : "⇥"}
             </button>
@@ -474,11 +474,39 @@ function StyleControl({
             </option>
           ))}
         </select>
+      ) : cfg.control === "number" ? (
+        <div className="ree-input-group">
+          <input
+            type="number"
+            className="ree-input ree-input-number"
+            value={numValue}
+            min={cfg.min}
+            max={cfg.max}
+            step={cfg.step ?? 1}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              if (Number.isFinite(n)) onChange(format(n));
+            }}
+          />
+          {cfg.unit ? <span className="ree-input-unit">{cfg.unit}</span> : null}
+        </div>
+      ) : cfg.control === "range" ? (
+        <div className="ree-range-row">
+          <input
+            type="range"
+            className="ree-range"
+            value={numValue}
+            min={cfg.min ?? 0}
+            max={cfg.max ?? 100}
+            step={cfg.step ?? 1}
+            onChange={(e) => onChange(format(Number(e.target.value)))}
+          />
+        </div>
       ) : (
         <input
           className="ree-input"
           value={value}
-          placeholder="如 16px"
+          placeholder="e.g. 16px"
           onChange={(e) => onChange(e.target.value)}
         />
       )}
@@ -502,7 +530,7 @@ function Inspector({
   if (!block || !def) {
     return (
       <div className="ree-inspector-empty">
-        点击画布中的区块进行编辑
+        Select a block on the canvas to edit
       </div>
     );
   }
@@ -523,7 +551,7 @@ function Inspector({
 
       {contentFields.length > 0 ? (
         <section className="ree-inspector-section">
-          <div className="ree-inspector-section-title">内容</div>
+          <div className="ree-inspector-section-title">Content</div>
           {contentFields.map((f) => (
             <FieldControl
               key={f.name}
@@ -539,7 +567,7 @@ function Inspector({
       {def.inlineEdit ? (
         <section className="ree-inspector-section">
           <div className="ree-inspector-hint">
-            内容在画布中直接点击编辑
+            Edit content inline on the canvas
           </div>
         </section>
       ) : null}
@@ -779,10 +807,10 @@ export function EmailEditor({
             HTML
           </button>
           <button type="button" className="ree-btn" onClick={() => setModal("preview")}>
-            预览
+            Preview
           </button>
           <button type="button" className="ree-btn ree-btn-primary" onClick={handleSave}>
-            生成 HTML
+            Export HTML
           </button>
         </div>
       </div>
@@ -796,7 +824,7 @@ export function EmailEditor({
           onDragEnd={handleDragEnd}
         >
           <aside className="ree-col ree-col-left">
-            <div className="ree-col-head">区块</div>
+            <div className="ree-col-head">Blocks</div>
             <div className="ree-lib">
               {defs.map((def) => (
                 <BlockLibraryItem
@@ -816,7 +844,7 @@ export function EmailEditor({
               <div className="ree-canvas-inner">
                 {doc.blocks.length === 0 ? (
                   <div className="ree-canvas-empty">
-                    从左侧拖入或点击区块开始编辑
+                    Drag a block here or click one to get started
                   </div>
                 ) : (
                   <SortableContext
@@ -845,7 +873,7 @@ export function EmailEditor({
           </div>
 
           <aside className="ree-col ree-col-right">
-            <div className="ree-col-head">配置区</div>
+            <div className="ree-col-head">Inspector</div>
             <Inspector
               block={selectedBlock}
               def={selectedDef}
@@ -872,17 +900,17 @@ export function EmailEditor({
             <div className="ree-modal-head">
               <span>
                 {modal === "preview"
-                  ? "预览"
+                  ? "Preview"
                   : modal === "html"
-                    ? "邮件 HTML"
-                    : "文档 JSON"}
+                    ? "Email HTML"
+                    : "Document JSON"}
               </span>
               <button
                 type="button"
                 className="ree-btn"
                 onClick={() => setModal(null)}
               >
-                关闭
+                Close
               </button>
             </div>
             {modal === "preview" ? (

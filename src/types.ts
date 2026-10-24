@@ -1,10 +1,11 @@
 /**
- * 邮件模板编辑器的核心数据模型。
+ * Core data model for the email template editor.
  *
- * 三层概念：
- * - EmailDocument    完整文档（唯一数据源）
- * - EmailBlockNode   文档里的一个区块实例
- * - BlockDefinition  区块的"定义/schema"，决定配置区展示哪些控件、如何渲染 HTML
+ * Three layers:
+ * - EmailDocument    the whole document (single source of truth)
+ * - EmailBlockNode   one block instance inside a document
+ * - BlockDefinition  the block "schema", deciding which inspector controls to show
+ *                    and how to render HTML
  */
 
 import type { ReactNode } from "react";
@@ -45,7 +46,7 @@ export interface Variable {
   description?: string;
 }
 
-// ---------- 区块定义 ----------
+// ---------- Block definition ----------
 
 export type FieldType =
   | "text"
@@ -68,44 +69,57 @@ export interface FieldConfig {
 
 export type StyleGroup = "dimension" | "typography" | "decorations";
 
+export type StyleControlType =
+  | "text"
+  | "color"
+  | "alignment"
+  | "select"
+  | "number"
+  | "range";
+
 export interface StyleFieldConfig {
-  /** 形如 "typography.fontSize"，决定读写 style 的哪一项 */
+  /** e.g. "typography.fontSize" — which style slot this reads/writes */
   id: string;
   group: StyleGroup;
   label: string;
-  control: "text" | "color" | "alignment" | "select";
+  control: StyleControlType;
   options?: { label: string; value: string }[];
+  /** Unit suffix for number/range controls, e.g. "px". Omit for unitless (line-height). */
+  unit?: string;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
-/** 区块渲染上下文：同一份数据在"画布静态 demo"与"邮件 Go 模板"两种模式下输出。 */
+/** Render context: the same data rendered in "canvas" (static demo) or "email" (Go template) mode. */
 export interface BlockRenderContext {
   block: EmailBlockNode;
   fields: Record<string, unknown>;
   style: EmailBlockStyle;
-  /** 画布 = 静态 demo；邮件 = 含 Go 指令（控制结构只出现在 email 分支）。 */
+  /** canvas = static demo; email = may contain Go directives (control structures only in email branch). */
   mode: "canvas" | "email";
 }
 
 export interface BlockDefinition {
   type: string;
   title: string;
-  /** SVG 字符串或 React 节点 */
+  /** SVG string or React node */
   icon?: ReactNode | string;
   description?: string;
-  /** 配置区"内容"字段 */
+  /** Inspector "content" fields */
   fields?: FieldConfig[];
-  /** 配置区"样式"字段 */
+  /** Inspector "style" fields */
   styleFields?: StyleFieldConfig[];
   defaultFields?: Record<string, unknown>;
   defaultStyle?: EmailBlockStyle;
-  /** 是否在画布内内联富文本编辑（内容存在 fields.html） */
+  /** Whether this block is inline-edited in the canvas (content lives in fields.html) */
   inlineEdit?: boolean;
-  /** 输出 HTML 片段（email 模式可含 Go 指令，canvas 模式为静态 demo） */
+  /** Outputs the HTML fragment (email mode may contain Go directives) */
   render: (ctx: BlockRenderContext) => string;
 }
 
 export const STYLE_GROUPS: { group: StyleGroup; label: string }[] = [
-  { group: "dimension", label: "尺寸" },
-  { group: "typography", label: "排版" },
-  { group: "decorations", label: "装饰" },
+  { group: "dimension", label: "Spacing" },
+  { group: "typography", label: "Typography" },
+  { group: "decorations", label: "Decorations" },
 ];

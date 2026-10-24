@@ -31,7 +31,7 @@ export function RichText({
         link: { openOnClick: false, autolink: true },
         codeBlock: false,
       }),
-      Placeholder.configure({ placeholder: placeholder ?? "输入内容…" }),
+      Placeholder.configure({ placeholder: placeholder ?? "Type something…" }),
     ],
     content: initialHtml,
     immediatelyRender: false,
@@ -39,7 +39,7 @@ export function RichText({
   });
 
   if (!editor) {
-    return <div className="ree-rte-loading">加载编辑器…</div>;
+    return <div className="ree-rte-loading">Loading editor…</div>;
   }
 
   const setLink = () => {
@@ -47,7 +47,7 @@ export function RichText({
       editor.chain().focus().unsetLink().run();
       return;
     }
-    const url = window.prompt("链接地址", "https://");
+    const url = window.prompt("Link URL", "https://");
     if (url) {
       editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
     }
@@ -72,7 +72,7 @@ export function RichText({
               e.preventDefault();
               editor.chain().focus().toggleBold().run();
             }}
-            title="加粗"
+            title="Bold"
           >
             B
           </button>
@@ -83,7 +83,7 @@ export function RichText({
               e.preventDefault();
               editor.chain().focus().toggleItalic().run();
             }}
-            title="斜体"
+            title="Italic"
           >
             I
           </button>
@@ -94,7 +94,7 @@ export function RichText({
               e.preventDefault();
               editor.chain().focus().toggleUnderline().run();
             }}
-            title="下划线"
+            title="Underline"
           >
             U
           </button>
@@ -105,7 +105,7 @@ export function RichText({
               e.preventDefault();
               editor.chain().focus().toggleStrike().run();
             }}
-            title="删除线"
+            title="Strikethrough"
           >
             S
           </button>
@@ -116,7 +116,7 @@ export function RichText({
               e.preventDefault();
               setLink();
             }}
-            title="链接"
+            title="Link"
           >
             🔗
           </button>
@@ -129,7 +129,7 @@ export function RichText({
                   e.preventDefault();
                   setVarOpen((v) => !v);
                 }}
-                title="插入变量"
+                title="Insert variable"
               >
                 {"{ }"}
               </button>
