@@ -3,7 +3,11 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CANVAS_DEVICE_WIDTH, CANVAS_DROP_ID } from "../../constants/editor";
+import {
+  CANVAS_DEVICE_WIDTH,
+  CANVAS_DROP_ID,
+  EMAIL_COLUMN_PADDING_X,
+} from "../../constants/editor";
 import { getBlockDefinition } from "../../document/registry";
 import { CanvasBlock } from "./CanvasBlock";
 import type { BlockDefinition, Variable } from "../../types/block";
@@ -51,7 +55,11 @@ export function Canvas({
     >
       <div
         className="ree-canvas-inner"
-        style={{ maxWidth: CANVAS_DEVICE_WIDTH[device] }}
+        style={{
+          width: CANVAS_DEVICE_WIDTH[device],
+          paddingLeft: EMAIL_COLUMN_PADDING_X,
+          paddingRight: EMAIL_COLUMN_PADDING_X,
+        }}
       >
         {blocks.length === 0 ? (
           <div className="ree-canvas-empty">

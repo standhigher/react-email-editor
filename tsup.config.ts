@@ -5,7 +5,7 @@ export default defineConfig({
   tsconfig: "tsconfig.build.json",
   format: ["esm"],
   dts: true,
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
   splitting: false,
   banner: { js: '"use client";' },

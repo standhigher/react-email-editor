@@ -1,4 +1,5 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
+import { CANVAS_DEVICE_WIDTH, EMAIL_COLUMN_PADDING_X } from "../constants/editor";
 import {
   blockToHtml,
   mergeTemplateData,
@@ -45,8 +46,8 @@ export function documentToHtml(
     '<body style="margin:0;padding:0;background-color:#f4f5f7;word-spacing:normal;">',
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f5f7;">',
     "<tr>",
-    '<td align="center" style="padding:24px 12px;">',
-    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background-color:#ffffff;">',
+    `<td align="center" style="padding:24px ${EMAIL_COLUMN_PADDING_X}px;">`,
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:${CANVAS_DEVICE_WIDTH.desktop}px;background-color:#ffffff;">`,
     "<tr>",
     '<td style="padding:0;">',
     body,

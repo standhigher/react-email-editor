@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import { CANVAS_DEVICE_WIDTH } from "../../constants/editor";
+import {
+  CANVAS_DEVICE_WIDTH,
+  EMAIL_COLUMN_PADDING_X,
+} from "../../constants/editor";
 import { documentToHtml } from "../../render/document-html";
 import type { BlockDefinition, Variable } from "../../types/block";
 import type { EmailDocument } from "../../types/document";
@@ -27,7 +30,9 @@ export function Preview({ document, definitions, variables, device }: PreviewPro
         className="ree-preview-frame"
         title="Email preview"
         srcDoc={html}
-        style={{ width: CANVAS_DEVICE_WIDTH[device] }}
+        style={{
+          width: CANVAS_DEVICE_WIDTH[device] + EMAIL_COLUMN_PADDING_X * 2,
+        }}
       />
     </div>
   );
