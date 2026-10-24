@@ -41,8 +41,6 @@
   color: var(--ree-text);
   font-family: var(--ree-font);
   font-size: 14px;
-  border: 1px solid var(--ree-border);
-  border-radius: var(--ree-radius-lg);
   overflow: hidden;
   box-sizing: border-box;
 }
