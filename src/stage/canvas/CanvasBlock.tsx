@@ -1,8 +1,9 @@
-import type { MouseEvent, SyntheticEvent } from "react";
+import type { SyntheticEvent } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { buildRenderContext } from "../../render/context";
 import { RichText } from "../rich-text/RichText";
+import { HtmlCanvas } from "./components/HtmlCanvas";
 import { canvasBlockStyle } from "./block-style";
 import type { BlockDefinition, Variable } from "../../types/block";
 import type { EmailBlockNode } from "../../types/document";
@@ -38,10 +39,15 @@ export function CanvasBlock({
     useSortable({ id: block.id, data: dragData });
 
   const stop = (event: SyntheticEvent) => event.stopPropagation();
-  const select = (event: MouseEvent) => {
+  const select = (event: SyntheticEvent) => {
     event.stopPropagation();
     onSelect();
   };
+  const renderedHtml = definition
+    ? definition.render(buildRenderContext(block, "canvas"))
+    : "";
+  const usesTemplatePreview =
+    block.type === "html" || block.defaultData !== undefined;
 
   return (
     <div
@@ -131,7 +137,12 @@ export function CanvasBlock({
         </div>
       ) : null}
 
-      <div className="ree-block-content" style={canvasBlockStyle(block, definition?.inlineEdit)}>
+      <div
+        className="ree-block-content"
+        style={canvasBlockStyle(block, definition?.inlineEdit)}
+        onPointerDownCapture={block.type === "html" ? select : undefined}
+        onClickCapture={block.type === "html" ? select : undefined}
+      >
         {definition?.inlineEdit ? (
           <RichText
             initialHtml={String(block.fields.html ?? "")}
@@ -139,6 +150,12 @@ export function CanvasBlock({
             selected={selected}
             onSelect={onSelect}
             onCommit={(html) => onCommitField(block.id, "html", html)}
+          />
+        ) : usesTemplatePreview ? (
+          <HtmlCanvas
+            html={renderedHtml}
+            defaultData={block.defaultData}
+            onSelect={select}
           />
         ) : (
           <div

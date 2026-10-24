@@ -68,6 +68,8 @@ export interface BlockDefinition {
   styleFields?: StyleFieldConfig[];
   defaultFields?: Record<string, unknown>;
   defaultStyle?: EmailBlockStyle;
+  /** Sample data used only to render template HTML on the canvas. */
+  defaultData?: Record<string, unknown>;
   /** Content is edited inline on the canvas and stored in fields.html. */
   inlineEdit?: boolean;
   render: (ctx: BlockRenderContext) => string;

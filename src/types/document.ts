@@ -9,6 +9,8 @@ export interface EmailBlockNode {
   type: string;
   fields: Record<string, unknown>;
   style?: EmailBlockStyle;
+  /** Optional sample data used only when previewing template HTML on the canvas. */
+  defaultData?: Record<string, unknown>;
 }
 
 export interface EmailBlockStyle {

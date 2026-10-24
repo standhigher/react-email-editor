@@ -566,10 +566,45 @@
 
 .ree-block-content {
   border-radius: var(--ree-radius-sm);
+  overflow: hidden;
 }
 
 .ree-block-static {
   min-height: 12px;
+}
+
+.ree-html-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 24px;
+  overflow: hidden;
+}
+
+.ree-html-canvas-hitbox {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ree-html-canvas-hitbox:focus {
+  outline: none;
+}
+
+.ree-html-canvas-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border: 0;
+  transform-origin: top left;
+  pointer-events: none;
 }
 
 .ree-block-content a {

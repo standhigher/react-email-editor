@@ -52,8 +52,12 @@ export function SubjectBar({
       <span className="ree-subject-count">
         {subject.length}/{SUBJECT_MAX_LENGTH}
       </span>
-      <PersonalizationMenu variables={variables} onInsert={insertVariable} />
-      <p className="ree-subject-hint">{PERSONALIZATION_HINT}</p>
+      {variables.length > 0 ? (
+        <>
+          <PersonalizationMenu variables={variables} onInsert={insertVariable} />
+          <p className="ree-subject-hint">{PERSONALIZATION_HINT}</p>
+        </>
+      ) : null}
       <button type="button" className="ree-btn ree-subject-reset" onClick={onReset}>
         Reset
       </button>

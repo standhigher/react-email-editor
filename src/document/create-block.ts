@@ -27,5 +27,8 @@ export function createBlockNode(
     style: definition.defaultStyle
       ? structuredClone(definition.defaultStyle)
       : undefined,
+    defaultData: definition.defaultData
+      ? structuredClone(definition.defaultData)
+      : undefined,
   };
 }
