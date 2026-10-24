@@ -20,6 +20,7 @@ export function StageHeader({
           type="button"
           className={`ree-segment-btn${viewMode === "edit" ? " is-active" : ""}`}
           aria-pressed={viewMode === "edit"}
+          aria-label="Edit"
           title="Edit"
           onClick={() => onViewModeChange("edit")}
         >
@@ -32,6 +33,8 @@ export function StageHeader({
           type="button"
           className={`ree-segment-btn ree-segment-btn-label${viewMode === "preview" ? " is-active" : ""}`}
           aria-pressed={viewMode === "preview"}
+          aria-label="Preview"
+          title="Preview"
           onClick={() => onViewModeChange("preview")}
         >
           Preview
@@ -42,6 +45,7 @@ export function StageHeader({
           type="button"
           className={`ree-segment-btn${device === "desktop" ? " is-active" : ""}`}
           aria-pressed={device === "desktop"}
+          aria-label="Desktop"
           title="Desktop"
           onClick={() => onDeviceChange("desktop")}
         >
@@ -55,6 +59,7 @@ export function StageHeader({
           type="button"
           className={`ree-segment-btn${device === "mobile" ? " is-active" : ""}`}
           aria-pressed={device === "mobile"}
+          aria-label="Mobile"
           title="Mobile"
           onClick={() => onDeviceChange("mobile")}
         >
