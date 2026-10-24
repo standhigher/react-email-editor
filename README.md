@@ -45,6 +45,37 @@ export function EmailPage() {
 也可分别调用 `getDocument()`、`getJson()`、`getHtml()`。返回的文档是独立快照，
 修改快照不会改变编辑器状态。`onChange` 仍可用于订阅内容变化。
 
+HTML 区块可以通过节点上的 `defaultData` 提供模板渲染数据。编辑区和预览区都会
+直接展示渲染后的 HTML；保存的 `fields.html` 以及 `getHtml()` 返回的邮件模板保持原样。
+全局变量通过 `variables` 传入，变量上的 `value` 参与预览渲染；区块级 `defaultData`
+优先覆盖同名全局变量。
+
+```tsx
+const initialDocument = {
+  version: 1,
+  blocks: [{
+    id: "products",
+    type: "html",
+    defaultData: {
+      has_products: true,
+      products: [{ name: "示例商品", price: "¥99" }],
+    },
+    fields: {
+      html: "{{if .has_products}}{{range .products}}<p>{{.name}} {{.price}}</p>{{end}}{{else}}<p>暂无商品</p>{{end}}",
+    },
+  }],
+};
+```
+
+```tsx
+<EmailEditor
+  variables={[{ name: "customer_name", label: "客户名称", value: "张三" }]}
+/>
+```
+
+`getHtml()` 返回包含 Go template 变量的原始邮件模板；
+`getRenderedHtml()` 返回使用全局 `variables` 和各 HTML 区块 `defaultData` 渲染后的邮件 HTML。
+
 `initialDocument` 仅用于首次初始化；Reset 恢复该初始快照。切换另一份文档时，
 请通过 React `key` 创建新的编辑会话。Edit / Preview 切换只改变显示状态，
 保留富文本编辑器实例和撤销历史。Heading / Text 默认包含 `16px` padding。

@@ -8,5 +8,5 @@ export const CANVAS_DROP_ID = "canvas";
 
 export const CANVAS_DEVICE_WIDTH: Record<EditorDevice, number> = {
   desktop: 600,
-  mobile: 375,
+  mobile: 360,
 };

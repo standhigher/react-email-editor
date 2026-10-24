@@ -1,20 +1,24 @@
 import { useMemo } from "react";
 import { CANVAS_DEVICE_WIDTH } from "../../constants/editor";
 import { documentToHtml } from "../../render/document-html";
-import type { BlockDefinition } from "../../types/block";
+import type { BlockDefinition, Variable } from "../../types/block";
 import type { EmailDocument } from "../../types/document";
 import type { EditorDevice } from "../../types/editor";
 
 interface PreviewProps {
   document: EmailDocument;
   definitions: BlockDefinition[];
+  variables: Variable[];
   device: EditorDevice;
 }
 
-export function Preview({ document, definitions, device }: PreviewProps) {
+export function Preview({ document, definitions, variables, device }: PreviewProps) {
   const html = useMemo(
-    () => documentToHtml(document, definitions),
-    [document, definitions],
+    () => documentToHtml(document, definitions, {
+      resolveHtmlTemplates: true,
+      variables,
+    }),
+    [document, definitions, variables],
   );
 
   return (

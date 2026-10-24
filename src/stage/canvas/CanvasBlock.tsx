@@ -2,6 +2,7 @@ import type { SyntheticEvent } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { buildRenderContext } from "../../render/context";
+import { mergeTemplateData, renderBlockContent } from "../../render/block-html";
 import { RichText } from "../rich-text/RichText";
 import { HtmlCanvas } from "./components/HtmlCanvas";
 import { canvasBlockStyle } from "./block-style";
@@ -39,15 +40,17 @@ export function CanvasBlock({
     useSortable({ id: block.id, data: dragData });
 
   const stop = (event: SyntheticEvent) => event.stopPropagation();
-  const select = (event: SyntheticEvent) => {
-    event.stopPropagation();
+  const select = (event?: SyntheticEvent) => {
+    event?.stopPropagation();
     onSelect();
   };
   const renderedHtml = definition
-    ? definition.render(buildRenderContext(block, "canvas"))
+    ? renderBlockContent(block, [definition], "canvas", {
+        resolveHtmlTemplate: block.type === "html",
+        templateData: mergeTemplateData(variables, block.defaultData),
+      })
     : "";
-  const usesTemplatePreview =
-    block.type === "html" || block.defaultData !== undefined;
+  const usesTemplatePreview = block.type === "html";
 
   return (
     <div
@@ -140,8 +143,6 @@ export function CanvasBlock({
       <div
         className="ree-block-content"
         style={canvasBlockStyle(block, definition?.inlineEdit)}
-        onPointerDownCapture={block.type === "html" ? select : undefined}
-        onClickCapture={block.type === "html" ? select : undefined}
       >
         {definition?.inlineEdit ? (
           <RichText
@@ -154,7 +155,6 @@ export function CanvasBlock({
         ) : usesTemplatePreview ? (
           <HtmlCanvas
             html={renderedHtml}
-            defaultData={block.defaultData}
             onSelect={select}
           />
         ) : (

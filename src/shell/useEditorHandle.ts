@@ -4,7 +4,7 @@ import type { EditorSession, EmailEditorHandle } from "../types/editor";
 
 export function useEditorHandle(
   ref: ForwardedRef<EmailEditorHandle>,
-  { getDocument, definitions }: EditorSession,
+  { getDocument, definitions, variables }: EditorSession,
 ) {
   useImperativeHandle(ref, () => ({
     getData: () => {
@@ -13,10 +13,18 @@ export function useEditorHandle(
         document,
         json: JSON.stringify(document, null, 2),
         html: documentToHtml(document, definitions),
+        renderedHtml: documentToHtml(document, definitions, {
+          resolveHtmlTemplates: true,
+          variables,
+        }),
       };
     },
     getDocument,
     getJson: () => JSON.stringify(getDocument(), null, 2),
     getHtml: () => documentToHtml(getDocument(), definitions),
-  }), [getDocument, definitions]);
+    getRenderedHtml: () => documentToHtml(getDocument(), definitions, {
+      resolveHtmlTemplates: true,
+      variables,
+    }),
+  }), [getDocument, definitions, variables]);
 }

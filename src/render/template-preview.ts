@@ -1,4 +1,4 @@
-interface TemplateData {
+export interface TemplateData {
   [key: string]: unknown;
 }
 
@@ -66,21 +66,14 @@ function parseNodes(tokens: Token[], startIndex: number): ParseResult {
 
     const branchMatch = /^(if|range|with)\s+(.+)$/.exec(tag);
     if (branchMatch) {
-      const body = parseNodes(tokens, index + 1);
-      let alternate: TemplateNode[] = [];
-      let nextIndex = body.nextIndex;
-      if (body.stopTag === "else") {
-        const alternateResult = parseNodes(tokens, body.nextIndex + 1);
-        alternate = alternateResult.nodes;
-        nextIndex = alternateResult.nextIndex;
-      }
-      nodes.push({
-        kind: branchMatch[1] as BranchNode["kind"],
-        expression: branchMatch[2],
-        children: body.nodes,
-        alternate,
-      });
-      index = nextIndex + (tokens[nextIndex]?.tag === "end" ? 1 : 0);
+      const branch = parseBranch(
+        tokens,
+        index,
+        branchMatch[1] as BranchNode["kind"],
+        branchMatch[2],
+      );
+      nodes.push(branch.node);
+      index = branch.nextIndex + (tokens[branch.nextIndex]?.tag === "end" ? 1 : 0);
       continue;
     }
 
@@ -88,6 +81,46 @@ function parseNodes(tokens: Token[], startIndex: number): ParseResult {
     index += 1;
   }
   return { nodes, nextIndex: index };
+}
+
+interface ParsedBranch {
+  node: BranchNode;
+  nextIndex: number;
+}
+
+function parseBranch(
+  tokens: Token[],
+  startIndex: number,
+  kind: BranchNode["kind"],
+  expression: string,
+): ParsedBranch {
+  const body = parseNodes(tokens, startIndex + 1);
+  let alternate: TemplateNode[] = [];
+  let nextIndex = body.nextIndex;
+
+  if (body.stopTag === "else") {
+    const elseTag = tokens[body.nextIndex]?.tag ?? "";
+    const elseIfMatch = /^else\s+if\s+(.+)$/.exec(elseTag);
+    if (elseIfMatch) {
+      const nested = parseBranch(
+        tokens,
+        body.nextIndex,
+        "if",
+        elseIfMatch[1],
+      );
+      alternate = [nested.node];
+      nextIndex = nested.nextIndex;
+    } else {
+      const alternateResult = parseNodes(tokens, body.nextIndex + 1);
+      alternate = alternateResult.nodes;
+      nextIndex = alternateResult.nextIndex;
+    }
+  }
+
+  return {
+    node: { kind, expression, children: body.nodes, alternate },
+    nextIndex,
+  };
 }
 
 function readPath(value: unknown, path: string): unknown {
@@ -111,6 +144,40 @@ function resolveExpression(expression: string, root: TemplateData, current: unkn
   if (trimmed.startsWith("$.")) return readPath(root, trimmed.slice(2));
   if (trimmed.startsWith(".")) return readPath(current, trimmed.slice(1));
   return readPath(current, trimmed);
+}
+
+/** Normalizes both `{{name}}` and `{{.name}}` to the Go-template dot form. */
+function normalizeExpression(expression: string): string {
+  const trimmed = expression.trim();
+  if (
+    trimmed === "" ||
+    trimmed === "." ||
+    trimmed.startsWith(".") ||
+    trimmed.startsWith("$") ||
+    /^(if|range|with|else|end)\b/.test(trimmed) ||
+    /^(true|false|nil)$/.test(trimmed) ||
+    /^[-+]?\d/.test(trimmed) ||
+    ((trimmed.startsWith('"') || trimmed.startsWith("'")) &&
+      trimmed.endsWith(trimmed[0]))
+  ) {
+    return trimmed;
+  }
+  return `.${trimmed}`;
+}
+
+function normalizeTemplateNodes(nodes: TemplateNode[]): TemplateNode[] {
+  return nodes.map((node) => {
+    if (node.kind === "text") return node;
+    if (node.kind === "expression") {
+      return { ...node, expression: normalizeExpression(node.expression) };
+    }
+    return {
+      ...node,
+      expression: normalizeExpression(node.expression),
+      children: normalizeTemplateNodes(node.children),
+      alternate: normalizeTemplateNodes(node.alternate),
+    };
+  });
 }
 
 function isTruthy(value: unknown): boolean {
@@ -155,11 +222,12 @@ function renderNodes(nodes: TemplateNode[], root: TemplateData, current: unknown
   }).join("");
 }
 
-/** Uses block sample data only for the canvas; email output keeps the template. */
+/** Resolves template HTML for the editor and preview while leaving stored source untouched. */
 export function renderTemplatePreview(
   html: string,
   defaultData?: TemplateData,
 ): string {
   if (defaultData === undefined) return html;
-  return renderNodes(parseNodes(tokenize(html), 0).nodes, defaultData, defaultData);
+  const nodes = normalizeTemplateNodes(parseNodes(tokenize(html), 0).nodes);
+  return renderNodes(nodes, defaultData, defaultData);
 }

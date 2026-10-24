@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useRef, type SyntheticEvent } from "react";
-import { renderTemplatePreview } from "../../../render/template-preview";
-
+import { useCallback, useEffect, useRef } from "react";
 interface HtmlCanvasProps {
   html: string;
-  defaultData?: Record<string, unknown>;
-  onSelect: (event: SyntheticEvent) => void;
+  onSelect: () => void;
 }
 
-/** 隔离完整邮件文档的 CSS；事件交给外层区块，源码保持原样。 */
-export function HtmlCanvas({ html, defaultData, onSelect }: HtmlCanvasProps) {
+/** HTML 标签内容用 iframe 隔离 CSS，纯文本直接渲染；事件交给外层区块。 */
+export function HtmlCanvas({ html, onSelect }: HtmlCanvasProps) {
+  const hasHtmlTag = /<\/?[a-z][\w:-]*(?:\s[^>]*)?>/i.test(html);
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const cleanupRef = useRef<() => void>();
@@ -64,28 +62,37 @@ export function HtmlCanvas({ html, defaultData, onSelect }: HtmlCanvasProps) {
     };
   }, []);
 
-  useEffect(() => () => cleanupRef.current?.(), []);
+  useEffect(() => () => cleanupRef.current?.(), [hasHtmlTag, html]);
+
+  if (!hasHtmlTag) {
+    return (
+      <div
+        className="ree-html-canvas ree-html-canvas-text"
+        onClick={onSelect}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  }
 
   return (
     <div
       ref={containerRef}
       className="ree-html-canvas"
-      onPointerDown={onSelect}
-      onClick={onSelect}
+      onClick={() => onSelect()}
     >
       <button
         type="button"
         className="ree-html-canvas-hitbox"
         aria-label="Select HTML block"
         tabIndex={-1}
-        onPointerDown={onSelect}
-        onClick={onSelect}
+        onPointerDown={() => onSelect()}
+        onClick={() => onSelect()}
       />
       <iframe
         ref={frameRef}
         className="ree-html-canvas-frame"
         title="HTML block preview"
-        srcDoc={renderTemplatePreview(html, defaultData)}
+        srcDoc={html}
         sandbox="allow-same-origin"
         tabIndex={-1}
         onLoad={observeContent}

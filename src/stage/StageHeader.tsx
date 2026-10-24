@@ -1,3 +1,4 @@
+import type { MouseEvent, PointerEvent } from "react";
 import type { EditorDevice, EditorViewMode } from "../types/editor";
 
 interface StageHeaderProps {
@@ -13,6 +14,24 @@ export function StageHeader({
   onViewModeChange,
   onDeviceChange,
 }: StageHeaderProps) {
+  const stopDrag = (event: PointerEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+  };
+  const handleModeClick = (
+    event: MouseEvent<HTMLButtonElement>,
+    mode: EditorViewMode,
+  ) => {
+    event.stopPropagation();
+    onViewModeChange(mode);
+  };
+  const handleDeviceClick = (
+    event: MouseEvent<HTMLButtonElement>,
+    nextDevice: EditorDevice,
+  ) => {
+    event.stopPropagation();
+    onDeviceChange(nextDevice);
+  };
+
   return (
     <div className="ree-col-head ree-stage-head">
       <div className="ree-segment" role="group" aria-label="Editor mode">
@@ -22,7 +41,8 @@ export function StageHeader({
           aria-pressed={viewMode === "edit"}
           aria-label="Edit"
           title="Edit"
-          onClick={() => onViewModeChange("edit")}
+          onPointerDown={stopDrag}
+          onClick={(event) => handleModeClick(event, "edit")}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M12 20h9" />
@@ -35,9 +55,13 @@ export function StageHeader({
           aria-pressed={viewMode === "preview"}
           aria-label="Preview"
           title="Preview"
-          onClick={() => onViewModeChange("preview")}
+          onPointerDown={stopDrag}
+          onClick={(event) => handleModeClick(event, "preview")}
         >
-          Preview
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+            <circle cx="12" cy="12" r="2.5" />
+          </svg>
         </button>
       </div>
       <div className="ree-segment" role="group" aria-label="Canvas device">
@@ -47,7 +71,8 @@ export function StageHeader({
           aria-pressed={device === "desktop"}
           aria-label="Desktop"
           title="Desktop"
-          onClick={() => onDeviceChange("desktop")}
+          onPointerDown={stopDrag}
+          onClick={(event) => handleDeviceClick(event, "desktop")}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <rect x="3" y="4" width="18" height="12" rx="1.5" />
@@ -61,7 +86,8 @@ export function StageHeader({
           aria-pressed={device === "mobile"}
           aria-label="Mobile"
           title="Mobile"
-          onClick={() => onDeviceChange("mobile")}
+          onPointerDown={stopDrag}
+          onClick={(event) => handleDeviceClick(event, "mobile")}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <rect x="7" y="2.5" width="10" height="19" rx="2" />

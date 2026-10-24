@@ -1,14 +1,37 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
-import { blockToHtml } from "./block-html";
-import type { BlockDefinition } from "../types/block";
+import {
+  blockToHtml,
+  mergeTemplateData,
+} from "./block-html";
+import type { BlockDefinition, Variable } from "../types/block";
 import type { EmailDocument } from "../types/document";
+import type { TemplateData } from "./template-preview";
+
+export interface DocumentHtmlOptions {
+  resolveHtmlTemplates?: boolean;
+  variables?: Variable[];
+  templateData?: TemplateData;
+}
 
 export function documentToHtml(
   document: EmailDocument,
   definitions: BlockDefinition[] = DEFAULT_BLOCKS,
+  options: DocumentHtmlOptions = {},
 ): string {
   const body = document.blocks
-    .map((node) => blockToHtml(node, definitions, "email"))
+    .map((node) => {
+      const blockData = {
+        ...(options.templateData ?? {}),
+        ...node.defaultData,
+      };
+      return blockToHtml(node, definitions, "email", {
+        resolveHtmlTemplate: options.resolveHtmlTemplates,
+        templateData: mergeTemplateData(
+          options.variables ?? [],
+          Object.keys(blockData).length > 0 ? blockData : undefined,
+        ),
+      });
+    })
     .join("\n");
 
   return [

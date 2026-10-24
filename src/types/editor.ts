@@ -20,6 +20,7 @@ export interface EmailEditorData {
   document: EmailDocument;
   json: string;
   html: string;
+  renderedHtml: string;
 }
 
 export interface EmailEditorHandle {
@@ -27,6 +28,7 @@ export interface EmailEditorHandle {
   getDocument: () => EmailDocument;
   getJson: () => string;
   getHtml: () => string;
+  getRenderedHtml: () => string;
 }
 
 export interface EmailEditorProps {

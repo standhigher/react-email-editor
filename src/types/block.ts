@@ -55,7 +55,7 @@ export interface BlockRenderContext {
   block: EmailBlockNode;
   fields: Record<string, unknown>;
   style: EmailBlockStyle;
-  /** canvas = static demo; email = may contain Go template directives. */
+  /** canvas/email identify the consumer; HTML template resolution is applied by the shared renderer. */
   mode: RenderMode;
 }
 
@@ -68,7 +68,7 @@ export interface BlockDefinition {
   styleFields?: StyleFieldConfig[];
   defaultFields?: Record<string, unknown>;
   defaultStyle?: EmailBlockStyle;
-  /** Sample data used only to render template HTML on the canvas. */
+  /** Sample data used to render template HTML in the editor and preview. */
   defaultData?: Record<string, unknown>;
   /** Content is edited inline on the canvas and stored in fields.html. */
   inlineEdit?: boolean;
@@ -79,4 +79,6 @@ export interface Variable {
   name: string;
   label: string;
   description?: string;
+  /** Global sample value used when rendering HTML block templates. */
+  value?: unknown;
 }

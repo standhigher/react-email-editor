@@ -289,7 +289,7 @@
 }
 
 .ree-segment-btn-label {
-  padding: 0 14px;
+  padding: 0 10px;
 }
 
 .ree-col-left {
@@ -578,6 +578,11 @@
   width: 100%;
   min-height: 24px;
   overflow: hidden;
+}
+
+.ree-html-canvas-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .ree-html-canvas-hitbox {

@@ -41,12 +41,13 @@ export function Canvas({
     id: CANVAS_DROP_ID,
     data: { kind: "canvas" },
   });
-
   return (
     <div
       ref={setNodeRef}
       className={`ree-canvas${isOver ? " is-over" : ""}`}
-      onClick={() => onSelect(null)}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onSelect(null);
+      }}
     >
       <div
         className="ree-canvas-inner"

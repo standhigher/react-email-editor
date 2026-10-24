@@ -48,6 +48,7 @@ export function Stage({
         <Preview
           document={session.document}
           definitions={session.definitions}
+          variables={session.variables}
           device={device}
         />
       </div>

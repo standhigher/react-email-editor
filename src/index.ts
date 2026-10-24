@@ -9,7 +9,17 @@ export { DEFAULT_BLOCKS } from "./blocks/registry";
 export { createEmailDocument } from "./document/create-document";
 export { createBlockNode } from "./document/create-block";
 export { documentToHtml } from "./render/document-html";
-export { blockToHtml, renderBlock } from "./render/block-html";
+export type { DocumentHtmlOptions } from "./render/document-html";
+export {
+  blockToHtml,
+  mergeTemplateData,
+  renderBlock,
+  renderBlockContent,
+  variablesToTemplateData,
+} from "./render/block-html";
+export type { BlockRenderOptions } from "./render/block-html";
+export { renderTemplatePreview } from "./render/template-preview";
+export type { TemplateData } from "./render/template-preview";
 export { buildRenderContext } from "./render/context";
 export { getBlockDefinition } from "./document/registry";
 export { generateId } from "./utils/id";
