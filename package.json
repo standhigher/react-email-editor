@@ -4,15 +4,23 @@
   "type": "module",
   "description": "JSON-driven React email template editor (three-panel: blocks / canvas / inspector).",
   "exports": {
-    ".": "./src/index.ts",
-    "./styles.css": "./src/styles.css"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
   },
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
-    "src",
+    "dist",
     "README.md"
   ],
   "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch src",
+    "prepack": "pnpm build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src"
   },
@@ -23,6 +31,7 @@
   "devDependencies": {
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "tsup": "^8",
     "typescript": "^5"
   },
   "dependencies": {
