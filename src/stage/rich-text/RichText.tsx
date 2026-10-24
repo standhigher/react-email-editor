@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import type { Variable } from "./types";
+import type { Variable } from "../../types/block";
 
 export interface RichTextProps {
   initialHtml: string;
@@ -35,8 +35,13 @@ export function RichText({
     ],
     content: initialHtml,
     immediatelyRender: false,
-    onUpdate: ({ editor }) => onCommit(editor.getHTML()),
+    onUpdate: ({ editor: current }) => onCommit(current.getHTML()),
   });
+
+  useEffect(() => {
+    if (!editor || editor.getHTML() === initialHtml) return;
+    editor.commands.setContent(initialHtml, { emitUpdate: false });
+  }, [editor, initialHtml]);
 
   if (!editor) {
     return <div className="ree-rte-loading">Loading editor…</div>;
@@ -58,18 +63,18 @@ export function RichText({
     setVarOpen(false);
   };
 
-  const btn = (active: boolean) =>
+  const toolClass = (active: boolean) =>
     `ree-tool-btn${active ? " is-active" : ""}`;
 
   return (
     <div className="ree-rte" onClick={onSelect}>
       {selected ? (
-        <div className="ree-rte-toolbar" onMouseDown={(e) => e.preventDefault()}>
+        <div className="ree-rte-toolbar" onMouseDown={(event) => event.preventDefault()}>
           <button
             type="button"
-            className={btn(editor.isActive("bold"))}
-            onMouseDown={(e) => {
-              e.preventDefault();
+            className={toolClass(editor.isActive("bold"))}
+            onMouseDown={(event) => {
+              event.preventDefault();
               editor.chain().focus().toggleBold().run();
             }}
             title="Bold"
@@ -78,9 +83,9 @@ export function RichText({
           </button>
           <button
             type="button"
-            className={btn(editor.isActive("italic"))}
-            onMouseDown={(e) => {
-              e.preventDefault();
+            className={toolClass(editor.isActive("italic"))}
+            onMouseDown={(event) => {
+              event.preventDefault();
               editor.chain().focus().toggleItalic().run();
             }}
             title="Italic"
@@ -89,9 +94,9 @@ export function RichText({
           </button>
           <button
             type="button"
-            className={btn(editor.isActive("underline"))}
-            onMouseDown={(e) => {
-              e.preventDefault();
+            className={toolClass(editor.isActive("underline"))}
+            onMouseDown={(event) => {
+              event.preventDefault();
               editor.chain().focus().toggleUnderline().run();
             }}
             title="Underline"
@@ -100,9 +105,9 @@ export function RichText({
           </button>
           <button
             type="button"
-            className={btn(editor.isActive("strike"))}
-            onMouseDown={(e) => {
-              e.preventDefault();
+            className={toolClass(editor.isActive("strike"))}
+            onMouseDown={(event) => {
+              event.preventDefault();
               editor.chain().focus().toggleStrike().run();
             }}
             title="Strikethrough"
@@ -111,9 +116,9 @@ export function RichText({
           </button>
           <button
             type="button"
-            className={btn(editor.isActive("link"))}
-            onMouseDown={(e) => {
-              e.preventDefault();
+            className={toolClass(editor.isActive("link"))}
+            onMouseDown={(event) => {
+              event.preventDefault();
               setLink();
             }}
             title="Link"
@@ -125,9 +130,9 @@ export function RichText({
               <button
                 type="button"
                 className="ree-tool-btn"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  setVarOpen((v) => !v);
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  setVarOpen((open) => !open);
                 }}
                 title="Insert variable"
               >
@@ -135,18 +140,18 @@ export function RichText({
               </button>
               {varOpen ? (
                 <div className="ree-var-menu">
-                  {variables.map((v) => (
+                  {variables.map((variable) => (
                     <button
-                      key={v.name}
+                      key={variable.name}
                       type="button"
                       className="ree-var-item"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        insertVariable(v.name);
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                        insertVariable(variable.name);
                       }}
                     >
-                      <span className="ree-var-name">{`{{${v.name}}}`}</span>
-                      <span className="ree-var-label">{v.label}</span>
+                      <span className="ree-var-name">{`{{${variable.name}}}`}</span>
+                      <span className="ree-var-label">{variable.label}</span>
                     </button>
                   ))}
                 </div>
