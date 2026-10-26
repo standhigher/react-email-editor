@@ -1,6 +1,7 @@
 import type { BlockDefinition } from "../types/block";
+import { htmlContent } from "../render/html-content";
 import { ICON_HTML } from "./icons";
-import { BG_COLOR, PADDING } from "./style-fields";
+import { COMMON_STYLE_FIELDS, TYPOGRAPHY_FIELDS } from "./style-fields";
 
 export const htmlBlock: BlockDefinition = {
   type: "html",
@@ -12,12 +13,12 @@ export const htmlBlock: BlockDefinition = {
       type: "html",
       name: "html",
       label: "HTML",
-      defaultValue: '<p style="margin:0;">Custom HTML block</p>',
+      defaultValue: '<p>Custom HTML block</p>',
       rows: 10,
       placeholder: "Paste raw HTML…",
     },
   ],
   defaultStyle: { dimension: { padding: "8px" } },
-  styleFields: [PADDING, BG_COLOR],
-  render: ({ fields }) => String(fields.html ?? ""),
+  styleFields: [...COMMON_STYLE_FIELDS, ...TYPOGRAPHY_FIELDS],
+  render: ({ fields, style, global, block }) => htmlContent(String(fields.html ?? ""), style, global, block.id),
 };

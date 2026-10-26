@@ -1,0 +1,66 @@
+/* ---------- 变量 ---------- */
+
+.ree-var-wrap {
+  position: relative;
+}
+
+.ree-var-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  min-width: 30px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--ree-radius-sm);
+  cursor: pointer;
+  color: var(--ree-muted);
+  font-size: 12px;
+}
+
+.ree-var-btn:hover {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-var-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  min-width: 200px;
+  background: var(--ree-panel);
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius);
+  box-shadow: var(--ree-shadow-lg);
+  padding: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.ree-var-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: var(--ree-radius-sm);
+  cursor: pointer;
+  text-align: left;
+}
+
+.ree-var-item:hover {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-var-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--ree-primary);
+}
+
+.ree-var-label {
+  font-size: 12px;
+  color: var(--ree-muted);
+}
+

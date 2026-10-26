@@ -33,24 +33,23 @@ export function Inspector({
   return (
     <aside className="ree-col ree-col-right">
       <div className="ree-col-head ree-inspector-bar">
-        <div className="ree-segment" role="group" aria-label="Inspector panel">
+        <div className="ree-inspector-tabs" role="group" aria-label="Inspector panel">
           <button
             type="button"
-            className={`ree-segment-btn ree-segment-btn-label${panel === "global" ? " is-active" : ""}`}
+            className={`ree-inspector-tab${panel === "global" ? " is-active" : ""}`}
             aria-pressed={panel === "global"}
             onClick={() => onPanelChange("global")}
           >
-            Global
+            GLOBAL
           </button>
-          <span className="ree-segment-divider" aria-hidden="true" />
           <button
             type="button"
-            className={`ree-segment-btn ree-segment-btn-label${showBlock ? " is-active" : ""}`}
+            className={`ree-inspector-tab${showBlock ? " is-active" : ""}`}
             aria-pressed={Boolean(showBlock)}
             disabled={!block || !definition}
             onClick={() => onPanelChange("block")}
           >
-            {definition?.title ?? "Block"}
+            BLOCK
           </button>
         </div>
       </div>
@@ -60,7 +59,7 @@ export function Inspector({
             block={block}
             definition={definition}
             variables={variables}
-            textColor={global.textColor}
+            global={global}
             onCommitField={onCommitField}
             onCommitStyle={onCommitStyle}
           />

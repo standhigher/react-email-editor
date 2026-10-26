@@ -1,0 +1,53 @@
+/* ==========================================================================
+   @standhigher/react-email-editor
+   Polaris 风格主题（浅色），CSS 变量 + ree- 前缀。间距刻意放大，营造大气留白。
+   ========================================================================== */
+
+.ree-root {
+  --ree-bg: #f1f1f1;            /* --p-color-bg-app */
+  --ree-panel: #ffffff;          /* --p-color-bg */
+  --ree-panel-secondary: #f6f6f7; /* --p-color-bg-surface-secondary */
+  --ree-border: #e3e3e5;         /* --p-color-border */
+  --ree-border-subdued: #ececec;
+  --ree-text: #202223;           /* --p-color-text */
+  --ree-muted: #6d7175;          /* --p-color-text-subdued */
+  --ree-primary: #005bd3;        /* --p-color-bg-fill-brand */
+  --ree-primary-hover: #084eb3;
+  --ree-primary-fg: #ffffff;
+  --ree-primary-soft: #eef4ff;
+  --ree-accent-border: #a9c8f4;   /* 区块 hover 浅蓝边框 */
+  --ree-accent-bg: #f1f6ff;       /* 区块 hover 浅蓝背景 */
+  --ree-accent-bg-strong: #e8f1ff; /* 区块选中背景 */
+  --ree-danger: #d72c0d;
+  --ree-danger-soft: #fbeae5;
+
+  --ree-radius-sm: 6px;
+  --ree-radius: 8px;
+  --ree-radius-lg: 12px;
+
+  --ree-shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.05);
+  --ree-shadow-md: 0 2px 16px rgba(31, 33, 36, 0.08);
+  --ree-shadow-lg: 0 6px 32px rgba(31, 33, 36, 0.16);
+
+  --ree-font: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: var(--ree-bg);
+  color: var(--ree-text);
+  font-family: var(--ree-font);
+  font-size: 14px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ree-root *,
+.ree-root *::before,
+.ree-root *::after {
+  box-sizing: border-box;
+}
+

@@ -3,7 +3,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { buildRenderContext } from "../../render/context";
 import { mergeTemplateData, renderBlockContent } from "../../render/block-html";
-import { resolvedFontWeight } from "../../utils/style";
+import { cssSpacing } from "../../utils/css-values";
+import { typographyStyle, resolvedFontWeight } from "../../utils/style";
 import { RichText } from "../rich-text/RichText";
 import { HtmlCanvas } from "./components/HtmlCanvas";
 import { canvasBlockStyle } from "./block-style";
@@ -62,6 +63,7 @@ export function CanvasBlock({
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
+        padding: cssSpacing(block.style?.dimension?.margin),
       }}
       className={[
         "ree-block",
@@ -146,7 +148,7 @@ export function CanvasBlock({
 
       <div
         className={`ree-block-content${definition?.inlineEdit ? " is-inline" : ""}`}
-        style={canvasBlockStyle(block, definition?.inlineEdit, global)}
+        style={canvasBlockStyle(block, global)}
       >
         {definition?.inlineEdit ? (
           <RichText
@@ -154,8 +156,8 @@ export function CanvasBlock({
             variables={variables}
             selected={selected}
             inherited={{
-              fontFamily: global.fontFamily,
-              fontSize: block.style?.typography?.fontSize || "15px",
+              fontFamily: String(typographyStyle(block.style, global).fontFamily),
+              fontSize: String(typographyStyle(block.style, global).fontSize),
               color: block.style?.typography?.color || global.textColor,
               fontWeight: resolvedFontWeight(
                 block.style?.typography?.fontWeight,

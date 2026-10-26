@@ -1,92 +1,88 @@
+import { useId } from "react";
+import { cssLength, formatCssLength, readCssLength } from "../utils/css-values";
 import { AlignControl } from "./components/AlignControl";
 import { ColorControl } from "./components/ColorControl";
-import { RangeControl } from "./components/RangeControl";
+import { CssValueInput } from "./components/CssValueInput";
+import { LengthControl } from "./components/LengthControl";
+import { ResetButton } from "./components/ResetButton";
 import { SelectControl } from "./components/SelectControl";
+import { SpacingControl } from "./components/SpacingControl";
 import type { StyleFieldConfig } from "../types/block";
 
 interface StyleControlProps {
   config: StyleFieldConfig;
   value: string;
-  inheritedColor?: string;
+  fallback?: string;
+  resetLabel?: string;
+  /** 点击重置时写回的值。空字符串表示清除覆盖。 */
+  resetTo?: string;
+  /** 未传时，只要当前有存储值就显示重置。 */
+  showReset?: boolean;
   onChange: (value: string) => void;
 }
 
-export function StyleControl({
-  config,
-  value,
-  inheritedColor,
-  onChange,
-}: StyleControlProps) {
-  const numeric = parseFloat(value);
-  const hasNumeric = Number.isFinite(numeric);
-  const numberValue = hasNumeric ? numeric : (config.min ?? 0);
-  const format = (next: number) => (config.unit ? `${next}${config.unit}` : String(next));
-  const readout = config.control === "range" ? `${numberValue}${config.unit ?? ""}` : null;
+function lengthUnits(config: StyleFieldConfig): string[] {
+  if (config.units?.length) return config.units;
+  if (config.unit) return [config.unit];
+  return [];
+}
+
+export function StyleControl({ config, value, fallback, resetLabel = "Reset", resetTo, showReset, onChange }: StyleControlProps) {
+  const id = useId();
+  const units = lengthUnits(config);
+  const stored = value === "auto" && units.length > 0 && !units.includes("auto") ? "" : value;
+  const actual = stored || fallback || config.defaultValue || "";
+  const numeric = config.control === "range" || config.control === "number";
+  const parsed = numeric ? readCssLength(actual, units) : null;
+  const options = config.options ?? [];
+  const selectOptions = actual && !options.some((option) => option.value === actual)
+    ? [{ label: actual, value: actual }, ...options] : options;
+  const reset = (showReset ?? Boolean(value)) ? <ResetButton label={resetLabel} onClick={() => onChange(resetTo ?? "")} /> : null;
+
+  if (config.control === "color") {
+    return (
+      <div className="ree-color-chip-row">
+        <ColorControl label={config.label} value={actual} onChange={onChange} />
+        {reset}
+      </div>
+    );
+  }
 
   return (
     <div className="ree-field">
       <div className="ree-field-label">
-        <span>{config.label}</span>
-        {readout ? <span className="ree-field-value">{readout}</span> : null}
+        <label htmlFor={numeric ? id : undefined}>{config.label}</label>
+        <span className="ree-field-meta">
+          {parsed ? <span className="ree-field-value">{formatCssLength(parsed.amount, parsed.unit)}</span> : null}
+          {reset}
+        </span>
       </div>
-
-      {config.control === "color" ? (
-        <ColorControl
-          value={value}
-          fallback={config.id === "typography.color" ? inheritedColor : undefined}
-          allowEmpty={config.id === "typography.color"}
-          onChange={onChange}
-        />
-      ) : null}
-
-      {config.control === "alignment" ? (
-        <AlignControl value={value} onChange={onChange} />
-      ) : null}
-
-      {config.control === "select" ? (
-        <SelectControl
-          value={value}
-          options={config.options ?? []}
-          onChange={onChange}
-        />
-      ) : null}
-
-      {config.control === "number" ? (
-        <div className="ree-input-group">
-          <input
-            type="number"
-            className="ree-input ree-input-number"
-            value={numberValue}
-            min={config.min}
-            max={config.max}
-            step={config.step ?? 1}
-            onChange={(event) => {
-              const next = Number(event.target.value);
-              if (Number.isFinite(next)) onChange(format(next));
-            }}
-          />
-          {config.unit ? <span className="ree-input-unit">{config.unit}</span> : null}
-        </div>
-      ) : null}
-
-      {config.control === "range" ? (
-        <RangeControl
-          value={numberValue}
+      {config.control === "alignment" ? <AlignControl value={actual} onChange={onChange} /> : null}
+      {config.control === "select" ? <SelectControl label={config.label} value={actual} options={selectOptions} onChange={onChange} /> : null}
+      {numeric && parsed ? (
+        <LengthControl
+          id={id}
+          label={config.label}
+          amount={parsed.amount}
+          unit={parsed.unit}
+          units={units}
           min={config.min}
           max={config.max}
           step={config.step}
-          onChange={(next) => onChange(format(next))}
+          onChange={onChange}
         />
       ) : null}
-
       {config.control === "text" ? (
-        <input
-          className="ree-input"
-          value={value}
-          placeholder="e.g. 16px"
-          onChange={(event) => onChange(event.target.value)}
+        <CssValueInput
+          label={config.label}
+          value={actual}
+          placeholder={config.placeholder}
+          onChange={(next) => {
+            if (!next || cssLength(next, "")) onChange(next);
+          }}
         />
       ) : null}
+      {config.control === "spacing" ? <SpacingControl label={config.label} value={actual} onChange={onChange} /> : null}
     </div>
   );
 }

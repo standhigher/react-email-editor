@@ -1,14 +1,11 @@
+import type { CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  CANVAS_DROP_ID,
-  EMAIL_COLUMN_PADDING_X,
-  contentColumnWidth,
-  emailViewportWidth,
-} from "../../constants/editor";
+import { CANVAS_DROP_ID } from "../../constants/editor";
+import { surfaceStyle, viewportWidth } from "../../render/layout";
 import { getBlockDefinition } from "../../document/registry";
 import { CanvasBlock } from "./CanvasBlock";
 import type { BlockDefinition, Variable } from "../../types/block";
@@ -67,49 +64,59 @@ export function Canvas({
       }}
     >
       <div
-        className="ree-email-surface"
+        className="ree-email-viewport"
         style={{
-          width: emailViewportWidth(device),
-          backgroundColor: global.backgroundColor || "#ffffff",
+          width: viewportWidth(device, global),
+          fontSize: global.defaultFontSize,
+          fontFamily: global.fontFamily,
+          backgroundColor: global.backgroundColor,
+          marginLeft: global.contentAlign === "left" ? 0 : "auto",
+          marginRight: global.contentAlign === "right" ? 0 : "auto",
         }}
       >
-        <div
-          className="ree-canvas-inner"
-          style={{
-            width: contentColumnWidth(device, global.contentWidth),
-            paddingLeft: EMAIL_COLUMN_PADDING_X,
-            paddingRight: EMAIL_COLUMN_PADDING_X,
-            marginLeft: global.contentAlign === "left" ? 0 : "auto",
-            marginRight: global.contentAlign === "right" ? 0 : "auto",
-          }}
-        >
-        {blocks.length === 0 ? (
-          <div className="ree-canvas-empty">
-            Drag a block here or click one to get started
-          </div>
-        ) : (
-          <SortableContext
-            items={blocks.map((block) => block.id)}
-            strategy={verticalListSortingStrategy}
+        <div className="ree-email-outer" style={{ padding: global.outerPadding }}>
+          <div
+            className="ree-email-surface"
+            style={{
+              ...surfaceStyle(global),
+              maxWidth: global.contentWidth,
+              marginLeft: global.contentAlign === "left" ? 0 : "auto",
+              marginRight: global.contentAlign === "right" ? 0 : "auto",
+            }}
           >
-            {blocks.map((block) => (
-              <CanvasBlock
-                key={block.id}
-                block={block}
-                global={global}
-                definition={getBlockDefinition(block.type, definitions)}
-                selected={block.id === selectedId}
-                isOver={overId === block.id}
-                variables={variables}
-                onSelect={() => onSelect(block.id)}
-                onCommitField={onCommitField}
-                onMove={(direction) => onMove(block.id, direction)}
-                onDuplicate={() => onDuplicate(block.id)}
-                onRemove={() => onRemove(block.id)}
-              />
-            ))}
-          </SortableContext>
-        )}
+            <div
+              className="ree-canvas-inner"
+              style={{ "--ree-block-gap": global.blockGap } as CSSProperties}
+            >
+              {blocks.length === 0 ? (
+                <div className="ree-canvas-empty">
+                  Drag a block here or click one to get started
+                </div>
+              ) : (
+                <SortableContext
+                  items={blocks.map((block) => block.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  {blocks.map((block) => (
+                    <CanvasBlock
+                      key={block.id}
+                      block={block}
+                      global={global}
+                      definition={getBlockDefinition(block.type, definitions)}
+                      selected={block.id === selectedId}
+                      isOver={overId === block.id}
+                      variables={variables}
+                      onSelect={() => onSelect(block.id)}
+                      onCommitField={onCommitField}
+                      onMove={(direction) => onMove(block.id, direction)}
+                      onDuplicate={() => onDuplicate(block.id)}
+                      onRemove={() => onRemove(block.id)}
+                    />
+                  ))}
+                </SortableContext>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

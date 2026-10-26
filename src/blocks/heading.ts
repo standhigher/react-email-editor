@@ -1,13 +1,8 @@
 import type { BlockDefinition } from "../types/block";
 import { typographyCss } from "../utils/style";
 import { ICON_HEADING } from "./icons";
-import {
-  FONT_SIZE,
-  FONT_WEIGHT,
-  LINE_HEIGHT,
-  PADDING,
-  TEXT_COLOR,
-} from "./style-fields";
+import { COMMON_STYLE_FIELDS, TYPOGRAPHY_FIELDS } from "./style-fields";
+import { styleRichText } from "../render/content-style";
 
 export const headingBlock: BlockDefinition = {
   type: "heading",
@@ -24,7 +19,7 @@ export const headingBlock: BlockDefinition = {
       lineHeight: "1.25",
     },
   },
-  styleFields: [FONT_SIZE, FONT_WEIGHT, LINE_HEIGHT, TEXT_COLOR, PADDING],
+  styleFields: [...COMMON_STYLE_FIELDS, ...TYPOGRAPHY_FIELDS],
   render: ({ fields, style, global }) =>
-    `<div style="${typographyCss(style, global)}">${String(fields.html ?? "")}</div>`,
+    `<div style="display:flow-root;${typographyCss(style, global)}">${styleRichText(String(fields.html ?? ""), style, global)}</div>`,
 };

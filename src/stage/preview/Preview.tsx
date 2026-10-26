@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { emailViewportWidth } from "../../constants/editor";
+import { viewportWidth } from "../../render/layout";
 import { documentToHtml } from "../../render/document-html";
 import type { BlockDefinition, Variable } from "../../types/block";
 import type { EmailDocument } from "../../types/document";
@@ -28,7 +28,10 @@ export function Preview({ document, definitions, variables, device }: PreviewPro
         title="Email preview"
         srcDoc={html}
         style={{
-          width: emailViewportWidth(device),
+          width: viewportWidth(device, document.global),
+          fontSize: document.global.defaultFontSize,
+          marginLeft: document.global.contentAlign === "left" ? 0 : "auto",
+          marginRight: document.global.contentAlign === "right" ? 0 : "auto",
           backgroundColor: document.global.backgroundColor || "#ffffff",
         }}
       />

@@ -1,0 +1,43 @@
+/* ---------- 区块库 ---------- */
+
+.ree-lib {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.ree-lib-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius);
+  cursor: grab;
+  user-select: none;
+  background: var(--ree-panel);
+  transition: box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.ree-lib-item:hover {
+  border-color: var(--ree-primary);
+  box-shadow: var(--ree-shadow-sm);
+}
+
+.ree-lib-item.is-dragging {
+  opacity: 0.4;
+}
+
+.ree-lib-icon {
+  display: inline-flex;
+  color: var(--ree-muted);
+  flex-shrink: 0;
+}
+
+.ree-lib-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+

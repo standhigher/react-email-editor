@@ -23,9 +23,12 @@ export interface FieldConfig {
   placeholder?: string;
   options?: FieldOption[];
   rows?: number;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
-export type StyleGroup = "dimension" | "typography" | "decorations";
+export type StyleGroup = "general" | "dimension" | "typography" | "decorations";
 
 export type StyleControlType =
   | "text"
@@ -33,7 +36,8 @@ export type StyleControlType =
   | "alignment"
   | "select"
   | "number"
-  | "range";
+  | "range"
+  | "spacing";
 
 export interface StyleFieldConfig {
   /** e.g. "typography.fontSize" — which style slot this reads and writes */
@@ -42,11 +46,15 @@ export interface StyleFieldConfig {
   label: string;
   control: StyleControlType;
   options?: FieldOption[];
-  /** Unit suffix for number/range controls, e.g. "px". Omit for unitless values. */
+  /** Unit suffix for a single-unit slider, e.g. "px". Omit for unitless values. */
   unit?: string;
+  /** Email-safe units. A select appears only when more than one is listed. */
+  units?: string[];
   min?: number;
   max?: number;
   step?: number;
+  defaultValue?: string;
+  placeholder?: string;
 }
 
 export type RenderMode = "canvas" | "email";

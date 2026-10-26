@@ -1,8 +1,10 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
-import { EMAIL_COLUMN_PADDING_X } from "../constants/editor";
+import { surfaceStyle } from "./layout";
+import { extractHeadStyles } from "./head-styles";
+import { spacerHtml } from "./spacer";
 import { ensureEmailDocument } from "../document/create-document";
 import { esc } from "../utils/html";
-import { emailBaseCss } from "../utils/style";
+import { emailBaseCss, styleToCss } from "../utils/style";
 import {
   blockToHtml,
   mergeTemplateData,
@@ -23,23 +25,27 @@ export function documentToHtml(
   options: DocumentHtmlOptions = {},
 ): string {
   const source = ensureEmailDocument(document);
-  const baseCss = emailBaseCss(source.global);
-  const body = source.blocks
-    .map((node) => {
+  const global = source.global;
+  const baseCss = emailBaseCss(global);
+  const rendered = source.blocks
+    .map((node, index) => {
       const blockData = {
         ...(options.templateData ?? {}),
         ...node.defaultData,
       };
-      return blockToHtml(node, definitions, "email", {
+      const block = blockToHtml(node, definitions, "email", {
         resolveHtmlTemplate: options.resolveHtmlTemplates,
-        global: source.global,
+        global,
         templateData: mergeTemplateData(
           options.variables ?? [],
           Object.keys(blockData).length > 0 ? blockData : undefined,
         ),
       });
+      const gap = index < source.blocks.length - 1 ? spacerHtml(global.blockGap) : "";
+      return block + gap;
     })
     .join("\n");
+  const { html: body, styles } = extractHeadStyles(rendered);
 
   return [
     "<!DOCTYPE html>",
@@ -48,14 +54,15 @@ export function documentToHtml(
     '<meta charset="utf-8" />',
     '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     "<title>Email</title>",
+    styles,
     "</head>",
-    `<body style="margin:0;padding:0;${baseCss};word-spacing:normal;">`,
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="${baseCss};">`,
+    `<body style="margin:0;padding:0;${baseCss};background-color:${esc(global.backgroundColor)};word-spacing:normal;">`,
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="${baseCss};background-color:${esc(global.backgroundColor)};table-layout:fixed;">`,
     "<tr>",
-    `<td align="${esc(source.global.contentAlign)}" style="padding:24px ${EMAIL_COLUMN_PADDING_X}px;${baseCss};">`,
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:${source.global.contentWidth}px;">`,
+    `<td align="${esc(global.contentAlign)}" style="padding:${esc(global.outerPadding)};${baseCss};">`,
+    `<table role="presentation" align="${esc(global.contentAlign)}" width="${global.contentWidth}" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:${global.contentWidth}px;margin-left:${global.contentAlign === "left" ? "0" : "auto"};margin-right:${global.contentAlign === "right" ? "0" : "auto"};table-layout:fixed;">`,
     "<tr>",
-    `<td style="padding:0;${baseCss};">`,
+    `<td style="box-sizing:border-box;${baseCss};${styleToCss(surfaceStyle(global))};">`,
     body,
     "</td>",
     "</tr>",

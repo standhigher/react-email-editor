@@ -1,45 +1,39 @@
 import type { BlockDefinition } from "../types/block";
 import { esc } from "../utils/html";
+import { cssLength } from "../utils/css-values";
+import { decorationStyle, styleToCss } from "../utils/style";
+import { imageBox, pixelLength, renderAligned } from "../render/align";
 import { ICON_IMAGE } from "./icons";
-import { PADDING } from "./style-fields";
+import { COMMON_STYLE_FIELDS } from "./style-fields";
+import { ELEMENT_ALIGN, IMAGE_STYLE_FIELDS } from "./element-fields";
 
 export const imageBlock: BlockDefinition = {
-  type: "image",
-  title: "Image",
-  icon: ICON_IMAGE,
-  description: "Insert an image",
+  type: "image", title: "Image", icon: ICON_IMAGE, description: "Insert an image",
   fields: [
-    {
-      type: "url",
-      name: "src",
-      label: "Image URL",
-      defaultValue: "https://placehold.co/560x200?text=Image",
-    },
+    { type: "url", name: "src", label: "Image URL", defaultValue: "https://placehold.co/560x200?text=Image" },
     { type: "text", name: "alt", label: "Alt text", defaultValue: "Image" },
     { type: "url", name: "link", label: "Link", defaultValue: "" },
-    {
-      type: "select",
-      name: "align",
-      label: "Align",
-      defaultValue: "center",
-      options: [
-        { label: "Left", value: "left" },
-        { label: "Center", value: "center" },
-        { label: "Right", value: "right" },
-      ],
-    },
   ],
   defaultStyle: { dimension: { padding: "8px" } },
-  styleFields: [PADDING],
-  render: ({ fields }) => {
-    const src = String(fields.src ?? "");
-    const alt = String(fields.alt ?? "");
-    const align = String(fields.align ?? "center");
+  styleFields: [...COMMON_STYLE_FIELDS, ELEMENT_ALIGN, ...IMAGE_STYLE_FIELDS],
+  render: ({ fields, style }) => {
+    const element = style.element ?? {};
+    const width = cssLength(element.width, "auto", true);
+    const height = cssLength(element.height, "auto", true);
+    const box = imageBox(width);
+    const css = styleToCss({
+      ...decorationStyle(element),
+      display: box.display,
+      width: box.width,
+      height,
+      maxWidth: "100%",
+      verticalAlign: box.display ? undefined : "bottom",
+    });
+    const widthAttr = pixelLength(width);
+    const heightAttr = pixelLength(height);
+    const image = `<img src="${esc(String(fields.src ?? ""))}" alt="${esc(String(fields.alt ?? ""))}"${widthAttr ? ` width="${widthAttr}"` : ""}${heightAttr ? ` height="${heightAttr}"` : ""} border="0" style="outline:none;text-decoration:none;${css};" />`;
     const link = String(fields.link ?? "");
-    const image = `<img src="${esc(src)}" alt="${esc(alt)}" style="max-width:100%;display:block;border:0;outline:none;text-decoration:none;" />`;
-    const content = link
-      ? `<a href="${esc(link)}" style="text-decoration:none;">${image}</a>`
-      : image;
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="${esc(align)}">${content}</td></tr></table>`;
+    const content = link ? `<a href="${esc(link)}" style="text-decoration:none;${box.display === "block" ? "display:block;" : ""}">${image}</a>` : image;
+    return renderAligned("image", { align: element.align, width, content });
   },
 };

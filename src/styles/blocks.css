@@ -1,0 +1,226 @@
+/* ---------- 区块 ---------- */
+
+.ree-block {
+  position: relative;
+  border: 0;
+  border-radius: var(--ree-radius-sm);
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.12s ease, outline-color 0.12s ease,
+    box-shadow 0.12s ease;
+  width: 100%;
+  display: flow-root;
+}
+
+/* hover：区块背景 + 边框均为浅蓝（参照 unlayer） */
+.ree-block:hover {
+  background: var(--ree-accent-bg);
+  outline-color: var(--ree-accent-border);
+}
+
+.ree-block.is-selected {
+  z-index: 8;
+  background: var(--ree-accent-bg-strong);
+  outline-color: var(--ree-primary);
+  box-shadow: 0 0 0 1px var(--ree-primary);
+}
+
+.ree-block.is-dragging {
+  opacity: 0.5;
+}
+
+.ree-block.is-over {
+  outline-color: var(--ree-primary);
+  box-shadow: inset 0 2px 0 var(--ree-primary);
+}
+
+/* 左侧拖拽把手（hover / 选中时出现，可拖动排序） */
+.ree-block-grip {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 34px;
+  padding: 0;
+  background: var(--ree-panel);
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius-sm);
+  color: var(--ree-muted);
+  box-shadow: var(--ree-shadow-sm);
+  cursor: grab;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease, visibility 0.12s ease, border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.ree-block-grip:active {
+  cursor: grabbing;
+}
+
+.ree-block-grip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ree-panel), 0 0 0 4px var(--ree-primary);
+}
+
+.ree-block:hover .ree-block-grip,
+.ree-block.is-selected .ree-block-grip {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.ree-block:hover .ree-block-grip {
+  border-color: var(--ree-accent-border);
+  color: var(--ree-primary);
+}
+
+/* 右下角当前区块类型标签 */
+.ree-block-badge {
+  position: absolute;
+  right: 8px;
+  bottom: -11px;
+  z-index: 6;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: var(--ree-primary);
+  background: var(--ree-panel);
+  border: 1px solid var(--ree-accent-border);
+  border-radius: 999px;
+  box-shadow: var(--ree-shadow-sm);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.ree-block:hover .ree-block-badge,
+.ree-block.is-selected .ree-block-badge {
+  opacity: 1;
+}
+
+.ree-block-toolbar {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 8px;
+  z-index: 7;
+  display: flex;
+  gap: 2px;
+  background: var(--ree-panel, #ffffff);
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius);
+  padding: 3px;
+  box-shadow: var(--ree-shadow-md);
+}
+
+.ree-block-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--ree-radius-sm);
+  cursor: pointer;
+  color: var(--ree-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.ree-block-btn:hover {
+  background: var(--ree-panel-secondary);
+  color: var(--ree-primary);
+}
+
+.ree-block-btn.ree-danger:hover {
+  background: var(--ree-danger-soft);
+  color: var(--ree-danger);
+}
+
+.ree-block-content {
+  width: 100%;
+  overflow: hidden;
+  /* 预览 iframe 使用浏览器默认渲染。宿主页面的抗锯齿和连字设置不要渗进邮件正文。 */
+  font-feature-settings: normal;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* 宿主样式会直接写到 p 和标题上，例如 Polaris 把它们的字重设为 450。
+   这些规则压过容器上的继承，画布就会和预览不一致。正文改回继承区块排版。
+   strong、em、a、span 除外，行内加粗、斜体和链接色仍然有效。 */
+.ree-block-content :is(p, h1, h2, h3, h4, h5, h6, li) {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  font-style: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+/* 文案在框内编辑。工具栏和下拉要画出内容盒，不能被选中框裁掉。 */
+.ree-block-content.is-inline {
+  overflow: visible;
+}
+
+.ree-block-static {
+  min-height: 0;
+}
+
+.ree-html-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ree-html-canvas-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ree-html-canvas-hitbox {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ree-html-canvas-hitbox:focus {
+  outline: none;
+}
+
+.ree-html-canvas-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border: 0;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
+.ree-block-content a {
+  pointer-events: none;
+}
+

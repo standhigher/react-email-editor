@@ -1,0 +1,318 @@
+/* ---------- 富文本 ---------- */
+
+.ree-rte-loading {
+  color: var(--ree-muted);
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+/* 挂到 .ree-root，避开画布 overflow，同时继承主题变量。位置按区块视口计算。 */
+.ree-rte-toolbar {
+  position: fixed;
+  z-index: 80;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: auto;
+  margin: 0;
+  padding: 4px;
+  background: var(--ree-panel, #ffffff);
+  border: 1px solid var(--ree-border, #e3e3e5);
+  border-radius: var(--ree-radius, 8px);
+  box-shadow: var(--ree-shadow-md, 0 2px 16px rgba(31, 33, 36, 0.08));
+  color: var(--ree-text, #202223);
+  font-family: var(--ree-font, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-weight: 500;
+}
+
+.ree-rte-toolbar.is-placed {
+  visibility: visible;
+}
+
+.ree-rte-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.ree-rte-sep {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 1px;
+  margin: 4px 4px;
+  background: var(--ree-border);
+}
+
+.ree-tool-btn,
+.ree-rte-select {
+  appearance: none;
+  border: none;
+  background: transparent;
+  height: 28px;
+  border-radius: var(--ree-radius-sm);
+  cursor: pointer;
+  color: var(--ree-text);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.ree-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 0 4px;
+}
+
+.ree-rte-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 168px;
+  padding: 0 6px 0 8px;
+}
+
+.ree-rte-select-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ree-tool-btn:hover,
+.ree-tool-btn.is-open,
+.ree-rte-select:hover,
+.ree-rte-select.is-open {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-tool-btn.is-active {
+  background: #202223;
+  color: #ffffff;
+}
+
+.ree-tool-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ree-tool-btn:disabled:hover {
+  background: transparent;
+  color: var(--ree-text);
+}
+
+.ree-tool-bold {
+  font-weight: 700;
+}
+
+.ree-tool-italic {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+}
+
+.ree-tool-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ree-tool-strike {
+  text-decoration: line-through;
+}
+
+.ree-tool-color {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  border-bottom: 3px solid currentColor;
+  padding-bottom: 1px;
+}
+
+.ree-rte-pop {
+  position: relative;
+}
+
+.ree-rte-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 180px;
+  max-height: 280px;
+  overflow: auto;
+  padding: 6px;
+  background: var(--ree-panel);
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius);
+  box-shadow: var(--ree-shadow-lg);
+}
+
+.ree-rte-menu.is-end {
+  left: auto;
+  right: 0;
+}
+
+.ree-rte-menu.is-link {
+  min-width: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.ree-rte-pop.is-up .ree-rte-menu {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+.ree-rte-option {
+  display: flex;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 7px 8px;
+  border-radius: var(--ree-radius-sm);
+  cursor: pointer;
+  color: var(--ree-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+
+.ree-rte-option:hover,
+.ree-rte-option.is-active {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-rte-option.is-active {
+  font-weight: 600;
+}
+
+.ree-rte-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 22px);
+  gap: 6px;
+  padding: 4px;
+}
+
+.ree-rte-swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid rgba(32, 34, 35, 0.16);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ree-rte-swatch.is-active {
+  outline: 2px solid #202223;
+  outline-offset: 1px;
+}
+
+.ree-rte-color-actions {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+}
+
+.ree-rte-color-actions .ree-btn {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.ree-rte-color-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ree-rte-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 28px);
+  gap: 2px;
+}
+
+.ree-rte-emoji {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--ree-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ree-rte-emoji:hover {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-rte-link {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 280px;
+  padding: 6px;
+}
+
+.ree-rte-link-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ree-rte-link-actions .ree-btn {
+  padding: 6px 12px;
+}
+
+.ree-rte-variables {
+  min-width: 220px;
+}
+
+.ree-rte .ProseMirror {
+  outline: none;
+  display: flow-root;
+  line-height: inherit;
+}
+
+.ree-rte .ProseMirror p {
+  margin: 0;
+}
+
+.ree-rte .ProseMirror p:has(+ p) {
+  margin-bottom: var(--ree-paragraph-spacing, 0px);
+}
+
+.ree-rte .ProseMirror li p {
+  margin: 0;
+}
+
+.ree-rte .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--ree-muted);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ree-rte .ProseMirror a {
+  color: var(--ree-link-color, #005bd3);
+  text-decoration: var(--ree-link-decoration, underline);
+}
+
+.ree-rte .ProseMirror ul,
+.ree-rte .ProseMirror ol {
+  margin: var(--ree-list-spacing, 0.25em) 0;
+  padding-left: var(--ree-list-indent, 1.4em);
+}
+
+.ree-rte .ProseMirror sup,
+.ree-rte .ProseMirror sub {
+  font-size: 0.75em;
+}
+

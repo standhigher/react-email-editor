@@ -1,0 +1,22 @@
+/* ---------- 拖拽浮层 ---------- */
+
+.ree-drag-overlay {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--ree-panel);
+  border: 1px solid var(--ree-primary);
+  box-shadow: var(--ree-shadow-lg);
+  cursor: grabbing;
+  font-weight: 500;
+}
+
+.ree-preview-frame {
+  height: 100%;
+  min-height: 520px;
+  flex-shrink: 0;
+  border: none;
+  background: #ffffff;
+  box-shadow: var(--ree-shadow-md);
+}

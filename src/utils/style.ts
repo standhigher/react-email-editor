@@ -1,103 +1,79 @@
-import type { EmailBlockStyle, EmailGlobalSettings } from "../types/document";
+import type { CSSProperties } from "react";
+import type { EmailBlockStyle, EmailDecorationStyle, EmailGlobalSettings } from "../types/document";
+import { resolveEmailGlobal } from "../document/create-document";
+import { cssBorderStyle, cssColor, cssFont, cssLength, cssLineHeight, cssSpacing } from "./css-values";
 import { esc } from "./html";
 
-const STYLE_GROUPS = ["dimension", "typography", "decorations"] as const;
-
-type StyleGroupKey = (typeof STYLE_GROUPS)[number];
-
-function isStyleGroupKey(value: string): value is StyleGroupKey {
-  return (STYLE_GROUPS as readonly string[]).includes(value);
+export function readStyleValue(style: EmailBlockStyle | undefined, id: string): string {
+  const [group, key] = id.split(".");
+  const values = style?.[group as keyof EmailBlockStyle];
+  return values ? String((values as Record<string, unknown>)[key] ?? "") : "";
 }
 
-export function readStyleValue(
-  style: EmailBlockStyle | undefined,
-  id: string,
-): string {
+export function writeStyleValue(style: EmailBlockStyle | undefined, id: string, value: string): EmailBlockStyle {
   const [group, key] = id.split(".");
-  if (!group || !key || !style || !isStyleGroupKey(group)) return "";
-  const groupValue = style[group];
-  if (!groupValue) return "";
-  const value = (groupValue as Record<string, unknown>)[key];
-  return value == null ? "" : String(value);
-}
-
-export function writeStyleValue(
-  style: EmailBlockStyle | undefined,
-  id: string,
-  value: string,
-): EmailBlockStyle {
-  const [group, key] = id.split(".");
-  const next: EmailBlockStyle = structuredClone(style ?? {});
-  if (!group || !key || !isStyleGroupKey(group)) return next;
-  const groupValue = { ...(next[group] ?? {}) } as Record<string, string>;
-  if (value === "") {
-    delete groupValue[key];
-  } else {
-    groupValue[key] = value;
-  }
-  next[group] = groupValue as EmailBlockStyle[StyleGroupKey];
+  const next = structuredClone(style ?? {});
+  if (!key || !["dimension", "typography", "decorations", "element"].includes(group)) return next;
+  const groupKey = group as keyof EmailBlockStyle;
+  const values = { ...next[groupKey] } as Record<string, string>;
+  if (value === "") delete values[key];
+  else values[key] = value;
+  next[groupKey] = values;
   return next;
 }
 
-function cssFontWeight(
-  value: string | undefined,
-  fallback?: string,
-): "normal" | "bold" | undefined {
-  const pick = (input: string | undefined) => {
-    const weight = input?.trim().toLowerCase();
-    if (weight === "normal" || weight === "400") return "normal" as const;
-    if (weight === "bold" || weight === "700") return "bold" as const;
-    return undefined;
-  };
-  return pick(value) ?? pick(fallback);
+export function resolvedFontWeight(blockWeight: string | undefined, globalWeight: EmailGlobalSettings["fontWeight"]): "normal" | "bold" {
+  if (blockWeight === "bold" || blockWeight === "700") return "bold";
+  if (blockWeight === "normal" || blockWeight === "400") return "normal";
+  return globalWeight;
 }
 
-export function resolvedFontWeight(
-  blockWeight: string | undefined,
-  globalWeight: EmailGlobalSettings["fontWeight"],
-): EmailGlobalSettings["fontWeight"] {
-  return cssFontWeight(blockWeight, globalWeight) ?? "normal";
-}
-
-export function typographyCss(
-  style: EmailBlockStyle | undefined,
-  global?: EmailGlobalSettings,
-): string {
+export function typographyStyle(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): CSSProperties {
+  const settings = resolveEmailGlobal(global);
   const typography = style?.typography ?? {};
-  const parts: string[] = [];
-  if (global?.fontFamily) parts.push(`font-family:${esc(global.fontFamily)}`);
-  if (typography.fontSize) parts.push(`font-size:${esc(typography.fontSize)}`);
-  const fontWeight = cssFontWeight(typography.fontWeight, global?.fontWeight);
-  if (fontWeight) parts.push(`font-weight:${esc(fontWeight)}`);
-  if (typography.lineHeight) parts.push(`line-height:${esc(typography.lineHeight)}`);
-  const color = typography.color || global?.textColor;
-  if (color) parts.push(`color:${esc(color)}`);
-  if (typography.textAlign) parts.push(`text-align:${esc(typography.textAlign)}`);
-  return parts.join(";");
+  return {
+    fontFamily: cssFont(typography.fontFamily, settings.fontFamily),
+    fontSize: cssLength(typography.fontSize, settings.defaultFontSize),
+    fontWeight: resolvedFontWeight(typography.fontWeight, settings.fontWeight),
+    lineHeight: cssLineHeight(typography.lineHeight, settings.defaultLineHeight),
+    color: cssColor(typography.color, settings.textColor),
+    textAlign: typography.textAlign ?? settings.textAlign,
+  };
+}
+
+export function decorationStyle(decoration: EmailDecorationStyle = {}): CSSProperties {
+  return {
+    backgroundColor: cssColor(decoration.backgroundColor),
+    borderWidth: cssLength(decoration.borderWidth),
+    borderStyle: cssBorderStyle(decoration.borderStyle),
+    borderColor: cssColor(decoration.borderColor, "#000000"),
+    borderRadius: cssLength(decoration.borderRadius),
+  };
+}
+
+export function styleToCss(style: CSSProperties): string {
+  return Object.entries(style).filter(([, value]) => value !== undefined)
+    .map(([name, value]) => `${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}:${esc(String(value))}`)
+    .join(";");
+}
+
+export function typographyCss(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): string {
+  return styleToCss(typographyStyle(style, global));
 }
 
 export function emailBaseCss(global: EmailGlobalSettings): string {
-  const background = global.backgroundColor || "#ffffff";
-  return [
-    `background-color:${esc(background)}`,
-    `color:${esc(global.textColor)}`,
-    `font-family:${esc(global.fontFamily)}`,
-  ].join(";");
+  return typographyCss(undefined, global);
 }
 
-export function blockCellCss(
-  style: EmailBlockStyle | undefined,
-  global?: EmailGlobalSettings,
-): string {
-  const padding = style?.dimension?.padding ?? "0";
-  const background = style?.decorations?.backgroundColor ?? "transparent";
-  const parts = [
-    `padding:${esc(padding)}`,
-    `background-color:${esc(background)}`,
-  ];
-  if (global) {
-    parts.push(`color:${esc(global.textColor)}`);
-    parts.push(`font-family:${esc(global.fontFamily)}`);
-  }
-  return `${parts.join(";")};`;
+export function blockContentStyle(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): CSSProperties {
+  return {
+    ...typographyStyle(style, global),
+    ...decorationStyle(style?.decorations),
+    padding: cssSpacing(style?.dimension?.padding),
+    overflowWrap: "anywhere",
+  };
+}
+
+export function blockCellCss(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): string {
+  return `${styleToCss(blockContentStyle(style, global))};`;
 }

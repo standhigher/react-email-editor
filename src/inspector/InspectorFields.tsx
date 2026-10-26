@@ -1,16 +1,19 @@
 import { STYLE_GROUPS } from "../constants/style-groups";
 import { BlockIcon } from "../components/BlockIcon";
+import { inheritedStyleValue, styleReset } from "./utils";
 import { readStyleValue } from "../utils/style";
 import { FieldControl } from "./FieldControl";
+import { InspectorSection } from "./components/InspectorSection";
+import { StyleFieldStack } from "./components/StyleFieldStack";
 import { StyleControl } from "./StyleControl";
-import type { BlockDefinition, Variable } from "../types/block";
-import type { EmailBlockNode } from "../types/document";
+import type { BlockDefinition, StyleFieldConfig, Variable } from "../types/block";
+import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
 
 interface InspectorFieldsProps {
   block: EmailBlockNode;
   definition: BlockDefinition;
   variables: Variable[];
-  textColor: string;
+  global: EmailGlobalSettings;
   onCommitField: (id: string, name: string, value: unknown) => void;
   onCommitStyle: (id: string, styleId: string, value: string) => void;
 }
@@ -19,16 +22,36 @@ export function InspectorFields({
   block,
   definition,
   variables,
-  textColor,
+  global,
   onCommitField,
   onCommitStyle,
 }: InspectorFieldsProps) {
   const contentFields = definition.fields ?? [];
   const styleFields = definition.styleFields ?? [];
-  const grouped = STYLE_GROUPS.map((group) => ({
-    group,
+  const renderStyle = (field: StyleFieldConfig) => {
+    const stored = readStyleValue(block.style, field.id);
+    const inherited = inheritedStyleValue(field.id, global);
+    const restore = readStyleValue(definition.defaultStyle, field.id) || field.defaultValue || "";
+    const reset = styleReset(stored, restore, inherited !== undefined);
+    return (
+      <StyleControl
+        key={field.id}
+        config={field}
+        value={stored}
+        fallback={inherited}
+        resetTo={reset.resetTo}
+        showReset={reset.show}
+        resetLabel={inherited !== undefined ? "Inherit global" : "Reset"}
+        onChange={(value) => onCommitStyle(block.id, field.id, value)}
+      />
+    );
+  };
+  const sections = STYLE_GROUPS.map((group) => ({
+    ...group,
     fields: styleFields.filter((field) => field.group === group.group),
-  })).filter((group) => group.fields.length > 0);
+  }));
+  const general = sections.find((section) => section.group === "general");
+  const showGeneral = contentFields.length > 0 || (general?.fields.length ?? 0) > 0;
 
   return (
     <div className="ree-inspector">
@@ -37,9 +60,8 @@ export function InspectorFields({
         <span className="ree-inspector-title">{definition.title}</span>
       </div>
 
-      {contentFields.length > 0 ? (
-        <section className="ree-inspector-section">
-          <div className="ree-inspector-section-title">Content</div>
+      {showGeneral ? (
+        <InspectorSection title="General">
           {contentFields.map((field) => (
             <FieldControl
               key={field.name}
@@ -49,30 +71,14 @@ export function InspectorFields({
               onChange={(value) => onCommitField(block.id, field.name, value)}
             />
           ))}
-        </section>
+          {general ? <StyleFieldStack fields={general.fields} renderField={renderStyle} /> : null}
+        </InspectorSection>
       ) : null}
 
-      {definition.inlineEdit ? (
-        <section className="ree-inspector-section">
-          <div className="ree-inspector-hint">
-            Edit content inline on the canvas
-          </div>
-        </section>
-      ) : null}
-
-      {grouped.map(({ group, fields }) => (
-        <section key={group.group} className="ree-inspector-section">
-          <div className="ree-inspector-section-title">{group.label}</div>
-          {fields.map((field) => (
-            <StyleControl
-              key={field.id}
-              config={field}
-              value={readStyleValue(block.style, field.id)}
-              inheritedColor={textColor}
-              onChange={(value) => onCommitStyle(block.id, field.id, value)}
-            />
-          ))}
-        </section>
+      {sections.filter((section) => section.group !== "general" && section.fields.length > 0).map((section) => (
+        <InspectorSection key={section.group} title={section.label}>
+          <StyleFieldStack fields={section.fields} renderField={renderStyle} />
+        </InspectorSection>
       ))}
     </div>
   );

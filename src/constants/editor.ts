@@ -11,24 +11,16 @@ export const CANVAS_DEVICE_WIDTH: Record<EditorDevice, number> = {
   mobile: 360,
 };
 
-/** 邮件栏左右留白。编辑区卡片和预览文档用同一个值，避免一边被 padding 挤窄、另一边被撑宽。 */
-export const EMAIL_COLUMN_PADDING_X = 24;
-
 export const CONTENT_WIDTH_MIN = 320;
 export const CONTENT_WIDTH_MAX = 900;
 export const CONTENT_WIDTH_STEP = 10;
 
-/** Shared inbox frame for the canvas card and the preview iframe. */
-export function emailViewportWidth(device: EditorDevice): number {
-  if (device === "mobile") return CANVAS_DEVICE_WIDTH.mobile;
-  return CONTENT_WIDTH_MAX + EMAIL_COLUMN_PADDING_X * 2;
-}
-
-export function contentColumnWidth(
+/** Shared email surface width for the canvas card and the preview iframe. */
+export function emailViewportWidth(
   device: EditorDevice,
-  contentWidth: number,
+  contentWidth = CANVAS_DEVICE_WIDTH.desktop,
 ): number {
-  const available = emailViewportWidth(device) - EMAIL_COLUMN_PADDING_X * 2;
-  if (!Number.isFinite(contentWidth)) return available;
-  return Math.min(contentWidth, available);
+  if (device === "mobile") return CANVAS_DEVICE_WIDTH.mobile;
+  const width = Number.isFinite(contentWidth) ? contentWidth : CANVAS_DEVICE_WIDTH.desktop;
+  return Math.min(CONTENT_WIDTH_MAX, Math.max(CONTENT_WIDTH_MIN, width));
 }

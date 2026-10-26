@@ -31,30 +31,33 @@ export function Stage({
         onViewModeChange={onViewModeChange}
         onDeviceChange={onDeviceChange}
       />
-      <div className="ree-stage-view" hidden={viewMode !== "edit"}>
-        <Canvas
-          blocks={session.document.blocks}
-          global={session.document.global}
-          definitions={session.definitions}
-          selectedId={session.selectedId}
-          overId={overId}
-          variables={session.variables}
-          device={device}
-          onSelect={onSelectBlock}
-          onCommitField={session.updateField}
-          onMove={session.moveBlock}
-          onDuplicate={session.duplicateBlock}
-          onRemove={session.removeBlock}
-        />
-      </div>
-      <div className="ree-stage-view" hidden={viewMode !== "preview"}>
-        <Preview
-          document={session.document}
-          definitions={session.definitions}
-          variables={session.variables}
-          device={device}
-        />
-      </div>
+      {viewMode === "edit" ? (
+        <div className="ree-stage-view">
+          <Canvas
+            blocks={session.document.blocks}
+            global={session.document.global}
+            definitions={session.definitions}
+            selectedId={session.selectedId}
+            overId={overId}
+            variables={session.variables}
+            device={device}
+            onSelect={onSelectBlock}
+            onCommitField={session.updateField}
+            onMove={session.moveBlock}
+            onDuplicate={session.duplicateBlock}
+            onRemove={session.removeBlock}
+          />
+        </div>
+      ) : (
+        <div className="ree-stage-view">
+          <Preview
+            document={session.document}
+            definitions={session.definitions}
+            variables={session.variables}
+            device={device}
+          />
+        </div>
+      )}
     </div>
   );
 }

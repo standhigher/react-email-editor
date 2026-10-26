@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useRef } from "react";
+import { extractHeadStyles } from "../../../render/head-styles";
+
 interface HtmlCanvasProps {
   html: string;
   onSelect: () => void;
+}
+
+function frameHtml(html: string): string {
+  const { html: body, styles } = extractHeadStyles(html);
+  return `<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;}body{display:flow-root;}</style>${styles}</head><body>${body}</body></html>`;
 }
 
 /** HTML 标签内容用 iframe 隔离 CSS，纯文本直接渲染；事件交给外层区块。 */
@@ -25,16 +32,11 @@ export function HtmlCanvas({ html, onSelect }: HtmlCanvasProps) {
     const fit = () => {
       const availableWidth = container.clientWidth;
       if (!availableWidth) return;
-      // 先按画布宽度排版，让邮件自己的响应式规则生效，再缩小剩余的固定宽内容。
       frame.style.width = `${availableWidth}px`;
       frame.style.height = "1px";
-      const contentWidth = Math.max(availableWidth, document.documentElement.scrollWidth, document.body.scrollWidth);
-      frame.style.width = `${contentWidth}px`;
-      const contentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, 24);
-      const scale = availableWidth / contentWidth;
+      const contentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
       frame.style.height = `${contentHeight}px`;
-      frame.style.transform = `scale(${scale})`;
-      container.style.height = `${contentHeight * scale}px`;
+      container.style.height = `${contentHeight}px`;
     };
 
     const scheduleFit = () => {
@@ -92,7 +94,7 @@ export function HtmlCanvas({ html, onSelect }: HtmlCanvasProps) {
         ref={frameRef}
         className="ree-html-canvas-frame"
         title="HTML block preview"
-        srcDoc={html}
+        srcDoc={frameHtml(html)}
         sandbox="allow-same-origin"
         tabIndex={-1}
         onLoad={observeContent}

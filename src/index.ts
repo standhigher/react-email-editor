@@ -30,6 +30,10 @@ export type {
   EmailDocument,
   EmailBlockNode,
   EmailBlockStyle,
+  EmailSpacingStyle,
+  EmailTypographyStyle,
+  EmailDecorationStyle,
+  EmailElementStyle,
   EmailGlobalSettings,
 } from "./types/document";
 export type {

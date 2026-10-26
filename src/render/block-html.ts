@@ -1,6 +1,8 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
 import { DEFAULT_EMAIL_GLOBAL } from "../document/constants";
 import { getBlockDefinition } from "../document/registry";
+import { cssSpacing } from "../utils/css-values";
+import { esc } from "../utils/html";
 import { blockCellCss } from "../utils/style";
 import { buildRenderContext } from "./context";
 import { renderTemplatePreview } from "./template-preview";
@@ -71,7 +73,9 @@ export function renderBlockContent(
     mode,
     normalizedOptions.global ?? DEFAULT_EMAIL_GLOBAL,
   );
-  if (!normalizedOptions.resolveHtmlTemplate || node.type !== "html") {
+  // 预览展开作用于每个区块 render 产出的 HTML，不限于 HTML 区块。
+  // getHtml 不传 resolveHtmlTemplate，Go template 原文保留。
+  if (!normalizedOptions.resolveHtmlTemplate) {
     return rendered;
   }
   return renderTemplatePreview(
@@ -104,5 +108,5 @@ export function blockToHtml(
     ...normalizedOptions,
     global,
   });
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="${blockCellCss(node.style, global)}">${inner}</td></tr></table>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td style="padding:${esc(cssSpacing(node.style?.dimension?.margin))};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td style="${blockCellCss(node.style, global)}">${inner}</td></tr></table></td></tr></table>`;
 }

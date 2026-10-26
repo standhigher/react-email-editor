@@ -18,7 +18,7 @@ export function useAnchoredToolbar(
     const place = () => {
       const block = anchor.closest(".ree-block") ?? anchor;
       const rect = block.getBoundingClientRect();
-      const offscreen = rect.bottom < 0 || rect.top > ownerWindow.innerHeight;
+      const offscreen = rect.width === 0 || rect.height === 0 || rect.bottom < 0 || rect.top > ownerWindow.innerHeight;
       if (offscreen) {
         toolbar.classList.remove("is-placed");
         return;

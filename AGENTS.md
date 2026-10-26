@@ -88,7 +88,7 @@ tests/
 - `blockToHtml`、`renderBlock`、`documentToHtml` 以及模板预览的职责必须保持清晰。修改渲染链时同时检查 canvas、email、preview 三种使用路径。
 - 邮件 HTML 使用表格布局和内联样式以兼容邮件客户端。不要把编辑器的拖拽边框、选中态、工具栏、空画布提示或其他 `ree-*` 编辑辅助 UI 输出到邮件。
 - 文档导出必须只生成一个完整的 `<!DOCTYPE html>`、`<html>`、`<head>` 和 `<body>`；HTML 区块输入的完整文档需要按现有逻辑合并，不能产生嵌套 `html`/`head`/`body`。
-- 默认导出保留 Go template 原文。只有传入 `resolveHtmlTemplates` 或预览专用路径时才解析模板；区块 `defaultData` 优先于同名全局变量，具体合并规则沿用现有实现。
+- 默认导出保留 Go template 原文。只有传入 `resolveHtmlTemplates` 或预览专用路径时才解析模板，解析对象是每个区块 `render` 产出的 HTML，不限于 HTML 区块；区块 `defaultData` 优先于同名全局变量，具体合并规则沿用现有实现。
 - 普通文本和属性插值使用 `src/utils/html.ts` 的现有转义工具，CSS 值先归一化再输出；URL 的协议安全与 HTML 转义是不同问题，新增 URL 入口需校验允许的协议。显式 HTML 区块和富文本按现有 HTML 内容路径处理，不能整体转义成纯文本，也不能把模板预览器当作完整 Go 引擎或安全沙箱。属性转义不等于 HTML 消毒，不得声称已有逻辑能安全执行任意不可信 HTML。
 - 新增区块必须完整考虑：定义、字段、默认字段、默认样式、注册表、画布展示、邮件输出、模板数据和测试；不得只让画布能显示而邮件导出缺失。
 

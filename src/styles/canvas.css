@@ -1,0 +1,67 @@
+/* ---------- 画布 ---------- */
+
+.ree-stage-view {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.ree-stage-view[hidden] {
+  display: none;
+}
+
+.ree-canvas,
+.ree-preview-stage {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+}
+
+.ree-canvas {
+  padding: 64px 24px 40px;
+}
+
+.ree-canvas.is-over {
+  outline: 2px dashed var(--ree-primary);
+  outline-offset: -12px;
+}
+
+.ree-email-surface {
+  box-sizing: border-box;
+  margin: 0 auto;
+  box-shadow: var(--ree-shadow-md);
+}
+
+.ree-root .ree-canvas-inner {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ree-block-gap, 0px);
+}
+
+.ree-preview-stage {
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.ree-inspector-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ree-canvas-empty {
+  padding: 72px 24px;
+  text-align: center;
+  color: var(--ree-muted);
+  border: 2px dashed var(--ree-border);
+}
+
+
+.ree-email-viewport { box-sizing: border-box; }

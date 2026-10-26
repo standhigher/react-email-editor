@@ -1,15 +1,17 @@
 import type { FieldOption } from "../../types/block";
 
 interface SelectControlProps {
+  label?: string;
   value: string;
   options: FieldOption[];
   onChange: (value: string) => void;
 }
 
-export function SelectControl({ value, options, onChange }: SelectControlProps) {
+export function SelectControl({ label, value, options, onChange }: SelectControlProps) {
   return (
     <div className="ree-select">
       <select
+        aria-label={label}
         className="ree-input"
         value={value}
         onChange={(event) => onChange(event.target.value)}

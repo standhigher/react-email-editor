@@ -1,5 +1,6 @@
 import { useRef, type ChangeEvent } from "react";
 import { ColorControl } from "./components/ColorControl";
+import { RangeControl } from "./components/RangeControl";
 import { SelectControl } from "./components/SelectControl";
 import { HtmlCodeEditor } from "./HtmlCodeEditor";
 import { VariablesDropdown } from "./VariablesDropdown";
@@ -95,9 +96,23 @@ export function FieldControl({
 
   if (field.type === "color") {
     return (
+      <div className="ree-color-chip-row">
+        <ColorControl label={field.label} value={stringValue} onChange={(next) => onChange(next)} />
+      </div>
+    );
+  }
+
+  if (field.type === "number") {
+    const amount = Number(value);
+    const max = field.max ?? 200;
+    const shown = Math.min(max, Math.max(field.min ?? 0, Number.isFinite(amount) ? amount : field.min ?? 0));
+    return (
       <div className="ree-field">
-        <label className="ree-field-label">{field.label}</label>
-        <ColorControl value={stringValue} onChange={(next) => onChange(next)} />
+        <div className="ree-field-label">
+          <span>{field.label}</span>
+          <span className="ree-field-value">{shown}px</span>
+        </div>
+        <RangeControl label={field.label} value={shown} min={field.min} max={max} step={field.step} onChange={onChange} />
       </div>
     );
   }
@@ -110,9 +125,13 @@ export function FieldControl({
           ref.current = element;
         }}
         className="ree-input"
+        aria-label={field.label}
+        min={field.min}
+        max={field.max}
+        step={field.step}
         value={stringValue}
         placeholder={field.placeholder}
-        type={field.type === "number" ? "number" : "text"}
+        type="text"
         onChange={handleChange}
       />
     </div>

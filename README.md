@@ -51,9 +51,9 @@ HTML 区块可以通过节点上的 `defaultData` 提供模板渲染数据。编
 优先覆盖同名全局变量。
 
 ```tsx
-const initialDocument = {
-  version: 1,
-  blocks: [{
+import { createEmailDocument } from "@standhigher/react-email-editor";
+
+const initialDocument = createEmailDocument([{
     id: "products",
     type: "html",
     defaultData: {
@@ -63,8 +63,7 @@ const initialDocument = {
     fields: {
       html: "{{if .has_products}}{{range .products}}<p>{{.name}} {{.price}}</p>{{end}}{{else}}<p>暂无商品</p>{{end}}",
     },
-  }],
-};
+  }]);
 ```
 
 ```tsx
@@ -74,17 +73,37 @@ const initialDocument = {
 ```
 
 `getHtml()` 返回包含 Go template 变量的原始邮件模板；
-`getRenderedHtml()` 返回使用全局 `variables` 和各 HTML 区块 `defaultData` 渲染后的邮件 HTML。
+`getRenderedHtml()` 和 Preview 会展开每个区块渲染结果中的 Go template，
+数据来自全局 `variables` 与该区块的 `defaultData`。自定义区块在 `email`
+模式输出的模板同样适用。
 
 `initialDocument` 仅用于首次初始化；Reset 恢复该初始快照。切换另一份文档时，
 请通过 React `key` 创建新的编辑会话。Edit / Preview 切换只改变显示状态，
 保留富文本编辑器实例和撤销历史。Heading / Text 默认包含 `16px` padding。
+
+## 样式配置
+
+开发阶段直接使用新的文档结构，不迁移旧版区块字段。建议通过
+`createEmailDocument()` 和 `createBlockNode()` 创建文档与区块。
+
+- `global.contentWidth` 是邮件内容外框宽度，默认 `600px`。邮件内容表同时写像素 `width` 和 `max-width`，Outlook 能认出宽度，窄屏仍可收缩。桌面画布与 Preview 跟随配置，移动视口为 `360px`。
+- `global.contentPadding` 默认四边 `24px`，`outerPadding` 默认 `0px`，`blockGap` 默认 `16px`，均可在 GLOBAL 面板修改或清零。
+- Global 同时管理内外背景、内容边框/圆角，以及字体、字号、行高、段落/列表间距、列表缩进、链接颜色和装饰。段落间距只加在相邻顶层段落之间，列表项里的段落不加这段间距。
+- 所有区块通过 `style.dimension` 配置 padding 和四边外侧留白，通过 `style.decorations` 配置容器背景、边框和圆角。外侧留白在邮件中使用表格单元格 padding 实现，避免 margin 折叠。
+- Heading、Text 和 HTML 使用 `style.typography` 覆盖全局排版；点击 Inherit Global 清除覆盖。Text 默认继承全局字号与行高。
+- Button、Image、Divider 使用 `style.element` 配置元素自身尺寸、对齐、边框等；按钮还支持独立字体、文字色、背景和内边距。
+- HTML 区块保留手写 HTML 的显式 inline style。段落、列表和链接的默认排版内联在标签上，并让位于作者已有的 style。完整文档 head 中的 style 会合并进邮件 head。
+
+编辑器工作区的留白、空画布拖入提示、选中边框和工具栏是编辑辅助界面，不进入邮件输出。
+配置在画布、Preview 与 `documentToHtml()` 中共用渲染规则。
 
 ## Development
 
 ```bash
 pnpm install
 pnpm typecheck
+pnpm build
+node --test tests/styles.test.mjs
 ```
 
 ## 构建与本地 link 联调

@@ -1,42 +1,34 @@
 import type { BlockDefinition } from "../types/block";
 import { esc } from "../utils/html";
+import { cssLength, cssSpacing } from "../utils/css-values";
+import { decorationStyle, styleToCss, typographyStyle } from "../utils/style";
+import { pixelLength, renderAligned } from "../render/align";
 import { ICON_BUTTON } from "./icons";
-import { BG_COLOR, BORDER_RADIUS, FONT_SIZE, PADDING, TEXT_COLOR } from "./style-fields";
+import { COMMON_STYLE_FIELDS } from "./style-fields";
+import { BUTTON_BOX_DEFAULTS, BUTTON_STYLE_FIELDS } from "./element-fields";
 
 export const buttonBlock: BlockDefinition = {
-  type: "button",
-  title: "Button",
-  icon: ICON_BUTTON,
-  description: "Clickable CTA button",
+  type: "button", title: "Button", icon: ICON_BUTTON, description: "Clickable CTA button",
   fields: [
     { type: "text", name: "label", label: "Label", defaultValue: "Buy now" },
     { type: "url", name: "href", label: "Link", defaultValue: "https://example.com" },
-    {
-      type: "select",
-      name: "variant",
-      label: "Style",
-      defaultValue: "filled",
-      options: [
-        { label: "Filled", value: "filled" },
-        { label: "Outline", value: "outline" },
-      ],
-    },
   ],
   defaultStyle: {
-    typography: { fontSize: "16px", color: "#ffffff", textAlign: "center" },
-    decorations: { backgroundColor: "#005bd3", borderRadius: "8px" },
+    element: { fontSize: "16px", color: "#ffffff", ...BUTTON_BOX_DEFAULTS },
   },
-  styleFields: [FONT_SIZE, TEXT_COLOR, BG_COLOR, BORDER_RADIUS, PADDING],
+  styleFields: [...COMMON_STYLE_FIELDS, ...BUTTON_STYLE_FIELDS],
   render: ({ fields, style, global }) => {
-    const label = String(fields.label ?? "Button");
-    const href = String(fields.href ?? "#");
-    const variant = String(fields.variant ?? "filled");
-    const background = style.decorations?.backgroundColor ?? "#005bd3";
-    const color = style.typography?.color ?? "#ffffff";
-    const radius = style.decorations?.borderRadius ?? "8px";
-    const fontSize = style.typography?.fontSize ?? "16px";
-    const backgroundValue = variant === "outline" ? "transparent" : background;
-    const colorValue = variant === "outline" ? background : color;
-    return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center"><a href="${esc(href)}" style="display:inline-block;background-color:${esc(backgroundValue)};color:${esc(colorValue)};font-size:${esc(fontSize)};font-family:${esc(global.fontFamily)};font-weight:${esc(global.fontWeight)};text-decoration:none;padding:12px 32px;border-radius:${esc(radius)};border:1px solid ${esc(background)};">${esc(label)}</a></td></tr></table>`;
+    const element = { ...BUTTON_BOX_DEFAULTS, ...style.element };
+    const width = cssLength(element.width, "auto", true);
+    const px = pixelLength(width);
+    const text = styleToCss({ ...typographyStyle({ typography: element }, global), textAlign: "center" });
+    const box = styleToCss({
+      ...decorationStyle(element),
+      padding: cssSpacing(element.padding, BUTTON_BOX_DEFAULTS.padding),
+      textAlign: "center",
+    });
+    const anchor = `<a href="${esc(String(fields.href ?? "#"))}" style="display:block;text-decoration:none;${text};">${esc(String(fields.label ?? "Button"))}</a>`;
+    const cell = `<td align="center"${px ? ` width="${px}"` : ""} style="${box};">${anchor}</td>`;
+    return renderAligned("button", { align: element.align, width, content: cell });
   },
 };

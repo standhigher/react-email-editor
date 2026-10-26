@@ -1,0 +1,142 @@
+/* ---------- 邮件主题 ---------- */
+
+.ree-subject-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  padding: 10px 16px;
+  background: var(--ree-panel);
+  border-bottom: 1px solid var(--ree-border);
+  min-height: 56px;
+}
+
+.ree-subject-label {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ree-text);
+}
+
+.ree-subject-input {
+  flex: 1 1 360px;
+  min-width: 240px;
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius);
+  background: var(--ree-panel);
+  color: var(--ree-text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 8px 12px;
+}
+
+.ree-subject-input:focus {
+  outline: none;
+  border-color: var(--ree-primary);
+  box-shadow: 0 0 0 1px var(--ree-primary);
+}
+
+.ree-subject-count {
+  flex-shrink: 0;
+  color: var(--ree-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ree-personalization {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ree-personalization-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--ree-border);
+  background: var(--ree-panel);
+  color: var(--ree-text);
+  border-radius: var(--ree-radius);
+  padding: 7px 10px 7px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.ree-personalization-btn:hover {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-personalization-menu {
+  left: 0;
+  min-width: 240px;
+}
+
+.ree-personalization-empty {
+  padding: 8px 10px;
+  color: var(--ree-muted);
+  font-size: 13px;
+}
+
+.ree-subject-hint {
+  flex: 0 1 auto;
+  margin: 0;
+  color: var(--ree-muted);
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.ree-subject-reset {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.ree-btn {
+  appearance: none;
+  border: 1px solid var(--ree-border);
+  background: var(--ree-panel);
+  color: var(--ree-text);
+  border-radius: var(--ree-radius);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.ree-btn:hover {
+  background: var(--ree-panel-secondary);
+  border-color: var(--ree-border);
+}
+
+.ree-btn:active {
+  background: #f0f0f1;
+}
+
+.ree-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ree-panel), 0 0 0 4px var(--ree-primary);
+}
+
+.ree-btn-primary {
+  background: var(--ree-primary);
+  border-color: var(--ree-primary);
+  color: var(--ree-primary-fg);
+}
+
+.ree-btn-primary:hover {
+  background: var(--ree-primary-hover);
+  border-color: var(--ree-primary-hover);
+}
+
+.ree-btn-primary:active {
+  background: var(--ree-primary-hover);
+}
+

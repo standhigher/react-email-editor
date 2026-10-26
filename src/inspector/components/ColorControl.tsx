@@ -4,33 +4,29 @@ import { colorInputValue } from "../utils";
 interface ColorControlProps {
   value: string;
   fallback?: string;
-  allowEmpty?: boolean;
+  label?: string;
   onChange: (value: string) => void;
 }
 
-export function ColorControl({
-  value,
-  fallback = "#000000",
-  allowEmpty = false,
-  onChange,
-}: ColorControlProps) {
-  const inherited = allowEmpty && !HEX_COLOR.test(value);
-  const display = colorInputValue(value, fallback);
-
+export function ColorControl({ value, fallback = "#000000", label = "Color", onChange }: ColorControlProps) {
+  const actual = value || fallback;
+  const empty = !actual || actual === "transparent" || !HEX_COLOR.test(actual);
   return (
-    <div className="ree-color-row">
-      <input
-        type="color"
-        value={display}
-        onChange={(event) => onChange(event.target.value)}
-        className="ree-color-input"
-      />
-      <span className="ree-color-value">{inherited ? "Default" : display}</span>
-      {allowEmpty && !inherited ? (
-        <button type="button" className="ree-color-reset" onClick={() => onChange("")}>
-          Default
-        </button>
-      ) : null}
-    </div>
+    <label className="ree-color-chip">
+      <span className="ree-color-swatch">
+        <span
+          className={`ree-color-swatch-face${empty ? " is-empty" : ""}`}
+          style={empty ? undefined : { background: actual }}
+        />
+        <input
+          type="color"
+          className="ree-color-native"
+          aria-label={label}
+          value={colorInputValue(actual)}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      </span>
+      <span className="ree-color-chip-label">{label}</span>
+    </label>
   );
 }

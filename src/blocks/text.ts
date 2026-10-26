@@ -1,7 +1,8 @@
 import type { BlockDefinition } from "../types/block";
 import { typographyCss } from "../utils/style";
 import { ICON_TEXT } from "./icons";
-import { FONT_SIZE, LINE_HEIGHT, PADDING, TEXT_COLOR } from "./style-fields";
+import { COMMON_STYLE_FIELDS, TYPOGRAPHY_FIELDS } from "./style-fields";
+import { styleRichText } from "../render/content-style";
 
 export const textBlock: BlockDefinition = {
   type: "text",
@@ -12,12 +13,8 @@ export const textBlock: BlockDefinition = {
   defaultFields: { html: "<p>Type your paragraph here…</p>" },
   defaultStyle: {
     dimension: { padding: "16px" },
-    typography: {
-      fontSize: "15px",
-      lineHeight: "1.6",
-    },
   },
-  styleFields: [FONT_SIZE, LINE_HEIGHT, TEXT_COLOR, PADDING],
+  styleFields: [...COMMON_STYLE_FIELDS, ...TYPOGRAPHY_FIELDS],
   render: ({ fields, style, global }) =>
-    `<div style="${typographyCss(style, global)}">${String(fields.html ?? "")}</div>`,
+    `<div style="display:flow-root;${typographyCss(style, global)}">${styleRichText(String(fields.html ?? ""), style, global)}</div>`,
 };

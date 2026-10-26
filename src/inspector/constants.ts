@@ -10,3 +10,7 @@ export const GLOBAL_FONT_WEIGHTS = [
   { label: "Regular", value: "normal" },
   { label: "Bold", value: "bold" },
 ] as const;
+
+export const SPACING_SIDES = ["Top", "Right", "Bottom", "Left"] as const;
+
+export const SPACING_MAX = 120;
