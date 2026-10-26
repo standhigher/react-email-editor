@@ -22,6 +22,12 @@ export default defineConfig({
     "@tiptap/pm",
     "@tiptap/react",
     "@tiptap/starter-kit",
+    "@codemirror/commands",
+    "@codemirror/language",
+    "@codemirror/state",
+    "@codemirror/view",
+    "@lezer/highlight",
+    "@lezer/html",
   ],
   onSuccess: "node scripts/copy-style.mjs",
 });

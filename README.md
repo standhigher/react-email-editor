@@ -163,7 +163,7 @@ TypeScript、TSX 和 CSS 改动；它不会启动预览服务，页面仍由消�
 已有服务正在运行时直接复用；消费方是否自动刷新取决于其对链接目录的监听配置。
 
 消费方需要安装 React 18 和 React DOM 18。构建产物不会内置 React、React DOM、
-TipTap 或 dnd-kit，这些依赖仍由包管理器解析。链接开发时应确保消费方和组件库使用
+TipTap、dnd-kit、CodeMirror 或 Lezer，这些依赖仍由包管理器解析。链接开发时应确保消费方和组件库使用
 同一个 React 实例，避免重复 React 导致的 `Invalid hook call`；Vite 可配置
 `resolve.dedupe: ["react", "react-dom"]`。
 Next.js 项目可保留 `transpilePackages: ["@standhigher/react-email-editor"]`；

@@ -18,7 +18,7 @@
 - `render(ctx)` 的 `mode` 为 `canvas` 或 `email`；画布展示编辑辅助界面，邮件模式生成可交付 HTML。
 - HTML 区块可以包含 Go template 风格变量，例如 `{{.customer_name}}`、`{{range .products}}`。导出应保留模板，只有预览或显式请求时才解析模板。
 - `getData()`、`getDocument()`、`getJson()`、`getHtml()` 等公开 API 返回独立数据快照；不得让调用方修改快照时意外改变编辑器内部状态。
-- 包不内置 React、React DOM、TipTap 或 dnd-kit；这些依赖由消费方解析，必须保持 peer dependency 和构建 external 约定。
+- 包不内置 React、React DOM、TipTap、dnd-kit、CodeMirror 或 Lezer。React 与 React DOM 保持 peer dependency，其余保持 dependency；构建时这些包都列入 external，由消费方的包管理器解析。
 
 ## 开始工作前
 
