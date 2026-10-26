@@ -1,5 +1,6 @@
+import { LINK_DECORATIONS } from "../constants/style-values";
 import type { StyleFieldConfig } from "../types/block";
-import { FONT_FAMILIES } from "../document/constants";
+import { copyFontFamilies } from "../document/constants";
 import { CONTENT_WIDTH_MAX, CONTENT_WIDTH_MIN, CONTENT_WIDTH_STEP } from "../constants/editor";
 import { BORDER_STYLE, FONT_WEIGHT, TEXT_ALIGN } from "../blocks/style-fields";
 
@@ -27,7 +28,7 @@ export const GLOBAL_FIELD_SECTIONS: GlobalFieldSection[] = [
     { id: "borderRadius", group: "decorations", label: "Corner radius", control: "range", min: 0, max: 48, unit: "px" },
   ] },
   { title: "Typography", fields: [
-    { id: "fontFamily", group: "typography", label: "Font family", control: "select", options: FONT_FAMILIES },
+    { id: "fontFamily", group: "typography", label: "Font family", control: "select", options: copyFontFamilies() },
     { ...FONT_WEIGHT, id: "fontWeight" },
     { ...TEXT_ALIGN, id: "textAlign" },
     { id: "defaultFontSize", group: "typography", label: "Font size", control: "range", min: 8, max: 72, unit: "px" },
@@ -37,6 +38,6 @@ export const GLOBAL_FIELD_SECTIONS: GlobalFieldSection[] = [
     { id: "listSpacing", group: "typography", label: "List spacing", control: "range", min: 0, max: 48, unit: "px" },
     { id: "listIndent", group: "typography", label: "List indent", control: "range", min: 0, max: 64, unit: "px" },
     { id: "linkColor", group: "typography", label: "Link", control: "color" },
-    { id: "linkDecoration", group: "typography", label: "Link decoration", control: "select", options: [{ label: "Underline", value: "underline" }, { label: "None", value: "none" }] },
+    { id: "linkDecoration", group: "typography", label: "Link decoration", control: "select", options: [{ label: "Underline", value: LINK_DECORATIONS.underline }, { label: "None", value: LINK_DECORATIONS.none }] },
   ] },
 ];

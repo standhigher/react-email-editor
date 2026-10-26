@@ -1,3 +1,4 @@
+import { BLOCK_TYPES } from "../constants/block-types";
 import type { BlockDefinition } from "../types/block";
 import { esc } from "../utils/html";
 import { cssLength } from "../utils/css-values";
@@ -8,7 +9,7 @@ import { COMMON_STYLE_FIELDS } from "./style-fields";
 import { ELEMENT_ALIGN, IMAGE_STYLE_FIELDS } from "./element-fields";
 
 export const imageBlock: BlockDefinition = {
-  type: "image", title: "Image", icon: ICON_IMAGE, description: "Insert an image",
+  type: BLOCK_TYPES.image, title: "Image", icon: ICON_IMAGE, description: "Insert an image",
   fields: [
     { type: "url", name: "src", label: "Image URL", defaultValue: "https://placehold.co/560x200?text=Image" },
     { type: "text", name: "alt", label: "Alt text", defaultValue: "Image" },

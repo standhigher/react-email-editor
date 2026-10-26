@@ -75,6 +75,8 @@ export interface BlockDefinition {
   description?: string;
   fields?: FieldConfig[];
   styleFields?: StyleFieldConfig[];
+  /** getBlockDefinition 只保留 styleFields，不补容器间距和装饰。 */
+  exactStyleFields?: boolean;
   defaultFields?: Record<string, unknown>;
   defaultStyle?: EmailBlockStyle;
   /** Sample data used to render template HTML in the editor and preview. */

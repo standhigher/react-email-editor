@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { FONT_WEIGHTS, isStyleValue, type FontWeight } from "../constants/style-values";
 import type { EmailBlockStyle, EmailDecorationStyle, EmailGlobalSettings } from "../types/document";
 import { resolveEmailGlobal } from "../document/create-document";
 import { cssBorderStyle, cssColor, cssFont, cssLength, cssLineHeight, cssSpacing } from "./css-values";
@@ -22,10 +23,8 @@ export function writeStyleValue(style: EmailBlockStyle | undefined, id: string, 
   return next;
 }
 
-export function resolvedFontWeight(blockWeight: string | undefined, globalWeight: EmailGlobalSettings["fontWeight"]): "normal" | "bold" {
-  if (blockWeight === "bold" || blockWeight === "700") return "bold";
-  if (blockWeight === "normal" || blockWeight === "400") return "normal";
-  return globalWeight;
+export function resolvedFontWeight(blockWeight: string | undefined, globalWeight: EmailGlobalSettings["fontWeight"]): FontWeight {
+  return isStyleValue(FONT_WEIGHTS, blockWeight) ? blockWeight : globalWeight;
 }
 
 export function typographyStyle(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): CSSProperties {

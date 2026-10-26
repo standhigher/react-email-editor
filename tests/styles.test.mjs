@@ -1,7 +1,22 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
-import { createEmailDocument, createBlockNode, DEFAULT_BLOCKS, documentToHtml, renderBlock, resolveEmailGlobal, blockToHtml } from '../dist/index.js';
+import { BLOCK_TYPES, BORDER_STYLES, createDecorationFields, createDimensionFields, createEmailDocument, createBlockNode, createTypographyFields, DEFAULT_BLOCKS, DOCUMENT_VERSION, documentToHtml, FONT_FAMILIES, FONT_WEIGHTS, getBlockDefinition, HORIZONTAL_ALIGNS, LINK_DECORATIONS, renderBlock, resolveBlockStyleFields, resolveEmailGlobal, blockToHtml, TEXT_ALIGNS } from '../dist/index.js';
+
+test('内置区块类型和样式取值可从包入口引用', () => {
+  assert.deepEqual(DEFAULT_BLOCKS.map((block) => block.type), Object.values(BLOCK_TYPES));
+  assert.equal(createEmailDocument().version, DOCUMENT_VERSION);
+  assert.equal(createBlockNode(BLOCK_TYPES.heading).type, BLOCK_TYPES.heading);
+  assert.deepEqual(Object.values(TEXT_ALIGNS), ['left', 'center', 'right', 'justify']);
+  assert.deepEqual(Object.values(HORIZONTAL_ALIGNS), ['left', 'center', 'right']);
+  assert.deepEqual(Object.values(FONT_WEIGHTS), ['normal', 'bold']);
+  assert.deepEqual(Object.values(BORDER_STYLES), ['none', 'solid', 'dashed', 'dotted']);
+  assert.deepEqual(Object.values(LINK_DECORATIONS), ['underline', 'none']);
+  assert.equal(Object.isFrozen(FONT_FAMILIES), true);
+  for (const value of ['Arial, Helvetica, sans-serif', 'Georgia, serif', "'Courier New', Courier, monospace"]) {
+    assert.equal(FONT_FAMILIES.some((font) => font.value === value), true, value);
+  }
+});
 
 test('新文档宽度默认 600，所有留白都允许清零', () => {
   const doc = createEmailDocument([createBlockNode('text'), createBlockNode('text')]);
@@ -98,6 +113,64 @@ test('HTML 模板预览解析数据，导出保留变量且没有嵌套文档', 
   assert.match(preview, /<p class="title" style="margin:0;">测试客户<\/p>/);
   assert.equal((preview.match(/<body\b/g) ?? []).length, 1);
   assert.equal((preview.match(/<html\b/g) ?? []).length, 1);
+});
+
+test('自定义区块按容器槽位合并样式，并返回独立副本', () => {
+  const customPadding = { id: 'dimension.padding', group: 'dimension', label: 'Inner padding', control: 'text', defaultValue: '12px' };
+  const customBackground = { id: 'decorations.backgroundColor', group: 'decorations', label: 'Card fill', control: 'color', defaultValue: '#eeeeee' };
+  const card = { id: 'element.backgroundColor', group: 'decorations', label: 'Card', control: 'color', defaultValue: '#ffffff' };
+  const containerIds = ['dimension.padding', 'dimension.margin', 'decorations.backgroundColor', 'decorations.borderWidth', 'decorations.borderStyle', 'decorations.borderColor', 'decorations.borderRadius'];
+  const resolved = resolveBlockStyleFields([customBackground, card, customPadding]);
+  assert.deepEqual(resolved.map((field) => field.id), [...containerIds, card.id]);
+  assert.equal(resolved.find((field) => field.id === 'dimension.padding').label, 'Inner padding');
+  assert.equal(resolved.find((field) => field.id === 'decorations.backgroundColor').label, 'Card fill');
+  assert.notEqual(resolved.find((field) => field.id === 'dimension.padding'), customPadding);
+  customPadding.label = 'Changed';
+  assert.equal(resolved.find((field) => field.id === 'dimension.padding').label, 'Inner padding');
+  const again = resolveBlockStyleFields(resolved);
+  assert.deepEqual(again.map((field) => field.id), resolved.map((field) => field.id));
+  assert.equal(again.find((field) => field.id === 'decorations.backgroundColor').label, 'Card fill');
+  assert.deepEqual(resolveBlockStyleFields([card], true).map((field) => field.id), [card.id]);
+  assert.notEqual(resolveBlockStyleFields([card], true)[0], card);
+  assert.deepEqual(resolveBlockStyleFields(undefined, true), []);
+  assert.deepEqual(resolveBlockStyleFields().map((field) => field.id), containerIds);
+  const text = DEFAULT_BLOCKS.find((definition) => definition.type === 'text');
+  assert.deepEqual(resolveBlockStyleFields(text.styleFields).map((field) => field.id), text.styleFields.map((field) => field.id));
+  const cardBlock = {
+    type: 'card',
+    title: 'Card',
+    styleFields: [customBackground, card],
+    render: () => '',
+  };
+  const lookedUp = getBlockDefinition('card', [cardBlock]);
+  assert.equal(lookedUp.styleFields.find((field) => field.id === 'decorations.backgroundColor').label, 'Card fill');
+  assert.deepEqual(lookedUp.styleFields.map((field) => field.id), [...containerIds, card.id]);
+  assert.equal(cardBlock.styleFields.length, 2);
+  assert.equal(createDimensionFields().padding.id, 'dimension.padding');
+  assert.equal(createDimensionFields().margin.label, 'Outer spacing');
+  const padding = createDimensionFields({ padding: { id: 'element.padding', label: 'Card padding', defaultValue: '16px' } }).padding;
+  assert.equal(padding.control, 'spacing');
+  assert.equal(padding.defaultValue, '16px');
+  const background = createDecorationFields({ backgroundColor: { id: 'element.backgroundColor', label: 'Card', defaultValue: '#ffffff' } }).backgroundColor;
+  assert.deepEqual(background, { id: 'element.backgroundColor', group: 'decorations', label: 'Card', control: 'color', defaultValue: '#ffffff' });
+  const border = createDecorationFields().borderStyle;
+  assert.deepEqual(border.options.map((option) => option.value), Object.values(BORDER_STYLES));
+  assert.deepEqual(border.options.map((option) => option.label), ['None', 'Solid', 'Dashed', 'Dotted']);
+  border.options.push({ label: 'Double', value: 'double' });
+  assert.equal(createDecorationFields().borderStyle.options.some((option) => option.value === 'double'), false);
+  const font = createTypographyFields({ fontSize: { id: 'element.fontSize' } }).fontSize;
+  assert.equal(createTypographyFields().fontSize.id, 'typography.fontSize');
+  assert.equal(font.unit, 'px');
+  assert.equal(font.min, 8);
+  assert.equal(font.max, 72);
+  const fontOptions = createTypographyFields().fontFamily.options;
+  fontOptions.push({ label: 'Extra', value: 'Extra, sans-serif' });
+  assert.equal(FONT_FAMILIES.some((item) => item.value === 'Extra, sans-serif'), false);
+  const button = DEFAULT_BLOCKS.find((definition) => definition.type === 'button');
+  const buttonPadding = button.styleFields.find((field) => field.id === 'element.padding');
+  assert.equal(buttonPadding.label, 'Button padding');
+  assert.equal(buttonPadding.defaultValue, '12px 32px');
+  assert.equal(button.styleFields.find((field) => field.id === 'element.borderColor').label, 'Outline');
 });
 
 test('自定义区块的邮件模板在预览时展开，导出保留变量', () => {

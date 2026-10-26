@@ -1,10 +1,25 @@
+import { HORIZONTAL_ALIGNS } from "../constants/style-values";
 import type { StyleFieldConfig } from "../types/block";
 import type { EmailElementStyle } from "../types/document";
-import { BORDER_COLOR, BORDER_RADIUS, BORDER_STYLE, BORDER_WIDTH, FONT_FAMILY, FONT_SIZE, FONT_WEIGHT, LINE_HEIGHT } from "./style-fields";
+import { createDecorationFields, createDimensionFields, createTypographyFields } from "./style-fields";
+
+const elementDecoration = createDecorationFields({
+  borderWidth: { id: "element.borderWidth", label: "Border width" },
+  borderStyle: { id: "element.borderStyle", label: "Border style" },
+  borderColor: { id: "element.borderColor", label: "Outline" },
+  borderRadius: { id: "element.borderRadius", label: "Corner radius" },
+});
+const buttonTypography = createTypographyFields({
+  fontFamily: { id: "element.fontFamily" },
+  fontSize: { id: "element.fontSize" },
+  fontWeight: { id: "element.fontWeight" },
+  lineHeight: { id: "element.lineHeight" },
+  color: { id: "element.color" },
+});
 
 /** 按钮盒子的初始外观。重置和缺省渲染都回到这组值，而不是透明底。 */
 export const BUTTON_BOX_DEFAULTS = {
-  align: "center",
+  align: HORIZONTAL_ALIGNS.center,
   backgroundColor: "#005bd3",
   borderRadius: "8px",
   borderWidth: "1px",
@@ -12,26 +27,23 @@ export const BUTTON_BOX_DEFAULTS = {
   padding: "12px 32px",
 } as const satisfies EmailElementStyle;
 
-function elementBorderLabel(field: StyleFieldConfig): string {
-  if (field.id === "decorations.borderColor") return "Outline";
-  const stripped = field.label.replace(/^Block /, "");
-  return stripped.charAt(0).toUpperCase() + stripped.slice(1);
-}
-
-export const ELEMENT_BORDER_FIELDS: StyleFieldConfig[] = [BORDER_WIDTH, BORDER_STYLE, BORDER_COLOR, BORDER_RADIUS].map((field) => ({
-  ...field,
-  id: field.id.replace("decorations.", "element."),
-  group: "decorations",
-  label: elementBorderLabel(field),
-}));
-export const ELEMENT_ALIGN: StyleFieldConfig = { id: "element.align", group: "general", label: "Alignment", control: "alignment", defaultValue: "center" };
+export const ELEMENT_BORDER_FIELDS: StyleFieldConfig[] = [
+  elementDecoration.borderWidth,
+  elementDecoration.borderStyle,
+  elementDecoration.borderColor,
+  elementDecoration.borderRadius,
+];
+export const ELEMENT_ALIGN: StyleFieldConfig = { id: "element.align", group: "general", label: "Alignment", control: "alignment", defaultValue: HORIZONTAL_ALIGNS.center };
 export const ELEMENT_WIDTH: StyleFieldConfig = { id: "element.width", group: "general", label: "Width", control: "range", units: ["px", "%", "auto"], min: 0, max: 600, defaultValue: "auto" };
 export const BUTTON_STYLE_FIELDS: StyleFieldConfig[] = [
   ELEMENT_ALIGN, ELEMENT_WIDTH,
-  { id: "element.padding", group: "dimension", label: "Button padding", control: "spacing", defaultValue: BUTTON_BOX_DEFAULTS.padding },
-  ...[FONT_FAMILY, FONT_SIZE, FONT_WEIGHT, LINE_HEIGHT].map((field): StyleFieldConfig => ({ ...field, id: field.id.replace("typography.", "element.") })),
-  { id: "element.color", group: "typography", label: "Text", control: "color" },
-  { id: "element.backgroundColor", group: "decorations", label: "Button", control: "color", defaultValue: BUTTON_BOX_DEFAULTS.backgroundColor },
+  createDimensionFields({ padding: { id: "element.padding", label: "Button padding", defaultValue: BUTTON_BOX_DEFAULTS.padding } }).padding,
+  buttonTypography.fontFamily,
+  buttonTypography.fontSize,
+  buttonTypography.fontWeight,
+  buttonTypography.lineHeight,
+  buttonTypography.color,
+  createDecorationFields({ backgroundColor: { id: "element.backgroundColor", label: "Button", defaultValue: BUTTON_BOX_DEFAULTS.backgroundColor } }).backgroundColor,
   ...ELEMENT_BORDER_FIELDS.map((field) => ({
     ...field,
     defaultValue: field.id === "element.borderWidth" ? BUTTON_BOX_DEFAULTS.borderWidth

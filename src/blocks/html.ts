@@ -1,10 +1,11 @@
+import { BLOCK_TYPES } from "../constants/block-types";
 import type { BlockDefinition } from "../types/block";
 import { htmlContent } from "../render/html-content";
 import { ICON_HTML } from "./icons";
 import { COMMON_STYLE_FIELDS, TYPOGRAPHY_FIELDS } from "./style-fields";
 
 export const htmlBlock: BlockDefinition = {
-  type: "html",
+  type: BLOCK_TYPES.html,
   title: "HTML",
   icon: ICON_HTML,
   description: "Paste raw HTML",

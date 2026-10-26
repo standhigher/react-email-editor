@@ -1,3 +1,5 @@
+import { BORDER_STYLES, isStyleValue, type BorderStyle } from "../constants/style-values";
+
 /** 仅接受配置控件支持的 CSS 值；保留 0、透明色和继承值的语义。 */
 export function cssLength(value: unknown, fallback = "0px", allowAuto = false): string {
   const input = String(value ?? "").trim();
@@ -64,6 +66,6 @@ export function cssLineHeight(value: unknown, fallback: string): string {
   return /^(?:\d+(?:\.\d+)?|\.\d+)$/.test(input) ? input : cssLength(input, fallback);
 }
 
-export function cssBorderStyle(value: unknown): "none" | "solid" | "dotted" | "dashed" {
-  return value === "none" || value === "dotted" || value === "dashed" ? value : "solid";
+export function cssBorderStyle(value: unknown): BorderStyle {
+  return isStyleValue(BORDER_STYLES, value) ? value : BORDER_STYLES.solid;
 }

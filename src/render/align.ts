@@ -1,6 +1,5 @@
+import { HORIZONTAL_ALIGNS, isStyleValue, type HorizontalAlign } from "../constants/style-values";
 import { esc } from "../utils/html";
-
-export type HorizontalAlign = "left" | "center" | "right";
 
 /** 图片、按钮、分割线的对齐方式不同，不能共用同一种定位。 */
 export type AlignTarget = "image" | "button" | "divider";
@@ -12,8 +11,8 @@ interface AlignFrameOptions {
   content: string;
 }
 
-export function readAlign(value: unknown, fallback: HorizontalAlign = "center"): HorizontalAlign {
-  return value === "left" || value === "right" || value === "center" ? value : fallback;
+export function readAlign(value: unknown, fallback: HorizontalAlign = HORIZONTAL_ALIGNS.center): HorizontalAlign {
+  return isStyleValue(HORIZONTAL_ALIGNS, value) ? value : fallback;
 }
 
 /** 邮件宽度属性只接受 px 和 %。 */

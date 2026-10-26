@@ -1,4 +1,5 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
+import { resolveBlockStyleFields } from "../blocks/style-fields";
 import type { BlockDefinition } from "../types/block";
 
 export function mergeBlockDefinitions(
@@ -14,5 +15,10 @@ export function getBlockDefinition(
   type: string,
   definitions: BlockDefinition[] = DEFAULT_BLOCKS,
 ): BlockDefinition | undefined {
-  return definitions.find((definition) => definition.type === type);
+  const definition = definitions.find((item) => item.type === type);
+  if (!definition) return undefined;
+  return {
+    ...definition,
+    styleFields: resolveBlockStyleFields(definition.styleFields, definition.exactStyleFields),
+  };
 }

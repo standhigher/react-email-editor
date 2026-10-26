@@ -1,3 +1,4 @@
+import { BLOCK_TYPES } from "../constants/block-types";
 import type { BlockDefinition } from "../types/block";
 import { typographyCss } from "../utils/style";
 import { ICON_HEADING } from "./icons";
@@ -5,7 +6,7 @@ import { COMMON_STYLE_FIELDS, TYPOGRAPHY_FIELDS } from "./style-fields";
 import { styleRichText } from "../render/content-style";
 
 export const headingBlock: BlockDefinition = {
-  type: "heading",
+  type: BLOCK_TYPES.heading,
   title: "Heading",
   icon: ICON_HEADING,
   description: "Large section heading",

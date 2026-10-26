@@ -1,11 +1,14 @@
+import type { BorderStyle, FontWeight, HorizontalAlign, LinkDecoration, TextAlign } from "../constants/style-values";
+import { DOCUMENT_VERSION } from "../document/constants";
+
 export interface EmailGlobalSettings {
   textColor: string;
-  textAlign: "left" | "center" | "right" | "justify";
+  textAlign: TextAlign;
   backgroundColor: string;
   contentWidth: number;
-  contentAlign: "left" | "center" | "right";
+  contentAlign: HorizontalAlign;
   fontFamily: string;
-  fontWeight: "normal" | "bold";
+  fontWeight: FontWeight;
   contentBackgroundColor: string;
   contentPadding: string;
   outerPadding: string;
@@ -16,15 +19,15 @@ export interface EmailGlobalSettings {
   listSpacing: string;
   listIndent: string;
   linkColor: string;
-  linkDecoration: "underline" | "none";
+  linkDecoration: LinkDecoration;
   borderWidth: string;
-  borderStyle: "solid" | "dashed" | "dotted" | "none";
+  borderStyle: BorderStyle;
   borderColor: string;
   borderRadius: string;
 }
 
 export interface EmailDocument {
-  version: 1;
+  version: typeof DOCUMENT_VERSION;
   subject?: string;
   global: EmailGlobalSettings;
   blocks: EmailBlockNode[];
@@ -43,21 +46,21 @@ export interface EmailDecorationStyle {
   borderRadius?: string;
   borderWidth?: string;
   borderColor?: string;
-  borderStyle?: "solid" | "dashed" | "dotted" | "none";
+  borderStyle?: BorderStyle;
 }
 
 export interface EmailTypographyStyle {
   fontFamily?: string;
   fontSize?: string;
-  fontWeight?: string;
+  fontWeight?: FontWeight;
   lineHeight?: string;
   color?: string;
-  textAlign?: "left" | "center" | "right" | "justify";
+  textAlign?: TextAlign;
   paragraphSpacing?: string;
   listSpacing?: string;
   listIndent?: string;
   linkColor?: string;
-  linkDecoration?: "underline" | "none";
+  linkDecoration?: LinkDecoration;
 }
 
 /** 按钮、图片和分割线自身的样式，与区块容器样式独立。 */
@@ -65,7 +68,7 @@ export interface EmailElementStyle extends EmailDecorationStyle, EmailTypography
   padding?: string;
   width?: string;
   height?: string;
-  align?: "left" | "center" | "right";
+  align?: HorizontalAlign;
 }
 
 export interface EmailSpacingStyle {

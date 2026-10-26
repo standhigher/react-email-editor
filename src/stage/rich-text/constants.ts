@@ -1,5 +1,7 @@
+import { TEXT_ALIGNS as TEXT_ALIGN_VALUES, type TextAlign } from "../../constants/style-values";
+
 export interface TextAlignOption {
-  value: "left" | "center" | "right" | "justify";
+  value: TextAlign;
   title: string;
   icon: "align-left" | "align-center" | "align-right" | "align-justify";
 }
@@ -67,8 +69,8 @@ export const EMOJIS = [
 ];
 
 export const TEXT_ALIGNS: TextAlignOption[] = [
-  { value: "left", title: "Align left", icon: "align-left" },
-  { value: "center", title: "Align center", icon: "align-center" },
-  { value: "right", title: "Align right", icon: "align-right" },
-  { value: "justify", title: "Justify", icon: "align-justify" },
+  { value: TEXT_ALIGN_VALUES.left, title: "Align left", icon: "align-left" },
+  { value: TEXT_ALIGN_VALUES.center, title: "Align center", icon: "align-center" },
+  { value: TEXT_ALIGN_VALUES.right, title: "Align right", icon: "align-right" },
+  { value: TEXT_ALIGN_VALUES.justify, title: "Justify", icon: "align-justify" },
 ];

@@ -1,3 +1,4 @@
+import { BLOCK_TYPES } from "../constants/block-types";
 import type { BlockDefinition } from "../types/block";
 import { esc } from "../utils/html";
 import { cssLength, cssSpacing } from "../utils/css-values";
@@ -8,7 +9,7 @@ import { COMMON_STYLE_FIELDS } from "./style-fields";
 import { BUTTON_BOX_DEFAULTS, BUTTON_STYLE_FIELDS } from "./element-fields";
 
 export const buttonBlock: BlockDefinition = {
-  type: "button", title: "Button", icon: ICON_BUTTON, description: "Clickable CTA button",
+  type: BLOCK_TYPES.button, title: "Button", icon: ICON_BUTTON, description: "Clickable CTA button",
   fields: [
     { type: "text", name: "label", label: "Label", defaultValue: "Buy now" },
     { type: "url", name: "href", label: "Link", defaultValue: "https://example.com" },

@@ -1,3 +1,5 @@
+import type { FontWeight, TextAlign } from "../../constants/style-values";
+
 export interface EditorTextRange {
   from: number;
   to: number;
@@ -5,13 +7,13 @@ export interface EditorTextRange {
 
 export type RichTextMenu = "font" | "size" | "emoji" | "color" | "link" | "variable";
 
-export type TextAlignment = "left" | "center" | "right" | "justify";
+export type TextAlignment = TextAlign;
 
 export interface RichTextInheritedStyle {
   fontFamily: string;
   fontSize: string;
   color: string;
-  fontWeight: "normal" | "bold";
+  fontWeight: FontWeight;
 }
 
 export interface ToolbarState {
@@ -24,7 +26,7 @@ export interface ToolbarState {
   align: TextAlignment | "";
   fontFamily: string;
   fontSize: string;
-  fontWeight: "normal" | "bold" | "";
+  fontWeight: FontWeight | "";
   color: string;
   linkHref: string;
 }

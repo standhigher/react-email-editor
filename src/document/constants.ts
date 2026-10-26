@@ -1,17 +1,28 @@
 import { CANVAS_DEVICE_WIDTH } from "../constants/editor";
+import { BORDER_STYLES, FONT_WEIGHTS, HORIZONTAL_ALIGNS, LINK_DECORATIONS, TEXT_ALIGNS } from "../constants/style-values";
 import type { FieldOption } from "../types/block";
 import type { EmailGlobalSettings } from "../types/document";
 
-export const FONT_FAMILIES: FieldOption[] = [
-  { label: "Arial", value: "Arial, Helvetica, sans-serif" },
-  { label: "Helvetica", value: "Helvetica, Arial, sans-serif" },
-  { label: "Verdana", value: "Verdana, Geneva, sans-serif" },
-  { label: "Tahoma", value: "Tahoma, Geneva, sans-serif" },
-  { label: "Trebuchet MS", value: "'Trebuchet MS', Helvetica, sans-serif" },
-  { label: "Georgia", value: "Georgia, serif" },
-  { label: "Times New Roman", value: "'Times New Roman', Times, serif" },
-  { label: "Courier New", value: "'Courier New', Courier, monospace" },
-];
+export const DOCUMENT_VERSION = 1 as const;
+
+function fontOption(label: string, value: string): FieldOption {
+  return Object.freeze({ label, value });
+}
+
+export const FONT_FAMILIES: readonly FieldOption[] = Object.freeze([
+  fontOption("Arial", "Arial, Helvetica, sans-serif"),
+  fontOption("Helvetica", "Helvetica, Arial, sans-serif"),
+  fontOption("Verdana", "Verdana, Geneva, sans-serif"),
+  fontOption("Tahoma", "Tahoma, Geneva, sans-serif"),
+  fontOption("Trebuchet MS", "'Trebuchet MS', Helvetica, sans-serif"),
+  fontOption("Georgia", "Georgia, serif"),
+  fontOption("Times New Roman", "'Times New Roman', Times, serif"),
+  fontOption("Courier New", "'Courier New', Courier, monospace"),
+]);
+
+export function copyFontFamilies(): FieldOption[] {
+  return FONT_FAMILIES.map((font) => ({ label: font.label, value: font.value }));
+}
 
 export function fontFamilyLabel(value: string): string {
   const match = FONT_FAMILIES.find((font) => font.value === value);
@@ -21,17 +32,18 @@ export function fontFamilyLabel(value: string): string {
 }
 
 export function fontFamilyOptions(value: string): FieldOption[] {
-  if (FONT_FAMILIES.some((font) => font.value === value)) return FONT_FAMILIES;
-  return [{ label: fontFamilyLabel(value), value }, ...FONT_FAMILIES];
+  const fonts = copyFontFamilies();
+  if (fonts.some((font) => font.value === value)) return fonts;
+  return [{ label: fontFamilyLabel(value), value }, ...fonts];
 }
 
 export const DEFAULT_EMAIL_GLOBAL: EmailGlobalSettings = {
   textColor: "#000000",
-  textAlign: "left",
+  textAlign: TEXT_ALIGNS.left,
   backgroundColor: "#ffffff",
   contentBackgroundColor: "#ffffff",
   contentWidth: CANVAS_DEVICE_WIDTH.desktop,
-  contentAlign: "center",
+  contentAlign: HORIZONTAL_ALIGNS.center,
   contentPadding: "24px",
   outerPadding: "0px",
   blockGap: "16px",
@@ -39,13 +51,13 @@ export const DEFAULT_EMAIL_GLOBAL: EmailGlobalSettings = {
   listSpacing: "4px",
   listIndent: "22px",
   borderWidth: "0px",
-  borderStyle: "solid",
+  borderStyle: BORDER_STYLES.solid,
   borderColor: "#000000",
   borderRadius: "0px",
   fontFamily: "Arial, Helvetica, sans-serif",
-  fontWeight: "normal",
+  fontWeight: FONT_WEIGHTS.normal,
   defaultFontSize: "16px",
   defaultLineHeight: "1.5",
   linkColor: "#005bd3",
-  linkDecoration: "underline",
+  linkDecoration: LINK_DECORATIONS.underline,
 };

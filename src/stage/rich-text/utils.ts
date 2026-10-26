@@ -1,24 +1,25 @@
 import type { Editor } from "@tiptap/react";
-import type { EditorTextRange, TextAlignment, ToolbarState } from "./types";
+import { FONT_WEIGHTS, TEXT_ALIGNS, type FontWeight, type TextAlign } from "../../constants/style-values";
+import type { EditorTextRange, ToolbarState } from "./types";
 
-const ALIGNMENTS: TextAlignment[] = ["left", "center", "right", "justify"];
+const ALIGNMENTS = Object.values(TEXT_ALIGNS) as TextAlign[];
 
 function textAttribute(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
 function markWeight(value: unknown): ToolbarState["fontWeight"] {
-  return value === "normal" || value === "bold" ? value : "";
+  return value === FONT_WEIGHTS.normal || value === FONT_WEIGHTS.bold ? value : "";
 }
 
 export function isVisuallyBold(
   markWeightValue: ToolbarState["fontWeight"],
   strong: boolean,
-  inherited: "normal" | "bold",
+  inherited: FontWeight,
 ): boolean {
-  if (strong || markWeightValue === "bold") return true;
-  if (markWeightValue === "normal") return false;
-  return inherited === "bold";
+  if (strong || markWeightValue === FONT_WEIGHTS.bold) return true;
+  if (markWeightValue === FONT_WEIGHTS.normal) return false;
+  return inherited === FONT_WEIGHTS.bold;
 }
 
 export function readToolbarState(editor: Editor): ToolbarState {
@@ -40,23 +41,23 @@ export function readToolbarState(editor: Editor): ToolbarState {
   };
 }
 
-export function toggleVisualBold(editor: Editor, inherited: "normal" | "bold") {
+export function toggleVisualBold(editor: Editor, inherited: FontWeight) {
   const state = readToolbarState(editor);
   const visuallyBold = isVisuallyBold(state.fontWeight, state.bold, inherited);
   const chain = editor.chain().focus().unsetBold();
   if (visuallyBold) {
-    if (inherited === "bold") {
-      chain.setMark("textStyle", { fontWeight: "normal" }).run();
+    if (inherited === FONT_WEIGHTS.bold) {
+      chain.setMark("textStyle", { fontWeight: FONT_WEIGHTS.normal }).run();
       return;
     }
     chain.setMark("textStyle", { fontWeight: null }).removeEmptyTextStyle().run();
     return;
   }
-  if (inherited === "bold") {
+  if (inherited === FONT_WEIGHTS.bold) {
     chain.setMark("textStyle", { fontWeight: null }).removeEmptyTextStyle().run();
     return;
   }
-  chain.setMark("textStyle", { fontWeight: "bold" }).run();
+  chain.setMark("textStyle", { fontWeight: FONT_WEIGHTS.bold }).run();
 }
 
 export function toColorInputValue(value: string, fallback: string): string {

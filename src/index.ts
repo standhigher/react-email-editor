@@ -9,6 +9,17 @@ export { DEFAULT_BLOCKS } from "./blocks/registry";
 export { createEmailDocument, resolveEmailGlobal } from "./document/create-document";
 export { DEFAULT_EMAIL_GLOBAL } from "./document/constants";
 export { createBlockNode } from "./document/create-block";
+export {
+  createDecorationFields,
+  createDimensionFields,
+  createTypographyFields,
+  resolveBlockStyleFields,
+} from "./blocks/style-fields";
+export type {
+  DecorationFieldName,
+  DimensionFieldName,
+  TypographyFieldName,
+} from "./blocks/style-fields";
 export { documentToHtml } from "./render/document-html";
 export type { DocumentHtmlOptions } from "./render/document-html";
 export {
@@ -26,6 +37,23 @@ export { getBlockDefinition } from "./document/registry";
 export { generateId } from "./utils/id";
 export type { RenderMode } from "./types/block";
 export { STYLE_GROUPS } from "./constants/style-groups";
+export { BLOCK_TYPES } from "./constants/block-types";
+export type { BuiltinBlockType } from "./constants/block-types";
+export {
+  BORDER_STYLES,
+  FONT_WEIGHTS,
+  HORIZONTAL_ALIGNS,
+  LINK_DECORATIONS,
+  TEXT_ALIGNS,
+} from "./constants/style-values";
+export type {
+  BorderStyle,
+  FontWeight,
+  HorizontalAlign,
+  LinkDecoration,
+  TextAlign,
+} from "./constants/style-values";
+export { DOCUMENT_VERSION, FONT_FAMILIES } from "./document/constants";
 export type {
   EmailDocument,
   EmailBlockNode,

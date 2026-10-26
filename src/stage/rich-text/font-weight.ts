@@ -1,10 +1,9 @@
 import { Extension } from "@tiptap/react";
+import { FONT_WEIGHTS, isStyleValue, type FontWeight as EmailFontWeight } from "../../constants/style-values";
 
-function parseFontWeight(value: string): "normal" | "bold" | null {
+function parseFontWeight(value: string): EmailFontWeight | null {
   const weight = value.trim().toLowerCase();
-  if (weight === "normal" || weight === "400") return "normal";
-  if (weight === "bold" || weight === "700") return "bold";
-  return null;
+  return isStyleValue(FONT_WEIGHTS, weight) ? weight : null;
 }
 
 export const FontWeight = Extension.create({
@@ -18,7 +17,7 @@ export const FontWeight = Extension.create({
             default: null,
             parseHTML: (element: HTMLElement) => parseFontWeight(element.style.fontWeight),
             renderHTML: (attributes: { fontWeight?: string | null }) => {
-              if (attributes.fontWeight !== "normal" && attributes.fontWeight !== "bold") {
+              if (attributes.fontWeight !== FONT_WEIGHTS.normal && attributes.fontWeight !== FONT_WEIGHTS.bold) {
                 return {};
               }
               return { style: `font-weight: ${attributes.fontWeight}` };

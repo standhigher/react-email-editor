@@ -51,11 +51,11 @@ HTML 区块可以通过节点上的 `defaultData` 提供模板渲染数据。编
 优先覆盖同名全局变量。
 
 ```tsx
-import { createEmailDocument } from "@standhigher/react-email-editor";
+import { BLOCK_TYPES, createEmailDocument } from "@standhigher/react-email-editor";
 
 const initialDocument = createEmailDocument([{
     id: "products",
-    type: "html",
+    type: BLOCK_TYPES.html,
     defaultData: {
       has_products: true,
       products: [{ name: "示例商品", price: "¥99" }],
@@ -84,15 +84,33 @@ const initialDocument = createEmailDocument([{
 ## 样式配置
 
 开发阶段直接使用新的文档结构，不迁移旧版区块字段。建议通过
-`createEmailDocument()` 和 `createBlockNode()` 创建文档与区块。
+`createEmailDocument()` 和 `createBlockNode()` 创建文档与区块。内置区块类型使用
+`BLOCK_TYPES`，文档版本是 `DOCUMENT_VERSION`。全局和区块样式里的封闭取值使用
+`TEXT_ALIGNS`、`HORIZONTAL_ALIGNS`、`FONT_WEIGHTS`、`BORDER_STYLES`、
+`LINK_DECORATIONS` 和 `FONT_FAMILIES`。`EmailBlockNode.type` 仍是字符串，自定义区块不受这些常量限制。
 
 - `global.contentWidth` 是邮件内容外框宽度，默认 `600px`。邮件内容表同时写像素 `width` 和 `max-width`，Outlook 能认出宽度，窄屏仍可收缩。桌面画布与 Preview 跟随配置，移动视口为 `360px`。
 - `global.contentPadding` 默认四边 `24px`，`outerPadding` 默认 `0px`，`blockGap` 默认 `16px`，均可在 GLOBAL 面板修改或清零。
 - Global 同时管理内外背景、内容边框/圆角，以及字体、字号、行高、段落/列表间距、列表缩进、链接颜色和装饰。段落间距只加在相邻顶层段落之间，列表项里的段落不加这段间距。
 - 所有区块通过 `style.dimension` 配置 padding 和四边外侧留白，通过 `style.decorations` 配置容器背景、边框和圆角。外侧留白在邮件中使用表格单元格 padding 实现，避免 margin 折叠。
+- 自定义区块经 `getBlockDefinition()` 合并容器字段，检查器读取这份结果。合并顺序固定为 Padding、Outer spacing、Background、边框宽度、边框样式、边框颜色、圆角。调用方声明了相同 `id` 时，用调用方的标签、控件和默认值占住该槽位；其余字段按原顺序排在这些容器字段后面。`exactStyleFields: true` 时只保留传入的 `styleFields`。这个开关只决定检查器展示哪些字段，邮件包裹层仍会应用区块 `style` 上已有的间距和装饰。区块定义上的原始 `styleFields` 保持调用方写入的内容。
+- `createDimensionFields()`、`createDecorationFields()`、`createTypographyFields()` 每次返回独立副本，例如 `createDimensionFields().padding`。要改 `id`、标签或默认值时，按字段名传入覆盖项。`resolveBlockStyleFields()` 返回同一套合并规则下的副本。
 - Heading、Text 和 HTML 使用 `style.typography` 覆盖全局排版；点击 Inherit Global 清除覆盖。Text 默认继承全局字号与行高。
 - Button、Image、Divider 使用 `style.element` 配置元素自身尺寸、对齐、边框等；按钮还支持独立字体、文字色、背景和内边距。
 - HTML 区块保留手写 HTML 的显式 inline style。段落、列表和链接的默认排版内联在标签上，并让位于作者已有的 style。完整文档 head 中的 style 会合并进邮件 head。
+
+```tsx
+import { createDecorationFields, createDimensionFields } from "@standhigher/react-email-editor";
+
+const styleFields = [
+  createDimensionFields().padding,
+  createDecorationFields().backgroundColor,
+  createDecorationFields().borderRadius,
+  createDimensionFields({
+    padding: { id: "element.padding", label: "Card padding", defaultValue: "16px" },
+  }).padding,
+];
+```
 
 编辑器工作区的留白、空画布拖入提示、选中边框和工具栏是编辑辅助界面，不进入邮件输出。
 配置在画布、Preview 与 `documentToHtml()` 中共用渲染规则。

@@ -3,6 +3,7 @@ import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 import type { Extensions } from "@tiptap/react";
+import { TEXT_ALIGNS } from "../../constants/style-values";
 import { FontWeight } from "./font-weight";
 
 export function createRichTextExtensions(placeholder: string): Extensions {
@@ -19,7 +20,7 @@ export function createRichTextExtensions(placeholder: string): Extensions {
     FontWeight,
     TextAlign.configure({
       types: ["paragraph"],
-      alignments: ["left", "center", "right", "justify"],
+      alignments: Object.values(TEXT_ALIGNS),
     }),
     Placeholder.configure({ placeholder }),
   ];
