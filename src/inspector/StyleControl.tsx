@@ -1,14 +1,22 @@
-import { TEXT_ALIGN_OPTIONS } from "./constants";
-import { colorInputValue } from "./utils";
+import { AlignControl } from "./components/AlignControl";
+import { ColorControl } from "./components/ColorControl";
+import { RangeControl } from "./components/RangeControl";
+import { SelectControl } from "./components/SelectControl";
 import type { StyleFieldConfig } from "../types/block";
 
 interface StyleControlProps {
   config: StyleFieldConfig;
   value: string;
+  inheritedColor?: string;
   onChange: (value: string) => void;
 }
 
-export function StyleControl({ config, value, onChange }: StyleControlProps) {
+export function StyleControl({
+  config,
+  value,
+  inheritedColor,
+  onChange,
+}: StyleControlProps) {
   const numeric = parseFloat(value);
   const hasNumeric = Number.isFinite(numeric);
   const numberValue = hasNumeric ? numeric : (config.min ?? 0);
@@ -23,45 +31,24 @@ export function StyleControl({ config, value, onChange }: StyleControlProps) {
       </div>
 
       {config.control === "color" ? (
-        <div className="ree-color-row">
-          <input
-            type="color"
-            value={colorInputValue(value)}
-            onChange={(event) => onChange(event.target.value)}
-            className="ree-color-input"
-          />
-          <span className="ree-color-value">{value || "–"}</span>
-        </div>
+        <ColorControl
+          value={value}
+          fallback={config.id === "typography.color" ? inheritedColor : undefined}
+          allowEmpty={config.id === "typography.color"}
+          onChange={onChange}
+        />
       ) : null}
 
       {config.control === "alignment" ? (
-        <div className="ree-align-row">
-          {TEXT_ALIGN_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className={`ree-align-btn${value === option.value ? " is-active" : ""}`}
-              onClick={() => onChange(option.value)}
-              title={option.label}
-            >
-              {option.glyph}
-            </button>
-          ))}
-        </div>
+        <AlignControl value={value} onChange={onChange} />
       ) : null}
 
       {config.control === "select" ? (
-        <select
-          className="ree-input"
+        <SelectControl
           value={value}
-          onChange={(event) => onChange(event.target.value)}
-        >
-          {(config.options ?? []).map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+          options={config.options ?? []}
+          onChange={onChange}
+        />
       ) : null}
 
       {config.control === "number" ? (
@@ -83,17 +70,13 @@ export function StyleControl({ config, value, onChange }: StyleControlProps) {
       ) : null}
 
       {config.control === "range" ? (
-        <div className="ree-range-row">
-          <input
-            type="range"
-            className="ree-range"
-            value={numberValue}
-            min={config.min ?? 0}
-            max={config.max ?? 100}
-            step={config.step ?? 1}
-            onChange={(event) => onChange(format(Number(event.target.value)))}
-          />
-        </div>
+        <RangeControl
+          value={numberValue}
+          min={config.min}
+          max={config.max}
+          step={config.step}
+          onChange={(next) => onChange(format(next))}
+        />
       ) : null}
 
       {config.control === "text" ? (

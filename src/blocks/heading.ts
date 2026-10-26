@@ -6,7 +6,6 @@ import {
   FONT_WEIGHT,
   LINE_HEIGHT,
   PADDING,
-  TEXT_ALIGN,
   TEXT_COLOR,
 } from "./style-fields";
 
@@ -23,11 +22,9 @@ export const headingBlock: BlockDefinition = {
       fontSize: "26px",
       fontWeight: "bold",
       lineHeight: "1.25",
-      color: "#202223",
-      textAlign: "left",
     },
   },
-  styleFields: [FONT_SIZE, FONT_WEIGHT, LINE_HEIGHT, TEXT_COLOR, TEXT_ALIGN, PADDING],
-  render: ({ fields, style }) =>
-    `<div style="${typographyCss(style)}">${String(fields.html ?? "")}</div>`,
+  styleFields: [FONT_SIZE, FONT_WEIGHT, LINE_HEIGHT, TEXT_COLOR, PADDING],
+  render: ({ fields, style, global }) =>
+    `<div style="${typographyCss(style, global)}">${String(fields.html ?? "")}</div>`,
 };

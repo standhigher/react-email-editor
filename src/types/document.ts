@@ -1,6 +1,16 @@
+export interface EmailGlobalSettings {
+  textColor: string;
+  backgroundColor: string;
+  contentWidth: number;
+  contentAlign: "left" | "center" | "right";
+  fontFamily: string;
+  fontWeight: "normal" | "bold";
+}
+
 export interface EmailDocument {
   version: 1;
   subject?: string;
+  global: EmailGlobalSettings;
   blocks: EmailBlockNode[];
 }
 

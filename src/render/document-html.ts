@@ -1,5 +1,8 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
-import { CANVAS_DEVICE_WIDTH, EMAIL_COLUMN_PADDING_X } from "../constants/editor";
+import { EMAIL_COLUMN_PADDING_X } from "../constants/editor";
+import { ensureEmailDocument } from "../document/create-document";
+import { esc } from "../utils/html";
+import { emailBaseCss } from "../utils/style";
 import {
   blockToHtml,
   mergeTemplateData,
@@ -19,7 +22,9 @@ export function documentToHtml(
   definitions: BlockDefinition[] = DEFAULT_BLOCKS,
   options: DocumentHtmlOptions = {},
 ): string {
-  const body = document.blocks
+  const source = ensureEmailDocument(document);
+  const baseCss = emailBaseCss(source.global);
+  const body = source.blocks
     .map((node) => {
       const blockData = {
         ...(options.templateData ?? {}),
@@ -27,6 +32,7 @@ export function documentToHtml(
       };
       return blockToHtml(node, definitions, "email", {
         resolveHtmlTemplate: options.resolveHtmlTemplates,
+        global: source.global,
         templateData: mergeTemplateData(
           options.variables ?? [],
           Object.keys(blockData).length > 0 ? blockData : undefined,
@@ -43,13 +49,13 @@ export function documentToHtml(
     '<meta name="viewport" content="width=device-width, initial-scale=1" />',
     "<title>Email</title>",
     "</head>",
-    '<body style="margin:0;padding:0;background-color:#f4f5f7;word-spacing:normal;">',
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f5f7;">',
+    `<body style="margin:0;padding:0;${baseCss};word-spacing:normal;">`,
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="${baseCss};">`,
     "<tr>",
-    `<td align="center" style="padding:24px ${EMAIL_COLUMN_PADDING_X}px;">`,
-    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:${CANVAS_DEVICE_WIDTH.desktop}px;background-color:#ffffff;">`,
+    `<td align="${esc(source.global.contentAlign)}" style="padding:24px ${EMAIL_COLUMN_PADDING_X}px;${baseCss};">`,
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:${source.global.contentWidth}px;">`,
     "<tr>",
-    '<td style="padding:0;">',
+    `<td style="padding:0;${baseCss};">`,
     body,
     "</td>",
     "</tr>",

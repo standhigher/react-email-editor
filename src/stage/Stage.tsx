@@ -10,6 +10,7 @@ interface StageProps {
   device: EditorDevice;
   onViewModeChange: (mode: EditorViewMode) => void;
   onDeviceChange: (device: EditorDevice) => void;
+  onSelectBlock: (id: string | null) => void;
 }
 
 export function Stage({
@@ -18,6 +19,7 @@ export function Stage({
   device,
   onViewModeChange,
   onDeviceChange,
+  onSelectBlock,
 }: StageProps) {
   const { overId } = useEditorDragState();
 
@@ -32,12 +34,13 @@ export function Stage({
       <div className="ree-stage-view" hidden={viewMode !== "edit"}>
         <Canvas
           blocks={session.document.blocks}
+          global={session.document.global}
           definitions={session.definitions}
           selectedId={session.selectedId}
           overId={overId}
           variables={session.variables}
           device={device}
-          onSelect={session.selectBlock}
+          onSelect={onSelectBlock}
           onCommitField={session.updateField}
           onMove={session.moveBlock}
           onDuplicate={session.duplicateBlock}

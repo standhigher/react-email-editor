@@ -1,15 +1,17 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
+import { DEFAULT_EMAIL_GLOBAL } from "../document/constants";
 import { getBlockDefinition } from "../document/registry";
 import { blockCellCss } from "../utils/style";
 import { buildRenderContext } from "./context";
 import { renderTemplatePreview } from "./template-preview";
 import type { BlockDefinition, RenderMode, Variable } from "../types/block";
-import type { EmailBlockNode } from "../types/document";
+import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
 import type { TemplateData } from "./template-preview";
 
 export interface BlockRenderOptions {
   resolveHtmlTemplate?: boolean;
   templateData?: TemplateData;
+  global?: EmailGlobalSettings;
 }
 
 type BlockRenderOptionsInput = BlockRenderOptions | boolean;
@@ -63,7 +65,12 @@ export function renderBlockContent(
   options: BlockRenderOptionsInput = {},
 ): string {
   const normalizedOptions = normalizeBlockRenderOptions(options);
-  const rendered = renderBlock(node, definitions, mode);
+  const rendered = renderBlock(
+    node,
+    definitions,
+    mode,
+    normalizedOptions.global ?? DEFAULT_EMAIL_GLOBAL,
+  );
   if (!normalizedOptions.resolveHtmlTemplate || node.type !== "html") {
     return rendered;
   }
@@ -77,10 +84,11 @@ export function renderBlock(
   node: EmailBlockNode,
   definitions: BlockDefinition[] = DEFAULT_BLOCKS,
   mode: RenderMode = "email",
+  global: EmailGlobalSettings = DEFAULT_EMAIL_GLOBAL,
 ): string {
   const definition = getBlockDefinition(node.type, definitions);
   return definition
-    ? definition.render(buildRenderContext(node, mode))
+    ? definition.render(buildRenderContext(node, mode, global))
     : `<!-- unknown block type: ${node.type} -->`;
 }
 
@@ -90,6 +98,11 @@ export function blockToHtml(
   mode: RenderMode = "email",
   options: BlockRenderOptionsInput = {},
 ): string {
-  const inner = renderBlockContent(node, definitions, mode, options);
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="${blockCellCss(node.style)}">${inner}</td></tr></table>`;
+  const normalizedOptions = normalizeBlockRenderOptions(options);
+  const global = normalizedOptions.global ?? DEFAULT_EMAIL_GLOBAL;
+  const inner = renderBlockContent(node, definitions, mode, {
+    ...normalizedOptions,
+    global,
+  });
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="${blockCellCss(node.style, global)}">${inner}</td></tr></table>`;
 }

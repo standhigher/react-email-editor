@@ -10,6 +10,7 @@ interface InspectorFieldsProps {
   block: EmailBlockNode;
   definition: BlockDefinition;
   variables: Variable[];
+  textColor: string;
   onCommitField: (id: string, name: string, value: unknown) => void;
   onCommitStyle: (id: string, styleId: string, value: string) => void;
 }
@@ -18,6 +19,7 @@ export function InspectorFields({
   block,
   definition,
   variables,
+  textColor,
   onCommitField,
   onCommitStyle,
 }: InspectorFieldsProps) {
@@ -66,6 +68,7 @@ export function InspectorFields({
               key={field.id}
               config={field}
               value={readStyleValue(block.style, field.id)}
+              inheritedColor={textColor}
               onChange={(value) => onCommitStyle(block.id, field.id, value)}
             />
           ))}

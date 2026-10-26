@@ -1,7 +1,12 @@
 import { CANVAS_DROP_ID } from "../constants/editor";
 import { generateId } from "../utils/id";
 import { writeStyleValue } from "../utils/style";
-import type { EmailBlockNode, EmailDocument } from "../types/document";
+import { mergeEmailGlobal } from "./create-document";
+import type {
+  EmailBlockNode,
+  EmailDocument,
+  EmailGlobalSettings,
+} from "../types/document";
 
 function moveItem<T>(items: T[], from: number, to: number): T[] {
   const next = items.slice();
@@ -117,4 +122,14 @@ export function withSubject(
   subject: string,
 ): EmailDocument {
   return { ...document, subject };
+}
+
+export function updateGlobalSettings(
+  document: EmailDocument,
+  patch: Partial<EmailGlobalSettings>,
+): EmailDocument {
+  return {
+    ...document,
+    global: mergeEmailGlobal(document.global, patch),
+  };
 }

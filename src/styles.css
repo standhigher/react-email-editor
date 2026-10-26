@@ -290,12 +290,22 @@
   box-shadow: inset 0 0 0 2px var(--ree-primary);
 }
 
+.ree-segment-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ree-segment-btn:disabled:hover {
+  background: #ffffff;
+  color: #303030;
+}
+
 .ree-segment-btn-label {
   padding: 0 10px;
 }
 
 .ree-col-left {
-  width: 264px;
+  width: 320px;
   border-right: 1px solid var(--ree-border);
   flex-shrink: 0;
 }
@@ -307,10 +317,24 @@
 }
 
 .ree-col-right {
-  width: 320px;
+  width: 400px;
   border-left: 1px solid var(--ree-border);
   flex-shrink: 0;
   overflow: hidden;
+}
+
+.ree-inspector-bar {
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
+  color: var(--ree-text);
+}
+
+.ree-inspector-bar .ree-segment-btn-label {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---------- 区块库 ---------- */
@@ -378,7 +402,7 @@
 }
 
 .ree-canvas {
-  padding: 40px 24px;
+  padding: 64px 24px 40px;
 }
 
 .ree-canvas.is-over {
@@ -386,14 +410,20 @@
   outline-offset: -12px;
 }
 
-.ree-root .ree-canvas-inner {
-  box-sizing: content-box;
+.ree-email-surface {
+  box-sizing: border-box;
   margin: 0 auto;
-  background: #ffffff;
+  min-height: 400px;
   border-radius: var(--ree-radius);
   box-shadow: var(--ree-shadow-md);
   padding: 24px 0;
-  min-height: 400px;
+  background: #ffffff;
+}
+
+.ree-root .ree-canvas-inner {
+  box-sizing: content-box;
+  margin: 0 auto;
+  background: transparent;
 }
 
 .ree-preview-stage {
@@ -442,6 +472,7 @@
 }
 
 .ree-block.is-selected {
+  z-index: 8;
   background: var(--ree-accent-bg-strong);
   outline-color: var(--ree-primary);
   box-shadow: 0 0 0 1px var(--ree-primary);
@@ -532,12 +563,12 @@
 
 .ree-block-toolbar {
   position: absolute;
-  top: -20px;
-  right: -1px;
+  top: calc(100% + 4px);
+  left: 8px;
   z-index: 7;
   display: flex;
   gap: 2px;
-  background: var(--ree-panel);
+  background: var(--ree-panel, #ffffff);
   border: 1px solid var(--ree-border);
   border-radius: var(--ree-radius);
   padding: 3px;
@@ -572,6 +603,11 @@
 .ree-block-content {
   border-radius: var(--ree-radius-sm);
   overflow: hidden;
+}
+
+/* 文案在框内编辑。工具栏和下拉要画出内容盒，不能被选中框裁掉。 */
+.ree-block-content.is-inline {
+  overflow: visible;
 }
 
 .ree-block-static {
@@ -623,52 +659,278 @@
 
 /* ---------- 富文本 ---------- */
 
-.ree-rte {
-  position: relative;
-}
-
 .ree-rte-loading {
   color: var(--ree-muted);
   font-size: 14px;
   padding: 8px 0;
 }
 
+/* 挂到 .ree-root，避开画布 overflow，同时继承主题变量。位置按区块视口计算。 */
 .ree-rte-toolbar {
-  position: absolute;
-  top: -32px;
+  position: fixed;
+  z-index: 80;
+  top: 0;
   left: 0;
-  z-index: 6;
+  visibility: hidden;
   display: flex;
+  flex-direction: column;
   gap: 2px;
-  background: var(--ree-panel);
-  border: 1px solid var(--ree-border);
-  border-radius: var(--ree-radius);
+  width: auto;
+  margin: 0;
   padding: 4px;
-  box-shadow: var(--ree-shadow-md);
+  background: var(--ree-panel, #ffffff);
+  border: 1px solid var(--ree-border, #e3e3e5);
+  border-radius: var(--ree-radius, 8px);
+  box-shadow: var(--ree-shadow-md, 0 2px 16px rgba(31, 33, 36, 0.08));
+  color: var(--ree-text, #202223);
+  font-family: var(--ree-font, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-weight: 500;
 }
 
-.ree-tool-btn {
+.ree-rte-toolbar.is-placed {
+  visibility: visible;
+}
+
+.ree-rte-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.ree-rte-sep {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 1px;
+  margin: 4px 4px;
+  background: var(--ree-border);
+}
+
+.ree-tool-btn,
+.ree-rte-select {
   appearance: none;
   border: none;
   background: transparent;
-  min-width: 26px;
-  height: 26px;
-  padding: 0 6px;
+  height: 28px;
   border-radius: var(--ree-radius-sm);
   cursor: pointer;
   color: var(--ree-text);
+  font: inherit;
   font-size: 13px;
   line-height: 1;
   transition: background 0.12s ease, color 0.12s ease;
 }
 
-.ree-tool-btn:hover {
+.ree-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 0 4px;
+}
+
+.ree-rte-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 168px;
+  padding: 0 6px 0 8px;
+}
+
+.ree-rte-select-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ree-tool-btn:hover,
+.ree-tool-btn.is-open,
+.ree-rte-select:hover,
+.ree-rte-select.is-open {
   background: var(--ree-panel-secondary);
 }
 
 .ree-tool-btn.is-active {
-  background: var(--ree-primary-soft);
-  color: var(--ree-primary);
+  background: #202223;
+  color: #ffffff;
+}
+
+.ree-tool-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ree-tool-btn:disabled:hover {
+  background: transparent;
+  color: var(--ree-text);
+}
+
+.ree-tool-bold {
+  font-weight: 700;
+}
+
+.ree-tool-italic {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+}
+
+.ree-tool-underline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ree-tool-strike {
+  text-decoration: line-through;
+}
+
+.ree-tool-color {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  border-bottom: 3px solid currentColor;
+  padding-bottom: 1px;
+}
+
+.ree-rte-pop {
+  position: relative;
+}
+
+.ree-rte-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 180px;
+  max-height: 280px;
+  overflow: auto;
+  padding: 6px;
+  background: var(--ree-panel);
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius);
+  box-shadow: var(--ree-shadow-lg);
+}
+
+.ree-rte-menu.is-end {
+  left: auto;
+  right: 0;
+}
+
+.ree-rte-menu.is-link {
+  min-width: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.ree-rte-pop.is-up .ree-rte-menu {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
+.ree-rte-option {
+  display: flex;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 7px 8px;
+  border-radius: var(--ree-radius-sm);
+  cursor: pointer;
+  color: var(--ree-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+}
+
+.ree-rte-option:hover,
+.ree-rte-option.is-active {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-rte-option.is-active {
+  font-weight: 600;
+}
+
+.ree-rte-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 22px);
+  gap: 6px;
+  padding: 4px;
+}
+
+.ree-rte-swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid rgba(32, 34, 35, 0.16);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ree-rte-swatch.is-active {
+  outline: 2px solid #202223;
+  outline-offset: 1px;
+}
+
+.ree-rte-color-actions {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+}
+
+.ree-rte-color-actions .ree-btn {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.ree-rte-color-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ree-rte-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 28px);
+  gap: 2px;
+}
+
+.ree-rte-emoji {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--ree-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ree-rte-emoji:hover {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-rte-link {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 280px;
+  padding: 6px;
+}
+
+.ree-rte-link-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ree-rte-link-actions .ree-btn {
+  padding: 6px 12px;
+}
+
+.ree-rte-variables {
+  min-width: 220px;
 }
 
 .ree-rte .ProseMirror {
@@ -696,6 +958,21 @@
 .ree-rte .ProseMirror a {
   color: var(--ree-primary);
   text-decoration: underline;
+}
+
+.ree-rte .ProseMirror ul,
+.ree-rte .ProseMirror ol {
+  margin: 0.25em 0;
+  padding-left: 1.4em;
+}
+
+.ree-rte .ProseMirror li p {
+  margin: 0;
+}
+
+.ree-rte .ProseMirror sup,
+.ree-rte .ProseMirror sub {
+  font-size: 0.75em;
 }
 
 /* ---------- 变量 ---------- */
@@ -850,6 +1127,28 @@
   box-shadow: 0 0 0 1px var(--ree-primary);
 }
 
+.ree-select {
+  position: relative;
+}
+
+.ree-select .ree-input {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 36px;
+  background-color: var(--ree-panel);
+}
+
+.ree-select-icon {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  color: var(--ree-muted);
+}
+
 .ree-textarea {
   resize: vertical;
   min-height: 60px;
@@ -908,6 +1207,22 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 13px;
   color: var(--ree-muted);
+}
+
+.ree-color-reset {
+  appearance: none;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--ree-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ree-color-reset:hover {
+  color: var(--ree-text);
 }
 
 .ree-field-value {

@@ -6,7 +6,8 @@ export type {
 } from "./types/editor";
 export { RichText } from "./stage/rich-text/RichText";
 export { DEFAULT_BLOCKS } from "./blocks/registry";
-export { createEmailDocument } from "./document/create-document";
+export { createEmailDocument, resolveEmailGlobal } from "./document/create-document";
+export { DEFAULT_EMAIL_GLOBAL } from "./document/constants";
 export { createBlockNode } from "./document/create-block";
 export { documentToHtml } from "./render/document-html";
 export type { DocumentHtmlOptions } from "./render/document-html";
@@ -29,6 +30,7 @@ export type {
   EmailDocument,
   EmailBlockNode,
   EmailBlockStyle,
+  EmailGlobalSettings,
 } from "./types/document";
 export type {
   BlockDefinition,

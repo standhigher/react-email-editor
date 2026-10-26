@@ -1,5 +1,5 @@
 import type { BlockDefinition, Variable } from "./block";
-import type { EmailBlockNode, EmailDocument } from "./document";
+import type { EmailBlockNode, EmailDocument, EmailGlobalSettings } from "./document";
 
 export type EditorViewMode = "edit" | "preview";
 
@@ -33,10 +33,13 @@ export interface EmailEditorHandle {
 
 export interface EmailEditorProps {
   initialDocument?: EmailDocument;
+  /** External global settings. Incoming changes are applied to the open document. */
+  global?: Partial<EmailGlobalSettings>;
   blocks?: BlockDefinition[];
   variables?: Variable[];
   height?: number | string;
   onChange?: (document: EmailDocument) => void;
+  onGlobalChange?: (global: EmailGlobalSettings) => void;
 }
 
 export interface EditorSession {
@@ -48,9 +51,10 @@ export interface EditorSession {
   selectedBlock: EmailBlockNode | null;
   selectedDefinition: BlockDefinition | undefined;
   selectBlock: (id: string | null) => void;
-  insertBlock: (type: string, index?: number) => void;
+  insertBlock: (type: string, index?: number) => boolean;
   updateField: (id: string, name: string, value: unknown) => void;
   updateStyle: (id: string, styleId: string, value: string) => void;
+  updateGlobal: (patch: Partial<EmailGlobalSettings>) => void;
   moveBlock: (id: string, direction: -1 | 1) => void;
   duplicateBlock: (id: string) => void;
   removeBlock: (id: string) => void;

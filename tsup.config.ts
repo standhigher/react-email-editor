@@ -17,6 +17,8 @@ export default defineConfig({
     "@dnd-kit/utilities",
     "@tiptap/extension-link",
     "@tiptap/extension-placeholder",
+    "@tiptap/extension-text-align",
+    "@tiptap/extension-text-style",
     "@tiptap/pm",
     "@tiptap/react",
     "@tiptap/starter-kit",

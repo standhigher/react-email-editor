@@ -1,38 +1,71 @@
+import { GlobalFields } from "./GlobalFields";
 import { InspectorFields } from "./InspectorFields";
 import type { BlockDefinition, Variable } from "../types/block";
-import type { EmailBlockNode } from "../types/document";
+import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
+
+export type InspectorPanel = "global" | "block";
 
 interface InspectorProps {
+  panel: InspectorPanel;
+  global: EmailGlobalSettings;
   block: EmailBlockNode | null;
   definition: BlockDefinition | undefined;
   variables: Variable[];
+  onPanelChange: (panel: InspectorPanel) => void;
+  onCommitGlobal: (patch: Partial<EmailGlobalSettings>) => void;
   onCommitField: (id: string, name: string, value: unknown) => void;
   onCommitStyle: (id: string, styleId: string, value: string) => void;
 }
 
 export function Inspector({
+  panel,
+  global,
   block,
   definition,
   variables,
+  onPanelChange,
+  onCommitGlobal,
   onCommitField,
   onCommitStyle,
 }: InspectorProps) {
+  const showBlock = panel === "block" && block && definition;
+
   return (
     <aside className="ree-col ree-col-right">
-      <div className="ree-col-head">Inspector</div>
+      <div className="ree-col-head ree-inspector-bar">
+        <div className="ree-segment" role="group" aria-label="Inspector panel">
+          <button
+            type="button"
+            className={`ree-segment-btn ree-segment-btn-label${panel === "global" ? " is-active" : ""}`}
+            aria-pressed={panel === "global"}
+            onClick={() => onPanelChange("global")}
+          >
+            Global
+          </button>
+          <span className="ree-segment-divider" aria-hidden="true" />
+          <button
+            type="button"
+            className={`ree-segment-btn ree-segment-btn-label${showBlock ? " is-active" : ""}`}
+            aria-pressed={Boolean(showBlock)}
+            disabled={!block || !definition}
+            onClick={() => onPanelChange("block")}
+          >
+            {definition?.title ?? "Block"}
+          </button>
+        </div>
+      </div>
       <div className="ree-inspector-scroll">
-        {block && definition ? (
+        {showBlock ? (
           <InspectorFields
             block={block}
             definition={definition}
             variables={variables}
+            textColor={global.textColor}
             onCommitField={onCommitField}
             onCommitStyle={onCommitStyle}
           />
         ) : (
-          <div className="ree-inspector-empty">
-            Select a block on the canvas to edit
-          </div>
+          <GlobalFields global={global} onChange={onCommitGlobal} />
         )}
       </div>
     </aside>

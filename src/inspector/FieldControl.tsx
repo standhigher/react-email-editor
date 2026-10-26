@@ -1,7 +1,8 @@
 import { useRef, type ChangeEvent } from "react";
+import { ColorControl } from "./components/ColorControl";
+import { SelectControl } from "./components/SelectControl";
 import { HtmlCodeEditor } from "./HtmlCodeEditor";
 import { VariablesDropdown } from "./VariablesDropdown";
-import { colorInputValue } from "./utils";
 import type { FieldConfig, Variable } from "../types/block";
 
 interface FieldControlProps {
@@ -83,13 +84,11 @@ export function FieldControl({
     return (
       <div className="ree-field">
         <label className="ree-field-label">{field.label}</label>
-        <select className="ree-input" value={stringValue} onChange={handleChange}>
-          {(field.options ?? []).map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <SelectControl
+          value={stringValue}
+          options={field.options ?? []}
+          onChange={onChange}
+        />
       </div>
     );
   }
@@ -98,15 +97,7 @@ export function FieldControl({
     return (
       <div className="ree-field">
         <label className="ree-field-label">{field.label}</label>
-        <div className="ree-color-row">
-          <input
-            type="color"
-            value={colorInputValue(stringValue)}
-            onChange={(event) => onChange(event.target.value)}
-            className="ree-color-input"
-          />
-          <span className="ree-color-value">{stringValue || "–"}</span>
-        </div>
+        <ColorControl value={stringValue} onChange={(next) => onChange(next)} />
       </div>
     );
   }

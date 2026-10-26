@@ -5,3 +5,8 @@ export const TEXT_ALIGN_OPTIONS = [
   { value: "center", label: "Center", glyph: "⇔" },
   { value: "right", label: "Right", glyph: "⇥" },
 ] as const;
+
+export const GLOBAL_FONT_WEIGHTS = [
+  { label: "Regular", value: "normal" },
+  { label: "Bold", value: "bold" },
+] as const;

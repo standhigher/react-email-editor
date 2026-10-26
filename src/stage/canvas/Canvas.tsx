@@ -4,18 +4,20 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import {
-  CANVAS_DEVICE_WIDTH,
   CANVAS_DROP_ID,
   EMAIL_COLUMN_PADDING_X,
+  contentColumnWidth,
+  emailViewportWidth,
 } from "../../constants/editor";
 import { getBlockDefinition } from "../../document/registry";
 import { CanvasBlock } from "./CanvasBlock";
 import type { BlockDefinition, Variable } from "../../types/block";
-import type { EmailBlockNode } from "../../types/document";
+import type { EmailBlockNode, EmailGlobalSettings } from "../../types/document";
 import type { EditorDevice } from "../../types/editor";
 
 interface CanvasProps {
   blocks: EmailBlockNode[];
+  global: EmailGlobalSettings;
   definitions: BlockDefinition[];
   selectedId: string | null;
   overId: string | null;
@@ -30,6 +32,7 @@ interface CanvasProps {
 
 export function Canvas({
   blocks,
+  global,
   definitions,
   selectedId,
   overId,
@@ -50,17 +53,36 @@ export function Canvas({
       ref={setNodeRef}
       className={`ree-canvas${isOver ? " is-over" : ""}`}
       onClick={(event) => {
-        if (event.target === event.currentTarget) onSelect(null);
+        // Portal 内容可能在另一个 iframe，DOM 类型和焦点必须取自画布所属文档。
+        const ownerDocument = event.currentTarget.ownerDocument;
+        const ownerWindow = ownerDocument.defaultView;
+        const target = event.target;
+        if (!ownerWindow || !(target instanceof ownerWindow.Element)) return;
+        if (target.closest(".ree-block")) return;
+        onSelect(null);
+        const active = ownerDocument.activeElement;
+        if (active instanceof ownerWindow.HTMLElement && active.closest(".ree-rte")) {
+          active.blur();
+        }
       }}
     >
       <div
-        className="ree-canvas-inner"
+        className="ree-email-surface"
         style={{
-          width: CANVAS_DEVICE_WIDTH[device],
-          paddingLeft: EMAIL_COLUMN_PADDING_X,
-          paddingRight: EMAIL_COLUMN_PADDING_X,
+          width: emailViewportWidth(device),
+          backgroundColor: global.backgroundColor || "#ffffff",
         }}
       >
+        <div
+          className="ree-canvas-inner"
+          style={{
+            width: contentColumnWidth(device, global.contentWidth),
+            paddingLeft: EMAIL_COLUMN_PADDING_X,
+            paddingRight: EMAIL_COLUMN_PADDING_X,
+            marginLeft: global.contentAlign === "left" ? 0 : "auto",
+            marginRight: global.contentAlign === "right" ? 0 : "auto",
+          }}
+        >
         {blocks.length === 0 ? (
           <div className="ree-canvas-empty">
             Drag a block here or click one to get started
@@ -74,6 +96,7 @@ export function Canvas({
               <CanvasBlock
                 key={block.id}
                 block={block}
+                global={global}
                 definition={getBlockDefinition(block.type, definitions)}
                 selected={block.id === selectedId}
                 isOver={overId === block.id}
@@ -87,6 +110,7 @@ export function Canvas({
             ))}
           </SortableContext>
         )}
+        </div>
       </div>
     </div>
   );

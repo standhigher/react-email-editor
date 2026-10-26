@@ -3,15 +3,17 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { buildRenderContext } from "../../render/context";
 import { mergeTemplateData, renderBlockContent } from "../../render/block-html";
+import { resolvedFontWeight } from "../../utils/style";
 import { RichText } from "../rich-text/RichText";
 import { HtmlCanvas } from "./components/HtmlCanvas";
 import { canvasBlockStyle } from "./block-style";
 import type { BlockDefinition, Variable } from "../../types/block";
-import type { EmailBlockNode } from "../../types/document";
+import type { EmailBlockNode, EmailGlobalSettings } from "../../types/document";
 import type { CanvasDragData } from "../../types/editor";
 
 interface CanvasBlockProps {
   block: EmailBlockNode;
+  global: EmailGlobalSettings;
   definition: BlockDefinition | undefined;
   selected: boolean;
   isOver: boolean;
@@ -25,6 +27,7 @@ interface CanvasBlockProps {
 
 export function CanvasBlock({
   block,
+  global,
   definition,
   selected,
   isOver,
@@ -48,6 +51,7 @@ export function CanvasBlock({
     ? renderBlockContent(block, [definition], "canvas", {
         resolveHtmlTemplate: block.type === "html",
         templateData: mergeTemplateData(variables, block.defaultData),
+        global,
       })
     : "";
   const usesTemplatePreview = block.type === "html";
@@ -141,14 +145,23 @@ export function CanvasBlock({
       ) : null}
 
       <div
-        className="ree-block-content"
-        style={canvasBlockStyle(block, definition?.inlineEdit)}
+        className={`ree-block-content${definition?.inlineEdit ? " is-inline" : ""}`}
+        style={canvasBlockStyle(block, definition?.inlineEdit, global)}
       >
         {definition?.inlineEdit ? (
           <RichText
             initialHtml={String(block.fields.html ?? "")}
             variables={variables}
             selected={selected}
+            inherited={{
+              fontFamily: global.fontFamily,
+              fontSize: block.style?.typography?.fontSize || "15px",
+              color: block.style?.typography?.color || global.textColor,
+              fontWeight: resolvedFontWeight(
+                block.style?.typography?.fontWeight,
+                global.fontWeight,
+              ),
+            }}
             onSelect={onSelect}
             onCommit={(html) => onCommitField(block.id, "html", html)}
           />
@@ -162,7 +175,7 @@ export function CanvasBlock({
             className="ree-block-static"
             dangerouslySetInnerHTML={{
               __html: definition
-                ? definition.render(buildRenderContext(block, "canvas"))
+                ? definition.render(buildRenderContext(block, "canvas", global))
                 : `<!-- ${block.type} -->`,
             }}
           />

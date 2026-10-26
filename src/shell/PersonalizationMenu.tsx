@@ -14,12 +14,14 @@ export function PersonalizationMenu({
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    const root = rootRef.current;
+    if (!open || !root) return;
+    const ownerDocument = root.ownerDocument;
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!root.contains(event.target as Node)) setOpen(false);
     };
-    window.addEventListener("pointerdown", onPointerDown);
-    return () => window.removeEventListener("pointerdown", onPointerDown);
+    ownerDocument.addEventListener("pointerdown", onPointerDown, true);
+    return () => ownerDocument.removeEventListener("pointerdown", onPointerDown, true);
   }, [open]);
 
   return (
