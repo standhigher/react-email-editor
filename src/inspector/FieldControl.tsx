@@ -1,4 +1,5 @@
 import { useRef, type ChangeEvent } from "react";
+import { HtmlCodeEditor } from "./HtmlCodeEditor";
 import { VariablesDropdown } from "./VariablesDropdown";
 import { colorInputValue } from "./utils";
 import type { FieldConfig, Variable } from "../types/block";
@@ -44,7 +45,23 @@ export function FieldControl({
     </div>
   );
 
-  if (field.type === "textarea" || field.type === "html") {
+  if (field.type === "html") {
+    return (
+      <div className="ree-field">
+        <div className="ree-field-label">
+          <span>{field.label}</span>
+        </div>
+        <HtmlCodeEditor
+          value={stringValue}
+          placeholder={field.placeholder}
+          rows={field.rows}
+          onChange={onChange}
+        />
+      </div>
+    );
+  }
+
+  if (field.type === "textarea") {
     return (
       <div className="ree-field">
         {label}
@@ -52,7 +69,7 @@ export function FieldControl({
           ref={(element) => {
             ref.current = element;
           }}
-          className={`ree-input ree-textarea${field.type === "html" ? " ree-code" : ""}`}
+          className="ree-input ree-textarea"
           value={stringValue}
           placeholder={field.placeholder}
           rows={field.rows ?? 4}

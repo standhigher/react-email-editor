@@ -856,11 +856,35 @@
   line-height: 1.5;
 }
 
-.ree-textarea.ree-code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 13px;
-  background: var(--ree-panel);
-  color: var(--ree-text);
+.ree-html-editor {
+  --ree-html-editor-min: 220px;
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius);
+  overflow: hidden;
+  background: #f6f8fa;
+}
+
+.ree-html-editor:focus-within {
+  border-color: var(--ree-primary);
+  box-shadow: 0 0 0 1px var(--ree-primary);
+}
+
+.ree-html-editor .cm-editor {
+  width: 100%;
+  max-height: 440px;
+  background: #f6f8fa;
+}
+
+.ree-html-editor .cm-scroller {
+  min-height: var(--ree-html-editor-min);
+  max-height: 440px;
+  overflow: auto;
+}
+
+.ree-html-editor .ree-cm-template {
+  color: #9a6700;
+  background: #fff8c5;
+  border-radius: 2px;
 }
 
 .ree-color-row {
