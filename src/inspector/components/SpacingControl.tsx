@@ -6,26 +6,40 @@ import { RangeControl } from "./RangeControl";
 interface SpacingControlProps {
   label: string;
   value: string;
+  max?: number;
+  sides?: readonly string[];
+  linkLabel?: string;
+  uniformLabel?: string;
+  expand?: (value: string) => string[];
   onChange: (value: string) => void;
 }
 
-function sideAmount(value: string): number {
-  return Math.min(SPACING_MAX, Math.max(0, readCssLength(value, ["px"]).amount));
+function sideAmount(value: string, max: number): number {
+  return Math.min(max, Math.max(0, readCssLength(value, ["px"]).amount));
 }
 
-export function SpacingControl({ label, value, onChange }: SpacingControlProps) {
-  const sides = spacingSides(value);
-  const equal = sides.every((side) => sideAmount(side) === sideAmount(sides[0]));
+export function SpacingControl({
+  label,
+  value,
+  max = SPACING_MAX,
+  sides: sideLabels = SPACING_SIDES,
+  linkLabel = "Link sides",
+  uniformLabel,
+  expand = spacingSides,
+  onChange,
+}: SpacingControlProps) {
+  const sides = expand(value);
+  const equal = sides.every((side) => sideAmount(side, max) === sideAmount(sides[0], max));
   const [independent, setIndependent] = useState(!equal);
   const slider = (sideLabel: string, sideValue: string, commit: (next: string) => void) => {
-    const amount = sideAmount(sideValue);
+    const amount = sideAmount(sideValue, max);
     return (
       <div className="ree-field" key={sideLabel}>
         <div className="ree-field-label">
           <span>{sideLabel}</span>
           <span className="ree-field-value">{amount}px</span>
         </div>
-        <RangeControl label={sideLabel} value={amount} min={0} max={SPACING_MAX} step={1} onChange={(next) => commit(`${next}px`)} />
+        <RangeControl label={sideLabel} value={amount} min={0} max={max} step={1} onChange={(next) => commit(`${next}px`)} />
       </div>
     );
   };
@@ -37,16 +51,16 @@ export function SpacingControl({ label, value, onChange }: SpacingControlProps) 
           checked={!independent && equal}
           onChange={(event) => {
             setIndependent(!event.target.checked);
-            if (event.target.checked) onChange(`${sideAmount(sides[0])}px`);
+            if (event.target.checked) onChange(`${sideAmount(sides[0] ?? "0px", max)}px`);
           }}
         />
-        Link sides
+        {linkLabel}
       </label>
       {!independent && equal
-        ? slider(`${label} all sides`, sides[0], onChange)
+        ? slider(uniformLabel ?? `${label} all sides`, sides[0] ?? "0px", onChange)
         : (
           <div className="ree-spacing-grid">
-            {SPACING_SIDES.map((side, index) => slider(side, sides[index], (next) => {
+            {sideLabels.map((side, index) => slider(side, sides[index] ?? "0px", (next) => {
               const updated = [...sides];
               updated[index] = next;
               onChange(updated.join(" "));

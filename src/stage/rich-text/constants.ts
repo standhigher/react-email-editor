@@ -6,6 +6,10 @@ export interface TextAlignOption {
   icon: "align-left" | "align-center" | "align-right" | "align-justify";
 }
 
+export const PARAGRAPH_SPACING_MAX = 48;
+
+export const LINE_HEIGHT_RANGE = { min: 1, max: 2.5, step: 0.05 } as const;
+
 export const FONT_SIZES = [
   "12px",
   "13px",

@@ -145,10 +145,12 @@
   max-height: 280px;
   overflow: auto;
   padding: 6px;
-  background: var(--ree-panel);
-  border: 1px solid var(--ree-border);
-  border-radius: var(--ree-radius);
-  box-shadow: var(--ree-shadow-lg);
+  background: var(--ree-panel, #ffffff);
+  border: 1px solid var(--ree-border, #e3e3e5);
+  border-radius: var(--ree-radius, 8px);
+  box-shadow: var(--ree-shadow-lg, 0 6px 32px rgba(31, 33, 36, 0.16));
+  color: var(--ree-text, #202223);
+  font-size: 14px;
 }
 
 .ree-rte-menu.is-end {
@@ -282,10 +284,31 @@
 
 .ree-rte .ProseMirror p {
   margin: 0;
+  margin-top: var(--ree-paragraph-gap, 0px);
 }
 
-.ree-rte .ProseMirror p:has(+ p) {
-  margin-bottom: var(--ree-paragraph-spacing, 0px);
+.ree-rte .ProseMirror p + p {
+  margin-top: var(--ree-paragraph-gap, var(--ree-paragraph-spacing, 0px));
+}
+
+.ree-rte-metric {
+  display: grid;
+  gap: 8px;
+  width: 220px;
+  padding: 4px;
+}
+
+.ree-rte-metric-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--ree-muted);
+  font-size: 12px;
+}
+
+.ree-rte-option:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .ree-rte .ProseMirror li p {

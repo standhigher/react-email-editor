@@ -21,7 +21,7 @@ export function Stage({
   onDeviceChange,
   onSelectBlock,
 }: StageProps) {
-  const { overId } = useEditorDragState();
+  const { targetId, dropEdge } = useEditorDragState();
 
   return (
     <div className="ree-col ree-col-center">
@@ -38,7 +38,8 @@ export function Stage({
             global={session.document.global}
             definitions={session.definitions}
             selectedId={session.selectedId}
-            overId={overId}
+            dropTargetId={targetId}
+            dropEdge={dropEdge}
             variables={session.variables}
             device={device}
             onSelect={onSelectBlock}

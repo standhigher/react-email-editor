@@ -130,7 +130,7 @@ tests/
 pnpm typecheck
 pnpm lint
 pnpm build
-node --test tests/*.test.mjs
+node --test tests/*.test.mjs tests/*.test.ts
 ```
 
 验证要求：
@@ -139,7 +139,7 @@ node --test tests/*.test.mjs
 - 文档-only 修改检查路径、命令、规则与源码是否一致，并运行 `git diff --check`；无需为纯文档改动添加实现测试或启动浏览器。
 - TypeScript、公共 API、文档模型或渲染逻辑变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build` 和相关 Node 测试；lint 暂不可用时按上述工程缺口报告。
 - UI/CSS/字段交互变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build`；若有可用消费方页面，复用已有服务和浏览器做 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景的实际验证。
-- `tests/*.test.mjs` 依赖构建后的 `dist/index.js` 和 `dist/styles.css`，必须先构建再运行；不要只测试 `src` 的假入口。
+- `tests/*.test.mjs` 依赖构建后的 `dist/index.js` 和 `dist/styles.css`，必须先构建再运行；不要只测试 `src` 的假入口。`tests/*.test.ts` 覆盖未从包入口导出的内部模块，由 Node 类型剥离直接执行，需要 Node 22.18 或更新版本。
 - 只运行了部分检查时，最终报告必须明确列出实际运行的命令和结果；不能把未运行的检查写成已通过。
 - 浏览器或跨域 iframe 无法操作时，明确记录限制和未覆盖的交互，不要声称完成了点击级验证。
 - 测试验证公开行为和实际回归风险，不为小型可逆改动编写仅重复实现细节的测试。检查通过后不无理由重复执行或扩大验证范围。

@@ -5,6 +5,7 @@ import { TextStyleKit } from "@tiptap/extension-text-style";
 import type { Extensions } from "@tiptap/react";
 import { TEXT_ALIGNS } from "../../constants/style-values";
 import { FontWeight } from "./font-weight";
+import { ParagraphStyle } from "./paragraph-style";
 
 export function createRichTextExtensions(placeholder: string): Extensions {
   return [
@@ -18,6 +19,7 @@ export function createRichTextExtensions(placeholder: string): Extensions {
     }),
     TextStyleKit.configure({ backgroundColor: false, lineHeight: false }),
     FontWeight,
+    ParagraphStyle,
     TextAlign.configure({
       types: ["paragraph"],
       alignments: Object.values(TEXT_ALIGNS),

@@ -25,7 +25,7 @@ export const GLOBAL_FIELD_SECTIONS: GlobalFieldSection[] = [
     { id: "borderWidth", group: "decorations", label: "Border width", control: "range", min: 0, max: 12, unit: "px" },
     { ...BORDER_STYLE, id: "borderStyle", label: "Border style" },
     { id: "borderColor", group: "decorations", label: "Border", control: "color" },
-    { id: "borderRadius", group: "decorations", label: "Corner radius", control: "range", min: 0, max: 48, unit: "px" },
+    { id: "borderRadius", group: "decorations", label: "Corner radius", control: "corners", max: 48 },
   ] },
   { title: "Typography", fields: [
     { id: "fontFamily", group: "typography", label: "Font family", control: "select", options: copyFontFamilies() },

@@ -1,4 +1,3 @@
-import { CANVAS_DROP_ID } from "../constants/editor";
 import { generateId } from "../utils/id";
 import { writeStyleValue } from "../utils/style";
 import { mergeEmailGlobal } from "./create-document";
@@ -14,15 +13,6 @@ function moveItem<T>(items: T[], from: number, to: number): T[] {
   if (item === undefined) return items;
   next.splice(to, 0, item);
   return next;
-}
-
-export function resolveInsertIndex(
-  blocks: EmailBlockNode[],
-  overId: string,
-): number {
-  if (overId === CANVAS_DROP_ID) return blocks.length;
-  const index = blocks.findIndex((block) => block.id === overId);
-  return index < 0 ? blocks.length : index;
 }
 
 export function insertBlockNode(

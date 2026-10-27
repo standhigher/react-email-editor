@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { FONT_WEIGHTS, isStyleValue, type FontWeight } from "../constants/style-values";
 import type { EmailBlockStyle, EmailDecorationStyle, EmailGlobalSettings } from "../types/document";
 import { resolveEmailGlobal } from "../document/create-document";
-import { cssBorderStyle, cssColor, cssFont, cssLength, cssLineHeight, cssSpacing } from "./css-values";
+import { cornerRadii, cssBorderStyle, cssColor, cssFont, cssLength, cssLineHeight, cssPx, cssSpacing } from "./css-values";
 import { esc } from "./html";
 
 export function readStyleValue(style: EmailBlockStyle | undefined, id: string): string {
@@ -40,13 +40,25 @@ export function typographyStyle(style: EmailBlockStyle | undefined, global?: Ema
   };
 }
 
+/** 四角相同保留单值缩写；四角不同写长属性，避免多值缩写在转发时被收成第一角。 */
+export function radiusStyle(value: string | undefined): CSSProperties {
+  const [topLeft, topRight, bottomRight, bottomLeft] = cornerRadii(value ?? "");
+  if (topLeft === topRight && topLeft === bottomRight && topLeft === bottomLeft) return { borderRadius: topLeft };
+  return {
+    borderTopLeftRadius: topLeft,
+    borderTopRightRadius: topRight,
+    borderBottomRightRadius: bottomRight,
+    borderBottomLeftRadius: bottomLeft,
+  };
+}
+
 export function decorationStyle(decoration: EmailDecorationStyle = {}): CSSProperties {
   return {
     backgroundColor: cssColor(decoration.backgroundColor),
     borderWidth: cssLength(decoration.borderWidth),
     borderStyle: cssBorderStyle(decoration.borderStyle),
     borderColor: cssColor(decoration.borderColor, "#000000"),
-    borderRadius: cssLength(decoration.borderRadius),
+    ...radiusStyle(decoration.borderRadius),
   };
 }
 
@@ -74,5 +86,12 @@ export function blockContentStyle(style: EmailBlockStyle | undefined, global?: E
 }
 
 export function blockCellCss(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): string {
-  return `${styleToCss(blockContentStyle(style, global))};`;
+  const css: CSSProperties = { ...blockContentStyle(style, global) };
+  const height = cssPx(style?.dimension?.height);
+  if (height) {
+    css.boxSizing = "border-box";
+    css.height = `${height}px`;
+    css.verticalAlign = "top";
+  }
+  return `${styleToCss(css)};`;
 }

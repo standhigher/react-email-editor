@@ -18,6 +18,7 @@ import { LinkPopover } from "./LinkPopover";
 import { ToolbarButton } from "./ToolbarButton";
 import { ToolbarIcon } from "./ToolbarIcon";
 import { ToolbarMenu } from "./ToolbarMenu";
+import { ParagraphMetricMenus } from "./ParagraphMetricMenus";
 import { VariableMenu } from "./VariableMenu";
 
 interface RichTextToolbarProps {
@@ -75,7 +76,7 @@ export function RichTextToolbar({
         setLinkUrl(state.linkHref || "https://");
         linkRange.current = range;
       }
-      if (next === "color") markRange.current = range;
+      if (next === "color" || next === "spacing" || next === "lineHeight") markRange.current = range;
     }
     setMenu((current) => (current === next ? null : next));
   };
@@ -222,6 +223,25 @@ export function RichTextToolbar({
             <ToolbarIcon name={align.icon} />
           </ToolbarButton>
         ))}
+        <span className="ree-rte-sep" />
+        <ParagraphMetricMenus
+          menu={menu}
+          spacing={state.spacing}
+          lineHeight={state.lineHeight}
+          inheritedSpacing={inherited.paragraphSpacing}
+          inheritedLineHeight={inherited.lineHeight}
+          onToggle={toggleMenu}
+          onSpacing={(value) => {
+            const chain = focusSelection(editor, markRange.current);
+            if (value) chain.updateAttributes("paragraph", { spacing: value }).run();
+            else chain.resetAttributes("paragraph", "spacing").run();
+          }}
+          onLineHeight={(value) => {
+            const chain = focusSelection(editor, markRange.current);
+            if (value) chain.updateAttributes("paragraph", { lineHeight: value }).run();
+            else chain.resetAttributes("paragraph", "lineHeight").run();
+          }}
+        />
         <span className="ree-rte-sep" />
         <ToolbarButton
           title="Bulleted list"

@@ -32,7 +32,7 @@ export function GlobalFields({ global, onChange }: GlobalFieldsProps) {
     );
   };
   return (
-    <div className="ree-inspector">
+    <div className="ree-inspector ree-inspector-global">
       {GLOBAL_FIELD_SECTIONS.map((section) => (
         <InspectorSection key={section.title} title={section.title}>
           <StyleFieldStack fields={section.fields} renderField={renderField} />

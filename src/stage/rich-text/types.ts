@@ -5,7 +5,7 @@ export interface EditorTextRange {
   to: number;
 }
 
-export type RichTextMenu = "font" | "size" | "emoji" | "color" | "link" | "variable";
+export type RichTextMenu = "font" | "size" | "emoji" | "color" | "link" | "variable" | "spacing" | "lineHeight";
 
 export type TextAlignment = TextAlign;
 
@@ -14,6 +14,8 @@ export interface RichTextInheritedStyle {
   fontSize: string;
   color: string;
   fontWeight: FontWeight;
+  lineHeight: string;
+  paragraphSpacing: string;
 }
 
 export interface ToolbarState {
@@ -29,4 +31,6 @@ export interface ToolbarState {
   fontWeight: FontWeight | "";
   color: string;
   linkHref: string;
+  spacing: string;
+  lineHeight: string;
 }

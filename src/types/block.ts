@@ -37,7 +37,8 @@ export type StyleControlType =
   | "select"
   | "number"
   | "range"
-  | "spacing";
+  | "spacing"
+  | "corners";
 
 export interface StyleFieldConfig {
   /** e.g. "typography.fontSize" — which style slot this reads and writes */

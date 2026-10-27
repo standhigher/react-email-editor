@@ -24,6 +24,8 @@ const DEFAULT_INHERITED: RichTextInheritedStyle = {
   fontSize: "15px",
   color: DEFAULT_EMAIL_GLOBAL.textColor,
   fontWeight: DEFAULT_EMAIL_GLOBAL.fontWeight,
+  lineHeight: DEFAULT_EMAIL_GLOBAL.defaultLineHeight,
+  paragraphSpacing: DEFAULT_EMAIL_GLOBAL.paragraphSpacing,
 };
 
 export function RichText({

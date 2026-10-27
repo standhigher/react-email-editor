@@ -31,9 +31,24 @@
   opacity: 0.5;
 }
 
-.ree-block.is-over {
-  outline-color: var(--ree-primary);
-  box-shadow: inset 0 2px 0 var(--ree-primary);
+.ree-block.is-drop-before::before,
+.ree-block.is-drop-after::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--ree-primary);
+  pointer-events: none;
+  z-index: 9;
+}
+
+.ree-block.is-drop-before::before {
+  top: -1px;
+}
+
+.ree-block.is-drop-after::after {
+  bottom: -1px;
 }
 
 /* 左侧拖拽把手（hover / 选中时出现，可拖动排序） */

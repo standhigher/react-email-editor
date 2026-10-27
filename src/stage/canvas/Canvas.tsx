@@ -8,6 +8,7 @@ import { CANVAS_DROP_ID } from "../../constants/editor";
 import { surfaceStyle, viewportWidth } from "../../render/layout";
 import { getBlockDefinition } from "../../document/registry";
 import { CanvasBlock } from "./CanvasBlock";
+import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
 import type { EmailBlockNode, EmailGlobalSettings } from "../../types/document";
 import type { EditorDevice } from "../../types/editor";
@@ -17,7 +18,8 @@ interface CanvasProps {
   global: EmailGlobalSettings;
   definitions: BlockDefinition[];
   selectedId: string | null;
-  overId: string | null;
+  dropTargetId: string | null;
+  dropEdge: DropEdge | null;
   variables: Variable[];
   device: EditorDevice;
   onSelect: (id: string | null) => void;
@@ -32,7 +34,8 @@ export function Canvas({
   global,
   definitions,
   selectedId,
-  overId,
+  dropTargetId,
+  dropEdge,
   variables,
   device,
   onSelect,
@@ -104,7 +107,7 @@ export function Canvas({
                       global={global}
                       definition={getBlockDefinition(block.type, definitions)}
                       selected={block.id === selectedId}
-                      isOver={overId === block.id}
+                      dropEdge={dropTargetId === block.id ? dropEdge : null}
                       variables={variables}
                       onSelect={() => onSelect(block.id)}
                       onCommitField={onCommitField}

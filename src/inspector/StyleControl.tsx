@@ -1,5 +1,6 @@
 import { useId } from "react";
-import { cssLength, formatCssLength, readCssLength } from "../utils/css-values";
+import { cornerRadii, cssLength, formatCssLength, readCssLength } from "../utils/css-values";
+import { CORNER_SIDES } from "./constants";
 import { AlignControl } from "./components/AlignControl";
 import { ColorControl } from "./components/ColorControl";
 import { CssValueInput } from "./components/CssValueInput";
@@ -83,6 +84,18 @@ export function StyleControl({ config, value, fallback, resetLabel = "Reset", re
         />
       ) : null}
       {config.control === "spacing" ? <SpacingControl label={config.label} value={actual} onChange={onChange} /> : null}
+      {config.control === "corners" ? (
+        <SpacingControl
+          label={config.label}
+          value={actual}
+          max={config.max ?? 48}
+          sides={CORNER_SIDES}
+          linkLabel="Link corners"
+          uniformLabel="All corners"
+          expand={cornerRadii}
+          onChange={onChange}
+        />
+      ) : null}
     </div>
   );
 }

@@ -74,6 +74,8 @@ export interface EmailElementStyle extends EmailDecorationStyle, EmailTypography
 export interface EmailSpacingStyle {
   padding?: string;
   margin?: string;
+  /** 内层单元格高度，只使用 px。缺省时不输出 height。 */
+  height?: string;
 }
 
 export interface EmailBlockStyle {

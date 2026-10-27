@@ -27,13 +27,14 @@
   left: 0;
   z-index: 20;
   min-width: 200px;
-  background: var(--ree-panel);
-  border: 1px solid var(--ree-border);
-  border-radius: var(--ree-radius);
-  box-shadow: var(--ree-shadow-lg);
+  background: var(--ree-panel, #ffffff);
+  border: 1px solid var(--ree-border, #e3e3e5);
+  border-radius: var(--ree-radius, 8px);
+  box-shadow: var(--ree-shadow-lg, 0 6px 32px rgba(31, 33, 36, 0.16));
   padding: 6px;
   max-height: 240px;
   overflow-y: auto;
+  color: var(--ree-text, #202223);
 }
 
 .ree-var-item {

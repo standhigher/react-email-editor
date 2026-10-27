@@ -4,10 +4,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { buildRenderContext } from "../../render/context";
 import { mergeTemplateData, renderBlockContent } from "../../render/block-html";
 import { cssSpacing } from "../../utils/css-values";
+import { contentDefaults } from "../../render/content-style";
 import { typographyStyle, resolvedFontWeight } from "../../utils/style";
 import { RichText } from "../rich-text/RichText";
 import { HtmlCanvas } from "./components/HtmlCanvas";
 import { canvasBlockStyle } from "./block-style";
+import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
 import type { EmailBlockNode, EmailGlobalSettings } from "../../types/document";
 import type { CanvasDragData } from "../../types/editor";
@@ -17,7 +19,7 @@ interface CanvasBlockProps {
   global: EmailGlobalSettings;
   definition: BlockDefinition | undefined;
   selected: boolean;
-  isOver: boolean;
+  dropEdge: DropEdge | null;
   variables: Variable[];
   onSelect: () => void;
   onCommitField: (id: string, name: string, value: unknown) => void;
@@ -31,7 +33,7 @@ export function CanvasBlock({
   global,
   definition,
   selected,
-  isOver,
+  dropEdge,
   variables,
   onSelect,
   onCommitField,
@@ -69,7 +71,8 @@ export function CanvasBlock({
         "ree-block",
         selected ? "is-selected" : "",
         isDragging ? "is-dragging" : "",
-        isOver ? "is-over" : "",
+        dropEdge === "before" ? "is-drop-before" : "",
+        dropEdge === "after" ? "is-drop-after" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -163,6 +166,8 @@ export function CanvasBlock({
                 block.style?.typography?.fontWeight,
                 global.fontWeight,
               ),
+              lineHeight: String(typographyStyle(block.style, global).lineHeight ?? ""),
+              paragraphSpacing: contentDefaults(block.style, global).paragraph,
             }}
             onSelect={onSelect}
             onCommit={(html) => onCommitField(block.id, "html", html)}

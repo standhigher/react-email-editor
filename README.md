@@ -90,10 +90,11 @@ const initialDocument = createEmailDocument([{
 `LINK_DECORATIONS` 和 `FONT_FAMILIES`。`EmailBlockNode.type` 仍是字符串，自定义区块不受这些常量限制。
 
 - `global.contentWidth` 是邮件内容外框宽度，默认 `600px`。邮件内容表同时写像素 `width` 和 `max-width`，Outlook 能认出宽度，窄屏仍可收缩。桌面画布与 Preview 跟随配置，移动视口为 `360px`。
-- `global.contentPadding` 默认四边 `24px`，`outerPadding` 默认 `0px`，`blockGap` 默认 `16px`，均可在 GLOBAL 面板修改或清零。
-- Global 同时管理内外背景、内容边框/圆角，以及字体、字号、行高、段落/列表间距、列表缩进、链接颜色和装饰。段落间距只加在相邻顶层段落之间，列表项里的段落不加这段间距。
-- 所有区块通过 `style.dimension` 配置 padding 和四边外侧留白，通过 `style.decorations` 配置容器背景、边框和圆角。外侧留白在邮件中使用表格单元格 padding 实现，避免 margin 折叠。
-- 自定义区块经 `getBlockDefinition()` 合并容器字段，检查器读取这份结果。合并顺序固定为 Padding、Outer spacing、Background、边框宽度、边框样式、边框颜色、圆角。调用方声明了相同 `id` 时，用调用方的标签、控件和默认值占住该槽位；其余字段按原顺序排在这些容器字段后面。`exactStyleFields: true` 时只保留传入的 `styleFields`。这个开关只决定检查器展示哪些字段，邮件包裹层仍会应用区块 `style` 上已有的间距和装饰。区块定义上的原始 `styleFields` 保持调用方写入的内容。
+- `global.contentPadding` 默认四边 `0px`，`outerPadding` 默认 `0px`，`blockGap` 默认 `4px`，均可在 GLOBAL 面板修改或清零。
+- Global 同时管理内外背景、内容边框/圆角，以及字体、字号、行高、段落/列表间距、列表缩进、链接颜色和装饰。段落间距只加在相邻顶层段落之间，写在后一段的 `margin` 缩写上；列表项里的段落不加这段间距。圆角接受一个长度，或按左上、右上、右下、左下排列的四个长度。四角相同输出 `border-radius`，四角不同输出四个长属性。
+- 所有区块通过 `style.dimension` 配置 padding、四边外侧留白和可选的 `height`（px），通过 `style.decorations` 配置容器背景、边框和圆角。外侧留白在邮件中使用表格单元格 padding 实现，避免 margin 折叠。设置高度时，内层单元格同时写 `height` 属性和 `height` 样式，`box-sizing` 为 `border-box`，并顶对齐。这段高度包含 padding，作为最小高度；画布用同样的 `min-height`。未设置或 `0` 时不输出。按钮、图片的 `element.height` 仍是元素自身高度。区块圆角和全局圆角使用同一套取值和输出规则，元素圆角也走这套输出。
+- 富文本里每一段可以单独设置与上一段的间距和行高。未设置时，段落间距只加在相邻顶层段落之间；列表项里的段落不加。顶层段落写了自己的段前距时，第一段和列表后面的段也会使用它，并替换该段已有的 margin。行高写在 `<p>` 上。
+- 自定义区块经 `getBlockDefinition()` 合并容器字段，检查器读取这份结果。合并顺序固定为 Padding、Outer spacing、Block height、Background、边框宽度、边框样式、边框颜色、圆角。调用方声明了相同 `id` 时，用调用方的标签、控件和默认值占住该槽位；其余字段按原顺序排在这些容器字段后面。`exactStyleFields: true` 时只保留传入的 `styleFields`。这个开关只决定检查器展示哪些字段，邮件包裹层仍会应用区块 `style` 上已有的间距和装饰。区块定义上的原始 `styleFields` 保持调用方写入的内容。
 - `createDimensionFields()`、`createDecorationFields()`、`createTypographyFields()` 每次返回独立副本，例如 `createDimensionFields().padding`。要改 `id`、标签或默认值时，按字段名传入覆盖项。`resolveBlockStyleFields()` 返回同一套合并规则下的副本。
 - Heading、Text 和 HTML 使用 `style.typography` 覆盖全局排版；点击 Inherit Global 清除覆盖。Text 默认继承全局字号与行高。
 - Button、Image、Divider 使用 `style.element` 配置元素自身尺寸、对齐、边框等；按钮还支持独立字体、文字色、背景和内边距。

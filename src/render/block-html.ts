@@ -1,7 +1,7 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
 import { DEFAULT_EMAIL_GLOBAL } from "../document/constants";
 import { getBlockDefinition } from "../document/registry";
-import { cssSpacing } from "../utils/css-values";
+import { cssPx, cssSpacing } from "../utils/css-values";
 import { esc } from "../utils/html";
 import { blockCellCss } from "../utils/style";
 import { buildRenderContext } from "./context";
@@ -108,5 +108,7 @@ export function blockToHtml(
     ...normalizedOptions,
     global,
   });
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td style="padding:${esc(cssSpacing(node.style?.dimension?.margin))};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td style="${blockCellCss(node.style, global)}">${inner}</td></tr></table></td></tr></table>`;
+  const height = cssPx(node.style?.dimension?.height);
+  const cellAttrs = height ? ` height="${esc(height)}" valign="top"` : "";
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td style="padding:${esc(cssSpacing(node.style?.dimension?.margin))};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td${cellAttrs} style="${blockCellCss(node.style, global)}">${inner}</td></tr></table></td></tr></table>`;
 }

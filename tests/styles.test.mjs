@@ -21,6 +21,8 @@ test('内置区块类型和样式取值可从包入口引用', () => {
 test('新文档宽度默认 600，所有留白都允许清零', () => {
   const doc = createEmailDocument([createBlockNode('text'), createBlockNode('text')]);
   assert.equal(doc.global.contentWidth, 600);
+  assert.equal(doc.global.contentPadding, '0px');
+  assert.equal(doc.global.blockGap, '4px');
   doc.global = resolveEmailGlobal({ ...doc.global, contentPadding: '0', outerPadding: '0', blockGap: '0', paragraphSpacing: '0', listSpacing: '0', listIndent: '0' });
   for (const key of ['contentPadding', 'outerPadding', 'blockGap', 'paragraphSpacing', 'listSpacing', 'listIndent']) assert.equal(doc.global[key], '0px');
   const html = documentToHtml(doc);
@@ -35,7 +37,7 @@ test('新文档宽度默认 600，所有留白都允许清零', () => {
 test('全部内置区块拥有独立容器样式和四边间距', () => {
   for (const definition of DEFAULT_BLOCKS) {
     const ids = definition.styleFields.map(field => field.id);
-    for (const id of ['dimension.padding', 'dimension.margin', 'decorations.backgroundColor', 'decorations.borderWidth', 'decorations.borderStyle', 'decorations.borderColor', 'decorations.borderRadius']) assert.ok(ids.includes(id), `${definition.type}: ${id}`);
+    for (const id of ['dimension.padding', 'dimension.margin', 'dimension.height', 'decorations.backgroundColor', 'decorations.borderWidth', 'decorations.borderStyle', 'decorations.borderColor', 'decorations.borderRadius']) assert.ok(ids.includes(id), `${definition.type}: ${id}`);
     const block = createBlockNode(definition.type);
     block.style = { ...block.style, dimension: { padding: '1px 2px 3px 4px', margin: '5px 6px 7px 8px' }, decorations: { backgroundColor: '#123456', borderWidth: '2px', borderStyle: 'dashed', borderRadius: '12px' } };
     const html = blockToHtml(block);
@@ -44,6 +46,7 @@ test('全部内置区块拥有独立容器样式和四边间距', () => {
     assert.match(html, /background-color:#123456/);
     assert.match(html, /border-style:dashed/);
     assert.match(html, /border-radius:12px/);
+    assert.doesNotMatch(html, /valign="top"/);
     assert.doesNotMatch(html, /width="600"/);
   }
 });
@@ -57,7 +60,7 @@ test('Text 继承全局排版，覆盖与显式富文本样式保持优先级', 
   assert.doesNotMatch(html, /margin:0 0 0px/);
   block.fields.html = '<p>A</p><p>B</p>';
   block.style.typography = { paragraphSpacing: '8px' };
-  assert.match(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /<p style="margin:0 0 8px;">A<\/p><p style="margin:0;">B<\/p>/);
+  assert.match(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /<p style="margin:0;">A<\/p><p style="margin:8px 0 0 0;">B<\/p>/);
   block.style.typography = { fontSize: '30px', paragraphSpacing: '5px' };
   assert.match(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /font-size:30px/);
 });
@@ -119,7 +122,7 @@ test('自定义区块按容器槽位合并样式，并返回独立副本', () =>
   const customPadding = { id: 'dimension.padding', group: 'dimension', label: 'Inner padding', control: 'text', defaultValue: '12px' };
   const customBackground = { id: 'decorations.backgroundColor', group: 'decorations', label: 'Card fill', control: 'color', defaultValue: '#eeeeee' };
   const card = { id: 'element.backgroundColor', group: 'decorations', label: 'Card', control: 'color', defaultValue: '#ffffff' };
-  const containerIds = ['dimension.padding', 'dimension.margin', 'decorations.backgroundColor', 'decorations.borderWidth', 'decorations.borderStyle', 'decorations.borderColor', 'decorations.borderRadius'];
+  const containerIds = ['dimension.padding', 'dimension.margin', 'dimension.height', 'decorations.backgroundColor', 'decorations.borderWidth', 'decorations.borderStyle', 'decorations.borderColor', 'decorations.borderRadius'];
   const resolved = resolveBlockStyleFields([customBackground, card, customPadding]);
   assert.deepEqual(resolved.map((field) => field.id), [...containerIds, card.id]);
   assert.equal(resolved.find((field) => field.id === 'dimension.padding').label, 'Inner padding');
@@ -173,6 +176,51 @@ test('自定义区块按容器槽位合并样式，并返回独立副本', () =>
   assert.equal(button.styleFields.find((field) => field.id === 'element.borderColor').label, 'Outline');
 });
 
+test('圆角可分四角，区块高度写在单元格上，段落可单独设置间距和行高', () => {
+  assert.equal(resolveEmailGlobal({ borderRadius: '8px' }).borderRadius, '8px');
+  assert.equal(resolveEmailGlobal({ borderRadius: '8px 8px 0 0' }).borderRadius, '8px 8px 0px 0px');
+  assert.equal(resolveEmailGlobal({ borderRadius: '8px 0' }).borderRadius, '0px');
+  assert.equal(createDecorationFields().borderRadius.control, 'corners');
+  assert.equal(createDimensionFields().height.id, 'dimension.height');
+  assert.equal(createDimensionFields().height.max, 480);
+  const block = createBlockNode('text');
+  block.style = { dimension: { height: '216px' }, decorations: { borderRadius: '8px 8px 0 0' } };
+  const html = blockToHtml(block);
+  assert.match(html, /height="216"/);
+  assert.match(html, /valign="top"/);
+  assert.match(html, /box-sizing:border-box/);
+  assert.match(html, /height:216px/);
+  assert.match(html, /vertical-align:top/);
+  assert.match(html, /border-top-left-radius:8px/);
+  assert.match(html, /border-top-right-radius:8px/);
+  assert.match(html, /border-bottom-right-radius:0px/);
+  assert.match(html, /border-bottom-left-radius:0px/);
+  assert.doesNotMatch(html, /border-radius:/);
+  block.style.dimension = { height: '0px' };
+  block.style.decorations = { borderRadius: '8px 8px 8px 8px' };
+  const uniform = blockToHtml(block);
+  assert.doesNotMatch(uniform, /valign="top"|height="0"|box-sizing:border-box/);
+  assert.match(uniform, /border-radius:8px/);
+  assert.doesNotMatch(uniform, /border-top-left-radius/);
+  const global = resolveEmailGlobal({ borderRadius: '8px 8px 0 0', paragraphSpacing: '6px' });
+  const shaped = documentToHtml({ ...createEmailDocument([createBlockNode('text')]), global });
+  assert.match(shaped, /border-top-left-radius:8px/);
+  assert.doesNotMatch(shaped, /border-radius:8px 8px 0 0/);
+  block.fields.html = '<p style="margin:10px">A</p><p data-spacing="0">B</p><p data-spacing="16px" data-line-height="1.5" style="line-height:2;--ree-paragraph-gap: 16px">C</p>';
+  block.style = { typography: { paragraphSpacing: '8px' } };
+  const text = renderBlock(block, DEFAULT_BLOCKS, 'email', global);
+  assert.match(text, /<p style="margin:0;margin:10px">A<\/p>/);
+  assert.match(text, /<p style="margin:0;">B<\/p>/);
+  assert.match(text, /<p style="margin:16px 0 0 0;line-height:1.5;">C<\/p>/);
+  assert.doesNotMatch(text, /data-spacing|data-line-height|--ree-paragraph-gap/);
+  block.fields.html = '<p data-spacing="12px" style="margin:10px">A</p><ul><li><p data-spacing="16px" style="margin:4px">B</p></li></ul><p style="margin:8px">C</p>';
+  const placed = renderBlock(block, DEFAULT_BLOCKS, 'email', global);
+  assert.match(placed, /<p style="margin:12px 0 0 0;">A<\/p>/);
+  assert.match(placed, /<p style="margin:0;margin:4px">B<\/p>/);
+  assert.match(placed, /<p style="margin:0;margin:8px">C<\/p>/);
+  assert.doesNotMatch(placed, /margin:16px|data-spacing/);
+});
+
 test('自定义区块的邮件模板在预览时展开，导出保留变量', () => {
   const products = {
     type: 'products',
@@ -201,5 +249,8 @@ test('构建产物包含展开后的画布、滑动条和配置控件 CSS', asyn
   const css = await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8');
   assert.doesNotMatch(css, /@import/);
   for (const selector of ['.ree-email-surface', '.ree-spacing-grid', '.ree-inspector-tab', '.ree-range::-webkit-slider-runnable-track']) assert.ok(css.includes(selector));
+  assert.match(css, /\.ree-rte \.ProseMirror p \{[^}]*--ree-paragraph-gap/);
+  assert.match(css, /\.ree-rte \.ProseMirror p \+ p \{[^}]*--ree-paragraph-gap/);
+  assert.doesNotMatch(css, /p:has\(\+ p\)/);
   assert.match(css, /#303030 var\(--ree-range-progress\), #e3e3e5/);
 });

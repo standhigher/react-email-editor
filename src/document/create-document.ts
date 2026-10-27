@@ -1,6 +1,6 @@
 import { CONTENT_WIDTH_MAX, CONTENT_WIDTH_MIN } from "../constants/editor";
 import { FONT_WEIGHTS, HORIZONTAL_ALIGNS, LINK_DECORATIONS, TEXT_ALIGNS, isStyleValue } from "../constants/style-values";
-import { cssBorderStyle, cssColor, cssFont, cssLength, cssLineHeight, cssSpacing } from "../utils/css-values";
+import { cssBorderStyle, cssColor, cssCornerRadius, cssFont, cssLength, cssLineHeight, cssSpacing } from "../utils/css-values";
 import { DEFAULT_EMAIL_GLOBAL, DOCUMENT_VERSION } from "./constants";
 import type { EmailBlockNode, EmailDocument, EmailGlobalSettings } from "../types/document";
 
@@ -30,7 +30,7 @@ export function resolveEmailGlobal(global?: Partial<EmailGlobalSettings> | null)
     borderWidth: cssLength(source.borderWidth, defaults.borderWidth),
     borderStyle: cssBorderStyle(source.borderStyle),
     borderColor: cssColor(source.borderColor, defaults.borderColor),
-    borderRadius: cssLength(source.borderRadius, defaults.borderRadius),
+    borderRadius: cssCornerRadius(source.borderRadius, defaults.borderRadius),
   };
 }
 

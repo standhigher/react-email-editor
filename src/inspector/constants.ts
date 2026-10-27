@@ -15,4 +15,6 @@ export const GLOBAL_FONT_WEIGHTS = [
 
 export const SPACING_SIDES = ["Top", "Right", "Bottom", "Left"] as const;
 
+export const CORNER_SIDES = ["Top left", "Top right", "Bottom right", "Bottom left"] as const;
+
 export const SPACING_MAX = 120;

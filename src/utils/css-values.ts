@@ -14,6 +14,29 @@ export function cssSpacing(value: unknown, fallback = "0px"): string {
   return parts.map((part) => cssLength(part)).join(" ");
 }
 
+/** 圆角只接受 1 个或 4 个长度。两个值在圆角里是对角，不能按间距的上下/左右展开。 */
+export function cssCornerRadius(value: unknown, fallback = "0px"): string {
+  const parts = String(value ?? "").trim().split(/\s+/).filter(Boolean);
+  if ((parts.length !== 1 && parts.length !== 4) || parts.some((part) => !cssLength(part, ""))) return fallback;
+  return parts.map((part) => cssLength(part)).join(" ");
+}
+
+/** 展开成左上、右上、右下、左下。单值复制到四角。 */
+export function cornerRadii(value: string): string[] {
+  const parts = cssCornerRadius(value).split(/\s+/);
+  const topLeft = parts[0] ?? "0px";
+  if (parts.length === 1) return [topLeft, topLeft, topLeft, topLeft];
+  return [parts[0] ?? topLeft, parts[1] ?? topLeft, parts[2] ?? topLeft, parts[3] ?? topLeft];
+}
+
+/** 单元格高度只接受正的 px。0 和其它单位视为没设置。 */
+export function cssPx(value: unknown): string | undefined {
+  const match = /^(\d+(?:\.\d+)?)px$/.exec(cssLength(value, ""));
+  if (!match) return undefined;
+  const px = String(Math.round(Number(match[1])));
+  return px === "0" ? undefined : px;
+}
+
 export function spacingSides(value: string): string[] {
   const [top = "0px", right = top, bottom = top, left = right] = cssSpacing(value).split(/\s+/);
   return [top, right, bottom, left];

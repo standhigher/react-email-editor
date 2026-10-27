@@ -38,6 +38,8 @@ export function readToolbarState(editor: Editor): ToolbarState {
     fontWeight: markWeight(textStyle.fontWeight),
     color: textAttribute(textStyle.color),
     linkHref: textAttribute(link.href),
+    spacing: textAttribute(editor.getAttributes("paragraph").spacing),
+    lineHeight: textAttribute(editor.getAttributes("paragraph").lineHeight),
   };
 }
 

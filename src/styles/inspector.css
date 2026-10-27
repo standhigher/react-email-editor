@@ -1,14 +1,14 @@
 /* ---------- 配置区 ---------- */
 
 .ree-inspector {
-  padding: 20px;
+  --ree-inspector-section-space: 16px;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
 .ree-inspector-empty {
-  padding: 40px 20px;
+  padding: 40px 16px;
   text-align: center;
   color: var(--ree-muted);
   font-size: 14px;
@@ -18,6 +18,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  padding-bottom: var(--ree-inspector-section-space);
   font-weight: 600;
 }
 
@@ -42,7 +43,7 @@
   justify-content: space-between;
   width: 100%;
   margin: 0;
-  padding: 12px 0;
+  padding: var(--ree-inspector-section-space) 0;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -67,7 +68,17 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-bottom: 14px;
+  padding-bottom: var(--ree-inspector-section-space);
+}
+
+/* Global 没有标题区，容器顶部留白会叠到第一个类目上。 */
+.ree-inspector-global {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.ree-inspector-global > .ree-inspector-section:first-child {
+  border-top: 0;
 }
 
 .ree-inspector-hint {
@@ -87,7 +98,7 @@
   justify-content: space-between;
   gap: 8px;
   font-size: 13px;
-  color: var(--ree-muted);
+  color: var(--ree-muted, #6d7175);
 }
 
 .ree-field-meta {
@@ -99,21 +110,21 @@
 
 .ree-input {
   width: 100%;
-  border: 1px solid var(--ree-border);
-  border-radius: var(--ree-radius);
+  border: 1px solid var(--ree-border, #e3e3e5);
+  border-radius: var(--ree-radius, 8px);
   padding: 8px 12px;
   font-size: 14px;
   line-height: 1.4;
   font-family: inherit;
-  color: var(--ree-text);
-  background: var(--ree-panel);
+  color: var(--ree-text, #202223);
+  background: var(--ree-panel, #ffffff);
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
 .ree-input:focus {
   outline: none;
-  border-color: var(--ree-primary);
-  box-shadow: 0 0 0 1px var(--ree-primary);
+  border-color: var(--ree-primary, #005bd3);
+  box-shadow: 0 0 0 1px var(--ree-primary, #005bd3);
 }
 
 .ree-select {
@@ -431,5 +442,4 @@
   outline: 2px solid #1a1a1a;
   outline-offset: 2px;
 }
-.ree-inspector > .ree-inspector-section:first-child { border-top: 0; }
 .ree-spacing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
