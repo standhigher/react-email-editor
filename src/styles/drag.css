@@ -11,12 +11,3 @@
   cursor: grabbing;
   font-weight: 500;
 }
-
-.ree-preview-frame {
-  height: 100%;
-  min-height: 520px;
-  flex-shrink: 0;
-  border: none;
-  background: #ffffff;
-  box-shadow: var(--ree-shadow-md);
-}

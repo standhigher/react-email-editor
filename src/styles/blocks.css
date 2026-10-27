@@ -3,7 +3,7 @@
 .ree-block {
   position: relative;
   border: 0;
-  border-radius: var(--ree-radius-sm);
+  border-radius: 0;
   outline: 1px solid transparent;
   outline-offset: -1px;
   background: transparent;
