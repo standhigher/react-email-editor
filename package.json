@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "JSON-driven React email template editor (three-panel: blocks / canvas / inspector).",
+  "author": "Nono",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
