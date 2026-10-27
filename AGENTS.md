@@ -8,7 +8,7 @@
 
 ## 项目定位
 
-本项目是 `@standhigher/react-email-editor` React 组件库，使用 TypeScript、React 18、`@dnd-kit` 和 TipTap。它是一个可发布的 ESM 包，不是带独立页面和开发服务器的应用。
+本项目是 `@standhigher/react-email-editor` React 组件库，使用 TypeScript、React 18、`@dnd-kit` 和 TipTap。发布产物是 ESM 包。`playground/` 只给 `pnpm dev` 在本地挂载编辑器，不参与 `tsup` 构建，也不进入 `files`。
 
 核心行为如下：
 
@@ -26,7 +26,7 @@
 2. 运行 `git status --short`，确认工作区已有修改。已有修改属于当前工作，不得覆盖、回滚或格式化无关文件。
 3. 先定位现有实现和调用方，再决定是否新增抽象。不要凭个人习惯引入新的目录层级、状态管理库、CSS 框架或构建系统。
 4. 如果任务涉及公开 API、文档结构、渲染结果或默认值，先检查 `src/index.ts`、`src/types/`、`src/document/`、`src/render/` 和相关测试。
-5. 如果任务涉及 UI，先确认是否已有消费方开发服务或浏览器页面；优先复用已有服务，不要为本组件库擅自启动新的预览服务。
+5. 如果任务涉及 UI，先确认是否已有消费方开发服务或浏览器页面。有消费方页面时复用该服务；没有时使用本仓库的 `pnpm dev`（`playground/`）。不要再另起预览服务。
 
 ## 目录与职责
 
@@ -49,6 +49,15 @@ src/
   styles.css            CSS 总入口，负责按顺序导入 styles/ 下文件
 scripts/
   copy-style.mjs        构建成功后复制并展开 CSS 到 dist/styles.css
+playground/
+  index.html            本地预览页面，不发布
+  main.tsx              React 挂载入口
+  App.tsx               铺满视口的 EmailEditor
+  sample.ts             示例文档和变量，不进入包导出
+  styles.css            预览页铺满视口，不进入编辑器样式
+  css.d.ts              让类型检查接受包样式入口
+  vite.config.ts        仅开发服务器；包入口指向 src/
+  tsconfig.json         playground 独立类型检查
 tests/
   *.test.mjs            Node 原生测试，测试构建产物和公开行为
 ```
@@ -138,7 +147,7 @@ node --test tests/*.test.mjs tests/*.test.ts
 - 当前工程缺口：`package.json` 声明了 `lint: eslint src`，但没有声明 ESLint 开发依赖，也未提供 ESLint 配置；干净环境下 lint 不能保证运行。遇到 `eslint: command not found` 等环境失败必须报告原因，并继续执行可用检查，不得标记为全部通过。不得依赖全局 ESLint或使用临时下载掩盖问题；在工程化任务中补齐仓库内依赖与配置后再更新本说明。
 - 文档-only 修改检查路径、命令、规则与源码是否一致，并运行 `git diff --check`；无需为纯文档改动添加实现测试或启动浏览器。
 - TypeScript、公共 API、文档模型或渲染逻辑变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build` 和相关 Node 测试；lint 暂不可用时按上述工程缺口报告。
-- UI/CSS/字段交互变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build`；若有可用消费方页面，复用已有服务和浏览器做 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景的实际验证。
+- `pnpm typecheck` 同时检查 `src/` 和 `playground/`。UI/CSS/字段交互变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build`。有消费方页面时复用该服务；否则用 `pnpm dev` 打开 playground，在浏览器里核对 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景。
 - `tests/*.test.mjs` 依赖构建后的 `dist/index.js` 和 `dist/styles.css`，必须先构建再运行；不要只测试 `src` 的假入口。`tests/*.test.ts` 覆盖未从包入口导出的内部模块，由 Node 类型剥离直接执行，需要 Node 22.18 或更新版本。
 - 只运行了部分检查时，最终报告必须明确列出实际运行的命令和结果；不能把未运行的检查写成已通过。
 - 浏览器或跨域 iframe 无法操作时，明确记录限制和未覆盖的交互，不要声称完成了点击级验证。

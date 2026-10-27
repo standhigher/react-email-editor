@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "incremental": false,
+    "types": ["vite/client", "node"],
+    "paths": {
+      "@standhigher/react-email-editor": ["../src/index.ts"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.tsx", "./css.d.ts"]
+}

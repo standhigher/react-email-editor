@@ -120,10 +120,21 @@ const styleFields = [
 
 ```bash
 pnpm install
+pnpm dev
 pnpm typecheck
 pnpm build
 node --test tests/styles.test.mjs
 ```
+
+## 本地预览
+
+`playground/` 只在本仓库里查看编辑器，不进入发布包，也不参与 `tsup` 构建。`pnpm dev` 用 Vite 直接加载 `src/`，改源码会热更新，不必先执行 `pnpm build`。
+
+```bash
+pnpm dev
+```
+
+浏览器打开 `http://localhost:5173`。页面是铺满视口的 `EmailEditor`，初始文档包含标题、正文和一个带 `defaultData` 的 HTML 区块，并传入全局变量 `customer_name`。发包和消费方 link 联调仍使用下面的 `pnpm build` / `pnpm build:watch`。
 
 ## 构建与本地 link 联调
 
@@ -178,7 +189,7 @@ pnpm link --global @standhigher/react-email-editor
 
 链接目标是包含 `package.json` 的组件库根目录，不是 `dist/` 目录本身。
 JS、类型声明和 CSS 都通过包入口从 `dist/` 读取。监听命令会处理 `src/` 下的
-TypeScript、TSX 和 CSS 改动；它不会启动预览服务，页面仍由消费方的开发服务提供。
+TypeScript、TSX 和 CSS 改动；它不会启动预览服务。在本仓库查看编辑器使用 `pnpm dev`；接到消费方时，页面仍由消费方的开发服务提供。
 已有服务正在运行时直接复用；消费方是否自动刷新取决于其对链接目录的监听配置。
 
 消费方需要安装 React 18 和 React DOM 18。构建产物不会内置 React、React DOM、

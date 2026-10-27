@@ -18,10 +18,11 @@
     "README.md"
   ],
   "scripts": {
+    "dev": "vite --config playground/vite.config.ts",
     "build": "tsup",
     "build:watch": "tsup --watch src",
     "prepack": "pnpm build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p playground",
     "lint": "eslint src"
   },
   "peerDependencies": {
@@ -29,13 +30,20 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^6.1.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "tsup": "^8",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^8.3.5"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "dependencies": {
     "@codemirror/commands": "^6.11.1",
