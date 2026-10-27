@@ -17,6 +17,9 @@
     "dist",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite --config playground/vite.config.ts",
     "build": "tsup",
