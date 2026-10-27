@@ -23,6 +23,7 @@ import { preserveTemplateSpaces } from "../template-spaces";
 import { VariableMenu } from "./VariableMenu";
 
 interface RichTextToolbarProps {
+  id: string;
   editor: Editor;
   variables: Variable[];
   anchorRef: RefObject<HTMLElement | null>;
@@ -30,6 +31,7 @@ interface RichTextToolbarProps {
 }
 
 export function RichTextToolbar({
+  id,
   editor,
   variables,
   anchorRef,
@@ -118,6 +120,7 @@ export function RichTextToolbar({
 
   return (
     <div
+      id={id}
       className="ree-rte-toolbar"
       ref={rootRef}
       onMouseDown={(event) => {

@@ -55,20 +55,26 @@ export function Preview({ document, definitions, variables, device }: PreviewPro
 
   return (
     <div className="ree-preview-stage">
-      <iframe
-        ref={frameRef}
-        className="ree-preview-frame"
-        title="Email preview"
-        srcDoc={html}
-        onLoad={observeContent}
+      <div
+        className="ree-email-viewport"
         style={{
           width: viewportWidth(device, document.global),
-          fontSize: document.global.defaultFontSize,
           marginLeft: document.global.contentAlign === "left" ? 0 : "auto",
           marginRight: document.global.contentAlign === "right" ? 0 : "auto",
-          backgroundColor: document.global.backgroundColor || "#ffffff",
         }}
-      />
+      >
+        <iframe
+          ref={frameRef}
+          className="ree-preview-frame"
+          title="Email preview"
+          srcDoc={html}
+          onLoad={observeContent}
+          style={{
+            fontSize: document.global.defaultFontSize,
+            backgroundColor: document.global.backgroundColor || "#ffffff",
+          }}
+        />
+      </div>
     </div>
   );
 }

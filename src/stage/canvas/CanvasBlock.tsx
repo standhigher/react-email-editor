@@ -1,4 +1,4 @@
-import type { SyntheticEvent } from "react";
+import { useId, useState, type SyntheticEvent } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { buildRenderContext } from "../../render/context";
@@ -8,6 +8,7 @@ import { contentDefaults } from "../../render/content-style";
 import { typographyStyle, resolvedFontWeight } from "../../utils/style";
 import { RichText } from "../rich-text/RichText";
 import { HtmlCanvas } from "./components/HtmlCanvas";
+import { BlockActions } from "./components/BlockActions";
 import { canvasBlockStyle } from "./block-style";
 import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
@@ -23,7 +24,6 @@ interface CanvasBlockProps {
   variables: Variable[];
   onSelect: () => void;
   onCommitField: (id: string, name: string, value: unknown) => void;
-  onMove: (direction: -1 | 1) => void;
   onDuplicate: () => void;
   onRemove: () => void;
 }
@@ -37,15 +37,15 @@ export function CanvasBlock({
   variables,
   onSelect,
   onCommitField,
-  onMove,
   onDuplicate,
   onRemove,
 }: CanvasBlockProps) {
+  const toolbarId = useId();
+  const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const dragData: CanvasDragData = { kind: "canvas" };
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: block.id, data: dragData });
 
-  const stop = (event: SyntheticEvent) => event.stopPropagation();
   const select = (event?: SyntheticEvent) => {
     event?.stopPropagation();
     onSelect();
@@ -97,56 +97,14 @@ export function CanvasBlock({
       </button>
 
       {selected ? (
-        <div
-          className="ree-block-toolbar"
-          onClick={stop}
-          onPointerDown={stop}
-          onMouseDown={stop}
-        >
-          <button
-            type="button"
-            className="ree-block-btn"
-            title="Move up"
-            onClick={() => onMove(-1)}
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m18 15-6-6-6 6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className="ree-block-btn"
-            title="Move down"
-            onClick={() => onMove(1)}
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className="ree-block-btn"
-            title="Duplicate"
-            onClick={onDuplicate}
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" />
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className="ree-block-btn ree-danger"
-            title="Delete"
-            onClick={onRemove}
-          >
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 6h18" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            </svg>
-          </button>
-        </div>
+        <BlockActions
+          inlineEdit={Boolean(definition?.inlineEdit)}
+          toolbarId={toolbarId}
+          toolbarCollapsed={toolbarCollapsed}
+          onToggleToolbar={() => setToolbarCollapsed((collapsed) => !collapsed)}
+          onDuplicate={onDuplicate}
+          onRemove={onRemove}
+        />
       ) : null}
 
       <div
@@ -158,6 +116,8 @@ export function CanvasBlock({
             initialHtml={String(block.fields.html ?? "")}
             variables={variables}
             selected={selected}
+            toolbarId={toolbarId}
+            toolbarCollapsed={toolbarCollapsed}
             inherited={{
               fontFamily: String(typographyStyle(block.style, global).fontFamily),
               fontSize: String(typographyStyle(block.style, global).fontSize),

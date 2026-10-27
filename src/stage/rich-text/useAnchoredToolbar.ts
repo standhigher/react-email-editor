@@ -43,6 +43,7 @@ export function useAnchoredToolbar(
     place();
     const observer = new ResizeObserver(place);
     observer.observe(toolbar);
+    observer.observe(anchor.closest(".ree-block") ?? anchor);
     ownerDocument.addEventListener("scroll", place, true);
     ownerWindow.addEventListener("resize", place);
     return () => {

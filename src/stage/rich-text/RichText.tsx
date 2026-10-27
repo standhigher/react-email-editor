@@ -15,6 +15,8 @@ export interface RichTextProps {
   placeholder?: string;
   variables: Variable[];
   selected: boolean;
+  toolbarId: string;
+  toolbarCollapsed: boolean;
   inherited?: RichTextInheritedStyle;
   onCommit: (html: string) => void;
   onSelect: () => void;
@@ -34,6 +36,8 @@ export function RichText({
   placeholder,
   variables,
   selected,
+  toolbarId,
+  toolbarCollapsed,
   inherited = DEFAULT_INHERITED,
   onCommit,
   onSelect,
@@ -60,9 +64,10 @@ export function RichText({
 
   return (
     <div className="ree-rte" ref={rootRef} onClick={onSelect}>
-      {selected && editor && host
+      {selected && !toolbarCollapsed && editor && host
         ? createPortal(
             <RichTextToolbar
+              id={toolbarId}
               editor={editor}
               variables={variables}
               anchorRef={rootRef}

@@ -44,7 +44,6 @@ export function Stage({
             device={device}
             onSelect={onSelectBlock}
             onCommitField={session.updateField}
-            onMove={session.moveBlock}
             onDuplicate={session.duplicateBlock}
             onRemove={session.removeBlock}
           />

@@ -21,11 +21,13 @@
 
 .ree-canvas,
 .ree-preview-stage {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   min-width: 0;
   overflow: auto;
-  padding: 64px 24px 40px;
+  padding: 64px 24px;
 }
 
 .ree-canvas.is-over {
@@ -36,7 +38,6 @@
 .ree-email-surface {
   box-sizing: border-box;
   margin: 0 auto;
-  box-shadow: var(--ree-shadow-md);
 }
 
 .ree-root .ree-canvas-inner {
@@ -49,19 +50,13 @@
   gap: var(--ree-block-gap, 0px);
 }
 
-.ree-preview-stage {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
 .ree-preview-frame {
   display: block;
+  width: 100%;
   height: 1px;
   flex-shrink: 0;
   border: none;
   background: #ffffff;
-  box-shadow: var(--ree-shadow-md);
 }
 
 .ree-inspector-scroll {
@@ -78,4 +73,9 @@
 }
 
 
-.ree-email-viewport { box-sizing: border-box; }
+.ree-email-viewport {
+  box-sizing: border-box;
+  flex: 1 0 auto;
+  background: rgb(246, 246, 247);
+  box-shadow: var(--ree-shadow-md);
+}

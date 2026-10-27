@@ -24,7 +24,6 @@ interface CanvasProps {
   device: EditorDevice;
   onSelect: (id: string | null) => void;
   onCommitField: (id: string, name: string, value: unknown) => void;
-  onMove: (id: string, direction: -1 | 1) => void;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
 }
@@ -40,7 +39,6 @@ export function Canvas({
   device,
   onSelect,
   onCommitField,
-  onMove,
   onDuplicate,
   onRemove,
 }: CanvasProps) {
@@ -72,12 +70,14 @@ export function Canvas({
           width: viewportWidth(device, global),
           fontSize: global.defaultFontSize,
           fontFamily: global.fontFamily,
-          backgroundColor: global.backgroundColor,
           marginLeft: global.contentAlign === "left" ? 0 : "auto",
           marginRight: global.contentAlign === "right" ? 0 : "auto",
         }}
       >
-        <div className="ree-email-outer" style={{ padding: global.outerPadding }}>
+        <div
+          className="ree-email-outer"
+          style={{ padding: global.outerPadding, backgroundColor: global.backgroundColor }}
+        >
           <div
             className="ree-email-surface"
             style={{
@@ -111,7 +111,6 @@ export function Canvas({
                       variables={variables}
                       onSelect={() => onSelect(block.id)}
                       onCommitField={onCommitField}
-                      onMove={(direction) => onMove(block.id, direction)}
                       onDuplicate={() => onDuplicate(block.id)}
                       onRemove={() => onRemove(block.id)}
                     />

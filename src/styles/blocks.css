@@ -128,7 +128,7 @@
 .ree-block-toolbar {
   position: absolute;
   top: calc(100% + 4px);
-  left: 8px;
+  left: 0;
   z-index: 7;
   display: flex;
   gap: 2px;
@@ -137,9 +137,11 @@
   border-radius: var(--ree-radius);
   padding: 3px;
   box-shadow: var(--ree-shadow-md);
+  font-family: var(--ree-font);
 }
 
 .ree-block-btn {
+  position: relative;
   appearance: none;
   border: none;
   background: transparent;
@@ -159,9 +161,56 @@
   color: var(--ree-primary);
 }
 
+.ree-block-btn:active {
+  background: var(--ree-accent-bg-strong);
+  color: var(--ree-primary);
+}
+
+.ree-block-btn:focus-visible {
+  outline: 2px solid var(--ree-primary);
+  outline-offset: 1px;
+}
+
 .ree-block-btn.ree-danger:hover {
   background: var(--ree-danger-soft);
   color: var(--ree-danger);
+}
+
+.ree-block-btn.ree-danger:active {
+  background: var(--ree-danger-soft);
+  color: var(--ree-danger);
+}
+
+.ree-block-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 10;
+  display: none;
+  padding: 6px 9px;
+  border-radius: var(--ree-radius-sm);
+  background: var(--ree-text);
+  color: var(--ree-panel);
+  box-shadow: var(--ree-shadow-md);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.ree-block-tooltip::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+}
+
+.ree-block-btn:hover .ree-block-tooltip,
+.ree-block-btn:focus-visible .ree-block-tooltip {
+  display: block;
 }
 
 .ree-block-content {
