@@ -7,7 +7,7 @@ export interface EditorTextRange {
   storedMarks: readonly Mark[] | null;
 }
 
-export type RichTextMenu = "font" | "size" | "emoji" | "color" | "link" | "variable" | "spacing" | "lineHeight" | "list";
+export type RichTextMenu = "font" | "size" | "emoji" | "link" | "variable" | "spacing" | "lineHeight" | "list";
 
 export type TextAlignment = TextAlign;
 
@@ -37,6 +37,7 @@ export interface ToolbarState {
   fontWeight: FontWeight | "";
   color: string;
   linkHref: string;
+  linkTarget: string;
   linkColor: string;
   linkDecoration: string;
   listSpacing: string;

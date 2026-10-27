@@ -89,12 +89,12 @@ Oxlint 使用 `.oxlintrc.json`，启用 TypeScript、Unicorn、Oxc 和 React 内
 | `initialDocument` | `EmailDocument` | 默认空文档，仅在首次挂载时读取。 |
 | `global` | `Partial<EmailGlobalSettings>` | 默认无外部覆盖。传入字段覆盖初始文档的全局设置；后续更新会合并到当前文档。 |
 | `blocks` | `BlockDefinition[]` | `[]`。新增自定义区块；同名 `type` 覆盖内置定义，其余内置区块保留。 |
-| `variables` | `Variable[]` | `[]`。用于插入和预览替换的变量列表。 |
+| `variables` | `Variable[]` | `[]`。用于插入和预览替换的变量列表；为空时隐藏所有 Personalization 入口与提示。 |
 | `height` | `number \| string` | `"100%"`。数字按 px 处理，字符串使用 CSS 高度值。 |
-| `onChange` | `(document: EmailDocument) => void` | 文档变化时触发，包括编辑、重置，以及实际改变文档值的外部全局设置更新。 |
-| `onGlobalChange` | `(global: EmailGlobalSettings) => void` | 在编辑器中修改全局设置时触发；外部 `global` 更新和重置不触发此回调。 |
+| `onChange` | `(document: EmailDocument) => void` | 文档变化时触发，包括编辑，以及实际改变文档值的外部全局设置更新。 |
+| `onGlobalChange` | `(global: EmailGlobalSettings) => void` | 在编辑器中修改全局设置时触发；外部 `global` 更新不触发此回调。 |
 
-Reset 恢复首次初始化的文档快照，并重新应用当前 `global` 覆盖项。切换文档时使用新的 React `key` 重新挂载，例如 `<EmailEditor key={documentId} initialDocument={document} />`；仅修改 `initialDocument` 不会替换已打开的文档。省略之前传入的某个 `global` 字段，不会将其恢复为默认值。
+切换文档时使用新的 React `key` 重新挂载，例如 `<EmailEditor key={documentId} initialDocument={document} />`；仅修改 `initialDocument` 不会替换已打开的文档。省略之前传入的某个 `global` 字段，不会将其恢复为默认值。
 
 ## 配置说明
 
@@ -171,7 +171,7 @@ export function TemplateEmailPage() {
 | `linkDecoration` | `"underline" \| "none"` | `"underline"` | 默认链接装饰。 |
 | `borderWidth` | `string` | `"0px"` | 内容边框宽度。 |
 | `borderStyle` | `"none" \| "solid" \| "dashed" \| "dotted"` | `"solid"` | 内容边框样式。 |
-| `borderColor` | `string` | `"#000000"` | 内容边框颜色。 |
+| `borderColor` | `string` | `"transparent"` | 内容边框颜色。 |
 | `borderRadius` | `string` | `"0px"` | 单个圆角值，或按左上、右上、右下、左下排列的四个值。 |
 
 间距和尺寸使用 `"16px"` 等 CSS 长度字符串；内边距支持 `"12px 24px"` 等简写，行高也支持无单位数值。桌面画布和预览跟随 `contentWidth`，移动预览的视口宽度为 360px。
@@ -202,6 +202,8 @@ export const variables: Variable[] = [
 
 ### 区块配置
 
+Button 默认填充为黑色（`#000000`）。按钮、图片、区块和全局内容的边框颜色默认透明，显式配置的颜色会保留。按钮和图片的 Link 输入框默认留空，仅显示 placeholder；链接为空或仅含空格时，画布、预览及邮件导出不生成跳转链接。
+
 区块节点的样式按用途分组：
 
 | 样式分组 | 用途 |
@@ -222,9 +224,9 @@ export const variables: Variable[] = [
 | Spacer | Spacer（高度、背景）。不再叠加另一套高度、内外边距或边框。 |
 | HTML | HTML 源码、Spacing、Block appearance。不提供内部元素的排版配置。 |
 
-Heading、Text、Button 的基础富文本工具栏包含字体、12–48px 预设字号、粗体、斜体、下划线、颜色、Emoji 和变量。Heading 另有左中右对齐、行高和链接；Text 另有删除线、两端对齐、段落菜单（段前距、行高）和列表。列表间距与缩进只在列表上下文菜单中出现；链接颜色与装饰在链接弹层中配置。未选中文字时，格式操作作用于整个区块；有选区时只修改所选文字或段落，并恢复光标或选区。
+Heading、Text、Button 的基础富文本工具栏包含字体、12–48px 预设字号、粗体、斜体、下划线、颜色、Emoji 和变量。所有颜色入口点击后直接打开共享颜色面板，默认显示 HEX 输入框，并提供饱和度/亮度选色区及色相滑动条。HEX 支持带或不带 # 的 3 位或 6 位色值；无效输入不会修改已保存颜色。选色和有效 HEX 输入立即生效，点击外部或按 Escape 关闭面板。HEX 输入框旁的 reset 图标恢复该字段的默认值并关闭面板；文字颜色会清除行内覆盖，恢复继承色。RGB 与 HEX 色值统一归一化后显示色块。Heading 另有左中右对齐、行高和链接；Text 另有删除线、两端对齐和列表；Space before（段前距）与 Line height（行高）使用独立的图标入口，点击后在菜单内显示说明文案。数值菜单在标题栏的数值旁提供重置图标，用于恢复继承值。工具栏按功能分组，空间不足时优先整组换行，换行后的行首不显示分隔线。列表间距与缩进只在列表上下文菜单中出现；点击链接按钮打开带遮罩的居中弹窗，包含默认留空的 URL、默认蓝色的胶囊颜色选择器、默认勾选的下划线，以及当前页 / 新开页 target（默认新开页）。Cancel 放弃修改，黑色 Save 按钮保存；清空已有 URL 并保存会移除链接，Escape 或点击遮罩退出且不保存。未选中文字时，格式操作作用于整个区块；有选区时只修改所选文字或段落，并恢复光标或选区。
 
-Button 文案直接在画布编辑；仅允许单段内容，按宽度自然换行，回车不新建段落。列表、删除线、段落格式、对齐和内部链接不进入按钮编辑能力；粘贴多个段落时用空格连接，保留基础文字格式。整个按钮的目标链接仍在右侧配置，邮件输出只有一个外层链接。新建与编辑内容统一写入 `fields.html`，不读取 `fields.label` 或 `style.element` 文字样式。缺失或为空时显示空内容。按钮导出保留模板表达式内的引号、比较符、注释和空格。
+Button 文案直接在画布编辑；仅允许单段内容，按宽度自然换行，回车不新建段落。列表、删除线、段落格式、对齐和内部链接不进入按钮编辑能力；粘贴多个段落时用空格连接，保留基础文字格式。整个按钮的目标链接仍在右侧配置，填写 URL 后，邮件输出只有一个外层链接。新建与编辑内容统一写入 `fields.html`，不读取 `fields.label` 或 `style.element` 文字样式。缺失或为空时显示空内容。按钮导出保留模板表达式内的引号、比较符、注释和空格。
 
 Heading 和 Text 默认包含 `16px` 内边距；Heading 的 `26px`、粗体及 `1.25` 行高写在初始富文本内容中，Button 的白色 `16px` 文案同样写在初始富文本中。列表类型切换保留各列表的间距与缩进，自动整块切换不包含末尾辅助空段。HTML 保留源码内部的段落、列表、链接及显式样式，不再使用正文排版器注入默认样式；未声明的文字属性仍可继承容器及邮件环境。完整 HTML 文档合并、head 样式提取和模板预览/导出规则保持不变。GLOBAL 默认排版仍然保留。各数据字段见 [EmailBlockStyle](./src/types/document.ts)。
 

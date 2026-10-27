@@ -25,8 +25,7 @@ export function ListControls({ editor, state, menu, range, inherited, onToggle }
     focusSelection(editor, range).updateAttributes(listType, { [key]: value }).run();
   };
   return (
-    <>
-      <span className="ree-rte-sep" />
+    <div className="ree-rte-group" role="group" aria-label="Lists">
       <ToolbarButton
         title="Bulleted list"
         active={state.bulletList}
@@ -67,6 +66,6 @@ export function ListControls({ editor, state, menu, range, inherited, onToggle }
           />
         </ToolbarMenu>
       ) : null}
-    </>
+    </div>
   );
 }

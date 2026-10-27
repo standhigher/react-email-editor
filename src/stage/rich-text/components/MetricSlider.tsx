@@ -1,4 +1,5 @@
-import type { CSSProperties } from "react";
+import { RangeControl } from "../../../components/RangeControl";
+import { ResetButton } from "../../../components/ResetButton";
 
 interface MetricSliderProps {
   label: string;
@@ -23,27 +24,23 @@ export function MetricSlider({
   onChange,
   onReset,
 }: MetricSliderProps) {
-  const progress = max > min ? Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100)) : 0;
   return (
     <div className="ree-rte-metric">
       <div className="ree-rte-metric-label">
         <span>{label}</span>
-        <span>{display}</span>
+        <span className="ree-rte-metric-meta">
+          <span>{display}</span>
+          <ResetButton label={`Reset ${label.toLowerCase()}`} disabled={!overridden} onClick={onReset} />
+        </span>
       </div>
-      <input
-        aria-label={label}
-        type="range"
-        className="ree-range"
-        style={{ "--ree-range-progress": `${progress}%` } as CSSProperties}
+      <RangeControl
+        label={label}
         value={value}
         min={min}
         max={max}
         step={step}
-        onChange={(event) => onChange(Number(event.target.value))}
+        onChange={onChange}
       />
-      <button type="button" className="ree-rte-option" disabled={!overridden} onClick={onReset}>
-        Default
-      </button>
     </div>
   );
 }

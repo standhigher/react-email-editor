@@ -173,3 +173,42 @@ test("反向选区经菜单格式化后保持方向，后续键盘扩选方向�
   assert.deepEqual(textSizes(editor), ["", "24px", "", ""]);
   editor.destroy();
 });
+
+test("颜色面板重置只清除保存选区的颜色，保留字号、粗体和选区方向", () => {
+  const editor = createEditor();
+  formatText(editor, (chain) => chain.setColor("#123456").setFontSize("24px").setBold());
+  editor.commands.setTextSelection({ from: 4, to: 2 });
+  const saved = currentSelection(editor);
+  editor.commands.setTextSelection(1);
+  formatText(editor, (chain) => chain.unsetColor(), saved, "text", false);
+  assert.equal(editor.state.selection.anchor, 4);
+  assert.equal(editor.state.selection.head, 2);
+  const uncolored: string[] = [];
+  editor.state.doc.descendants((node) => {
+    if (!node.isText) return;
+    const mark = node.marks.find((item) => item.type.name === "textStyle");
+    assert.equal(mark?.attrs.fontSize, "24px");
+    assert.equal(node.marks.some((item) => item.type.name === "bold"), true);
+    if (!mark?.attrs.color) uncolored.push(node.text!);
+    else assert.equal(mark.attrs.color, "#123456");
+  });
+  assert.deepEqual(uncolored, ["ir"]);
+  editor.destroy();
+});
+
+test("颜色面板支持整块及空区块重置，后续输入不带显式颜色", () => {
+  for (const texts of [["First", "Second"], [""]]) {
+    const editor = createEditor(texts);
+    formatText(editor, (chain) => chain.setColor("#123456").setFontSize("24px"));
+    formatText(editor, (chain) => chain.unsetColor(), currentSelection(editor), "text", false);
+    editor.commands.insertContent({ type: "text", text: "!" });
+    editor.state.doc.descendants((node) => {
+      if (!node.isText) return;
+      const mark = node.marks.find((item) => item.type.name === "textStyle");
+      assert.equal(mark?.attrs.color ?? null, null);
+      assert.equal(mark?.attrs.fontSize, "24px");
+    });
+    assert.equal(editor.state.doc.textContent, `!${texts.join("")}`);
+    editor.destroy();
+  }
+});

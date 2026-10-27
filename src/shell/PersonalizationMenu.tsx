@@ -24,6 +24,8 @@ export function PersonalizationMenu({
     return () => ownerDocument.removeEventListener("pointerdown", onPointerDown, true);
   }, [open]);
 
+  if (variables.length === 0) return null;
+
   return (
     <div className="ree-personalization" ref={rootRef}>
       <button
@@ -39,24 +41,20 @@ export function PersonalizationMenu({
       </button>
       {open ? (
         <div className="ree-var-menu ree-personalization-menu">
-          {variables.length === 0 ? (
-            <div className="ree-personalization-empty">No personalization fields</div>
-          ) : (
-            variables.map((variable) => (
-              <button
-                key={variable.name}
-                type="button"
-                className="ree-var-item"
-                onClick={() => {
-                  onInsert(variable.name);
-                  setOpen(false);
-                }}
-              >
-                <span className="ree-var-name">{variable.name}</span>
-                {variable.description ? <span className="ree-var-label">{variable.description}</span> : null}
-              </button>
-            ))
-          )}
+          {variables.map((variable) => (
+            <button
+              key={variable.name}
+              type="button"
+              className="ree-var-item"
+              onClick={() => {
+                onInsert(variable.name);
+                setOpen(false);
+              }}
+            >
+              <span className="ree-var-name">{variable.name}</span>
+              {variable.description ? <span className="ree-var-label">{variable.description}</span> : null}
+            </button>
+          ))}
         </div>
       ) : null}
     </div>

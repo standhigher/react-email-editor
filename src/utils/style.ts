@@ -57,7 +57,7 @@ export function decorationStyle(decoration: EmailDecorationStyle = {}): CSSPrope
     backgroundColor: cssColor(decoration.backgroundColor),
     borderWidth: cssLength(decoration.borderWidth),
     borderStyle: cssBorderStyle(decoration.borderStyle),
-    borderColor: cssColor(decoration.borderColor, "#000000"),
+    borderColor: cssColor(decoration.borderColor, "transparent"),
     ...radiusStyle(decoration.borderRadius),
   };
 }

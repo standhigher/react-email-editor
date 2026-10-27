@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { isAllowedUri } from "@tiptap/extension-link";
+import { DEFAULT_EMAIL_GLOBAL } from "../../../document/constants";
 import { useEditorState, type Editor } from "@tiptap/react";
 import type { RichTextProfile, Variable } from "../../../types/block";
-import { TEXT_ALIGNS, TEXT_COLORS } from "../constants";
+import { DEFAULT_LINK_TARGET, TEXT_ALIGNS } from "../constants";
 import type { EditorTextRange, RichTextInheritedStyle, RichTextMenu } from "../types";
 import { useAnchoredToolbar } from "../useAnchoredToolbar";
 import { readToolbarState } from "../utils";
 import { currentSelection, focusSelection, formatText, isVisuallyBold } from "../formatting";
-import { ColorMenu } from "./ColorMenu";
+import { EmojiMenu } from "./EmojiMenu";
+import { TextColorControl } from "./TextColorControl";
 import { TextFormatControls } from "./TextFormatControls";
 import { ListControls } from "./ListControls";
 import { LinkPopover } from "./LinkPopover";
@@ -41,15 +43,17 @@ export function RichTextToolbar({
   });
   const rootRef = useAnchoredToolbar(anchorRef, Boolean(state), profile === "button");
   const linkRange = useRef<EditorTextRange | null>(null);
+  const colorRange = useRef<EditorTextRange | null>(null);
   const [markRange, setMarkRange] = useState<EditorTextRange | null>(null);
   const [menu, setMenu] = useState<RichTextMenu | null>(null);
-  const [linkUrl, setLinkUrl] = useState("https://");
+  const [linkUrl, setLinkUrl] = useState("");
   const [linkColor, setLinkColor] = useState("");
   const [linkDecoration, setLinkDecoration] = useState("");
+  const [linkTarget, setLinkTarget] = useState(DEFAULT_LINK_TARGET);
 
   useEffect(() => {
     const root = rootRef.current;
-    if (!menu || !root) return;
+    if (!menu || menu === "link" || !root) return;
     const ownerDocument = root.ownerDocument;
     const onPointerDown = (event: PointerEvent) => {
       if (!root.contains(event.target as Node)) setMenu(null);
@@ -67,16 +71,16 @@ export function RichTextToolbar({
 
   if (!state) return null;
 
-  const color = state.color || inherited.color;
   const bold = isVisuallyBold(state.fontWeight, state.bold, inherited.fontWeight);
 
   const toggleMenu = (next: RichTextMenu) => {
     if (menu !== next) {
       const range = currentSelection(editor);
       if (next === "link") {
-        setLinkUrl(state.linkHref || "https://");
-        setLinkColor(state.linkColor);
-        setLinkDecoration(state.linkDecoration);
+        setLinkUrl(state.linkHref);
+        setLinkColor(state.linkColor || (state.linkHref ? inherited.linkColor : "") || DEFAULT_EMAIL_GLOBAL.linkColor);
+        setLinkDecoration(state.linkDecoration || (state.linkHref ? inherited.linkDecoration : "") || "underline");
+        setLinkTarget(state.linkTarget === "_self" ? "_self" : DEFAULT_LINK_TARGET);
         linkRange.current = range;
       }
       setMarkRange(range);
@@ -86,8 +90,12 @@ export function RichTextToolbar({
 
   const applyLink = () => {
     const href = linkUrl.trim();
-    if (!href || !isAllowedUri(href)) return;
-    const attrs = { href, color: linkColor || null, decoration: linkDecoration || null };
+    if (!href) {
+      if (state.linkHref) unlinkSaved();
+      return;
+    }
+    if (!isAllowedUri(href)) return;
+    const attrs = { href, color: linkColor, decoration: linkDecoration, target: linkTarget };
     const range = linkRange.current;
     const chain = focusSelection(editor, range);
     if (range && range.anchor === range.head && !state.linkHref) {
@@ -135,135 +143,134 @@ export function RichTextToolbar({
         event.preventDefault();
       }}
     >
-      <div className="ree-rte-row">
-        <TextFormatControls
+      <TextFormatControls
+        editor={editor}
+        profile={profile}
+        state={state}
+        inherited={inherited}
+        menu={menu}
+        range={markRange}
+        bold={bold}
+        toggleMenu={toggleMenu}
+        run={run}
+      >
+        <TextColorControl
+          value={state.color}
+          fallback={inherited.color}
+          onOpen={() => {
+            colorRange.current = currentSelection(editor);
+            setMenu(null);
+          }}
+          onChange={(color) =>
+            formatText(editor, (chain) => chain.setColor(color), colorRange.current, "text", false)
+          }
+          onReset={() =>
+            formatText(editor, (chain) => chain.unsetColor(), colorRange.current, "text", false)
+          }
+        />
+      </TextFormatControls>
+      {profile !== "button" ? (
+        <div className="ree-rte-group" role="group" aria-label="Paragraph">
+          {TEXT_ALIGNS.filter((align) => profile === "text" || align.value !== "justify").map((align) => (
+            <ToolbarButton
+              key={align.value}
+              title={align.title}
+              active={state.align === align.value}
+              onClick={() => formatText(editor, (chain) => chain.toggleTextAlign(align.value), null, "paragraph")}
+            >
+              <ToolbarIcon name={align.icon} />
+            </ToolbarButton>
+          ))}
+          <ParagraphMetricMenus
+            menu={menu}
+            showSpacing={profile === "text"}
+            spacing={state.spacing}
+            lineHeight={state.lineHeight}
+            inheritedSpacing={inherited.paragraphSpacing}
+            inheritedLineHeight={inherited.lineHeight}
+            onToggle={toggleMenu}
+            onSpacing={(value) => {
+              formatText(editor, (chain) => value
+                ? chain.updateAttributes("paragraph", { spacing: value })
+                : chain.resetAttributes("paragraph", "spacing"), markRange, "paragraph");
+            }}
+            onLineHeight={(value) => {
+              formatText(editor, (chain) => value
+                ? chain.updateAttributes("paragraph", { lineHeight: value })
+                : chain.resetAttributes("paragraph", "lineHeight"), markRange, "paragraph");
+            }}
+          />
+        </div>
+      ) : null}
+      {profile === "text" ? (
+        <ListControls
           editor={editor}
-          profile={profile}
           state={state}
-          inherited={inherited}
           menu={menu}
           range={markRange}
-          bold={bold}
-          toggleMenu={toggleMenu}
-          run={run}
+          inherited={inherited}
+          onToggle={toggleMenu}
         />
-      </div>
-      <div className="ree-rte-row">
-        {profile !== "button" ? (
-          <>
-            {TEXT_ALIGNS.filter((align) => profile === "text" || align.value !== "justify").map((align) => (
-              <ToolbarButton
-                key={align.value}
-                title={align.title}
-                active={state.align === align.value}
-                onClick={() => formatText(editor, (chain) => chain.toggleTextAlign(align.value), null, "paragraph")}
-              >
-                <ToolbarIcon name={align.icon} />
-              </ToolbarButton>
-            ))}
-            <span className="ree-rte-sep" />
-            <ParagraphMetricMenus
-              menu={menu}
-              showSpacing={profile === "text"}
-              spacing={state.spacing}
-              lineHeight={state.lineHeight}
-              inheritedSpacing={inherited.paragraphSpacing}
-              inheritedLineHeight={inherited.lineHeight}
-              onToggle={toggleMenu}
-              onSpacing={(value) => {
-                formatText(editor, (chain) => value
-                  ? chain.updateAttributes("paragraph", { spacing: value })
-                  : chain.resetAttributes("paragraph", "spacing"), markRange, "paragraph");
-              }}
-              onLineHeight={(value) => {
-                formatText(editor, (chain) => value
-                  ? chain.updateAttributes("paragraph", { lineHeight: value })
-                  : chain.resetAttributes("paragraph", "lineHeight"), markRange, "paragraph");
-              }}
+      ) : null}
+      {profile !== "button" ? (
+        <div className="ree-rte-group" role="group" aria-label="Links">
+          <ToolbarButton
+            title="Link"
+            active={Boolean(state.linkHref)}
+            onClick={() => toggleMenu("link")}
+          >
+            <ToolbarIcon name="link" />
+          </ToolbarButton>
+          {menu === "link" ? (
+            <LinkPopover
+              url={linkUrl}
+              color={linkColor}
+              decoration={linkDecoration}
+              target={linkTarget}
+              onColorChange={setLinkColor}
+              onDecorationChange={setLinkDecoration}
+              onTargetChange={setLinkTarget}
+              canUnlink={Boolean(state.linkHref)}
+              onUrlChange={setLinkUrl}
+              onApply={applyLink}
+              onClose={() => setMenu(null)}
             />
-          </>
-        ) : null}
-        {profile === "text" ? (
-          <ListControls
-            editor={editor}
-            state={state}
-            menu={menu}
-            range={markRange}
-            inherited={inherited}
-            onToggle={toggleMenu}
-          />
-        ) : null}
+          ) : null}
+          <ToolbarButton title="Unlink" disabled={!state.linkHref} onClick={unlinkSelection}>
+            <ToolbarIcon name="unlink" />
+          </ToolbarButton>
+        </div>
+      ) : null}
+      <div className="ree-rte-group" role="group" aria-label="Insert">
         <ToolbarMenu
-          title="Text color"
+          title="Emoji"
           variant="icon"
+          caret={false}
           align="end"
-          open={menu === "color"}
-          onToggle={() => toggleMenu("color")}
-          label={
-            <span className="ree-tool-color" style={{ borderBottomColor: color }}>
-              A
-            </span>
-          }
+          open={menu === "emoji"}
+          onToggle={() => toggleMenu("emoji")}
+          label={<ToolbarIcon name="emoji" />}
         >
-          <ColorMenu
-            colors={TEXT_COLORS}
-            value={state.color}
-            fallback={inherited.color}
-            onSelect={(color) =>
-              run(() => formatText(editor, (chain) => chain.setColor(color), markRange))
-            }
-            onClear={() =>
-              run(() => formatText(editor, (chain) => chain.unsetColor(), markRange))
-            }
+          <EmojiMenu
+            onPick={(emoji) => run(() => editor.chain().focus().insertContent(emoji).run())}
           />
         </ToolbarMenu>
-        {profile !== "button" ? (
-          <>
-            <span className="ree-rte-sep" />
-            <ToolbarMenu
-              title="Link"
-              variant="icon"
-              caret={false}
-              active={Boolean(state.linkHref)}
-              align="end"
-              open={menu === "link"}
-              onToggle={() => toggleMenu("link")}
-              label={<ToolbarIcon name="link" />}
-              panelClassName="is-link"
-            >
-              <LinkPopover
-                url={linkUrl}
-                color={linkColor}
-                fallbackColor={inherited.linkColor || inherited.color}
-                decoration={linkDecoration}
-                onColorChange={setLinkColor}
-                onDecorationChange={setLinkDecoration}
-                canUnlink={Boolean(state.linkHref)}
-                onUrlChange={setLinkUrl}
-                onApply={applyLink}
-                onUnlink={unlinkSaved}
-              />
-            </ToolbarMenu>
-            <ToolbarButton title="Unlink" disabled={!state.linkHref} onClick={unlinkSelection}>
-              <ToolbarIcon name="unlink" />
-            </ToolbarButton>
-          </>
+        {variables.length > 0 ? (
+          <ToolbarMenu
+            title="Personalization"
+            align="end"
+            open={menu === "variable"}
+            onToggle={() => toggleMenu("variable")}
+            label="Personalization"
+          >
+            <VariableMenu
+              variables={variables}
+              onInsert={(token) =>
+                run(() => editor.chain().focus().insertContent(preserveTemplateSpaces(token)).run())
+              }
+            />
+          </ToolbarMenu>
         ) : null}
-        <span className="ree-rte-sep" />
-        <ToolbarMenu
-          title="Personalization"
-          align="end"
-          open={menu === "variable"}
-          onToggle={() => toggleMenu("variable")}
-          label="Personalization"
-        >
-          <VariableMenu
-            variables={variables}
-            onInsert={(token) =>
-              run(() => editor.chain().focus().insertContent(preserveTemplateSpaces(token)).run())
-            }
-          />
-        </ToolbarMenu>
       </div>
     </div>
   );

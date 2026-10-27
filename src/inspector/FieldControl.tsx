@@ -1,7 +1,8 @@
 import { useRef, type ChangeEvent } from "react";
-import { ColorControl } from "./components/ColorControl";
-import { RangeControl } from "./components/RangeControl";
-import { SelectControl } from "./components/SelectControl";
+import { ColorControl } from "../components/ColorControl";
+import { RangeControl } from "../components/RangeControl";
+import { SelectControl } from "../components/SelectControl";
+import { TextInput } from "../components/TextInput";
 import { HtmlCodeEditor } from "./HtmlCodeEditor";
 import { VariablesDropdown } from "./VariablesDropdown";
 import type { FieldConfig, Variable } from "../types/block";
@@ -85,6 +86,7 @@ export function FieldControl({
       <div className="ree-field">
         <label className="ree-field-label">{field.label}</label>
         <SelectControl
+          label={field.label}
           value={stringValue}
           options={field.options ?? []}
           onChange={onChange}
@@ -96,7 +98,7 @@ export function FieldControl({
   if (field.type === "color") {
     return (
       <div className="ree-color-chip-row">
-        <ColorControl label={field.label} value={stringValue} onChange={(next) => onChange(next)} />
+        <ColorControl label={field.label} value={stringValue} resetTo={String(field.defaultValue ?? "")} onChange={(next) => onChange(next)} />
       </div>
     );
   }
@@ -119,11 +121,10 @@ export function FieldControl({
   return (
     <div className="ree-field">
       {label}
-      <input
+      <TextInput
         ref={(element) => {
           ref.current = element;
         }}
-        className="ree-input"
         aria-label={field.label}
         min={field.min}
         max={field.max}

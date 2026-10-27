@@ -78,6 +78,7 @@ export function CanvasBlock({
         .join(" ")}
       onClick={select}
     >
+      <span className="ree-block-highlight" aria-hidden="true" />
       <button
         type="button"
         className="ree-block-grip"

@@ -123,3 +123,38 @@ test('自定义区块仅渲染启用的样式，默认对象独立，旧文档�
   assert.equal(doc.version, 2);
   assert.throws(() => documentToHtml({ ...doc, version: 1 }, [definition]), /Unsupported email document version/);
 });
+
+
+test('按钮和图片的链接默认留空，空白链接在画布、邮件及预览中不可跳转', () => {
+  for (const type of ['button', 'image']) {
+    const block = createBlockNode(type);
+    const key = type === 'button' ? 'href' : 'link';
+    assert.equal(block.fields[key], '');
+    for (const value of [undefined, '', '   ']) {
+      block.fields[key] = value;
+      for (const mode of ['canvas', 'email']) {
+        const html = renderBlock(block, DEFAULT_BLOCKS, mode);
+        assert.doesNotMatch(html, /<a\b|href=/);
+        assert.match(html, type === 'button' ? /Buy now/ : /<img\b/);
+      }
+      assert.doesNotMatch(documentToHtml(createEmailDocument([block]), DEFAULT_BLOCKS, { resolveHtmlTemplates: true }), /<a\b|href=/);
+    }
+    block.fields[key] = 'https://example.com/?a=1&b=2';
+    assert.match(renderBlock(block), /href="https:\/\/example\.com\/\?a=1&amp;b=2"/);
+  }
+});
+
+test('低频边框颜色默认为透明，显式颜色仍正常导出', () => {
+  assert.equal(resolveEmailGlobal().borderColor, 'transparent');
+  for (const type of ['button', 'image', 'text']) {
+    const definition = getBlockDefinition(type);
+    assert.equal(definition.styleFields.find((field) => field.id === 'decorations.borderColor').defaultValue, 'transparent');
+    const block = createBlockNode(type);
+    if (type !== 'text') {
+      assert.equal(definition.styleFields.find((field) => field.id === 'element.borderColor').defaultValue, 'transparent');
+      assert.match(renderBlock(block), /border-color:transparent/);
+      block.style.element = { ...block.style.element, borderColor: '#123456' };
+      assert.match(renderBlock(block), /border-color:#123456/);
+    }
+  }
+});

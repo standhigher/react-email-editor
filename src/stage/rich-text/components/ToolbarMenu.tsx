@@ -48,6 +48,7 @@ export function ToolbarMenu({
         type="button"
         className={buttonClass}
         title={title}
+        aria-label={variant === "icon" ? title : undefined}
         aria-expanded={open}
         onClick={onToggle}
       >

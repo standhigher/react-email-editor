@@ -7,8 +7,8 @@ export function currentSelection(editor: Editor): EditorTextRange {
   return { anchor: selection.anchor, head: selection.head, storedMarks };
 }
 
-export function focusSelection(editor: Editor, range?: EditorTextRange | null) {
-  const chain = editor.chain().focus();
+export function focusSelection(editor: Editor, range?: EditorTextRange | null, focus = true) {
+  const chain = focus ? editor.chain().focus() : editor.chain();
   if (!range) return chain;
   return chain.command(({ tr, commands }) => {
     if (tr.selection.anchor !== range.anchor || tr.selection.head !== range.head) {
@@ -25,8 +25,9 @@ export function formatText(
   command: (chain: ChainedCommands) => ChainedCommands,
   range?: EditorTextRange | null,
   scope: "text" | "paragraph" = "text",
+  focus = true,
 ): boolean {
-  const chain = focusSelection(editor, range);
+  const chain = focusSelection(editor, range, focus);
   return chain.command(({ tr, chain: scopedChain }) => {
     const selection = tr.selection;
     const pendingMarks = tr.storedMarks;

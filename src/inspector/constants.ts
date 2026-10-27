@@ -1,7 +1,5 @@
 import { FONT_WEIGHTS, HORIZONTAL_ALIGNS } from "../constants/style-values";
 
-export const HEX_COLOR = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
-
 export const TEXT_ALIGN_OPTIONS = [
   { value: HORIZONTAL_ALIGNS.left, label: "Left", glyph: "⇤" },
   { value: HORIZONTAL_ALIGNS.center, label: "Center", glyph: "⇔" },

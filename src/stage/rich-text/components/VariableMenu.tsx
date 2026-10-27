@@ -7,7 +7,7 @@ interface VariableMenuProps {
 
 export function VariableMenu({ variables, onInsert }: VariableMenuProps) {
   if (variables.length === 0) {
-    return <div className="ree-personalization-empty">No personalization fields</div>;
+    return null;
   }
 
   return (

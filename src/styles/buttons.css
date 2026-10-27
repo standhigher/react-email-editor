@@ -1,0 +1,105 @@
+/* ---------- 共享普通按钮 ---------- */
+
+.ree-btn {
+  appearance: none;
+  border: 1px solid #b5b5b5;
+  background: var(--ree-panel, #ffffff);
+  color: var(--ree-text, #202223);
+  border-radius: var(--ree-radius, 8px);
+  --ree-button-padding-y: 8px;
+  --ree-button-padding-x: 16px;
+  padding: var(--ree-button-padding-y) var(--ree-button-padding-x);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s ease, border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.ree-btn:hover {
+  background: var(--ree-panel-secondary);
+  border-color: var(--ree-border);
+}
+
+.ree-btn:active {
+  background: #f0f0f1;
+}
+
+.ree-btn-primary {
+  background: var(--ree-primary, #005bd3);
+  border-color: var(--ree-primary, #005bd3);
+  color: var(--ree-primary-fg, #ffffff);
+}
+
+.ree-btn-primary:hover {
+  background: var(--ree-primary-hover);
+  border-color: var(--ree-primary-hover);
+}
+
+.ree-btn-primary:active {
+  background: var(--ree-primary-hover);
+}
+
+
+.ree-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ree-btn-solid {
+  background: #202223;
+  border-color: #202223;
+  color: #ffffff;
+}
+
+.ree-btn-solid:hover,
+.ree-btn-solid:active {
+  background: #000000;
+  border-color: #000000;
+}
+
+.ree-btn:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-width: 2px;
+  border-color: #202223;
+  padding: calc(var(--ree-button-padding-y) - 1px) calc(var(--ree-button-padding-x) - 1px);
+}
+
+.ree-reset {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ree-muted);
+  cursor: pointer;
+}
+
+.ree-reset:hover {
+  background: var(--ree-panel-secondary);
+  color: var(--ree-text);
+}
+
+.ree-reset:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ree-reset:disabled:hover {
+  background: transparent;
+  color: var(--ree-muted);
+}
+
+.ree-reset:focus-visible {
+  outline: 1px solid #202223;
+  outline-offset: -1px;
+}

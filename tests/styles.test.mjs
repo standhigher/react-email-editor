@@ -73,6 +73,7 @@ test('Text 继承全局排版，覆盖与显式富文本样式保持优先级', 
 
 test('按钮、图片、分割线的元素样式与容器样式分离', () => {
   const button = createBlockNode('button');
+  button.fields.href = 'https://example.com';
   button.style.decorations = { backgroundColor: '#abcdef', borderRadius: '20px' };
   button.style.element = { ...button.style.element, width: '100%', padding: '0px', backgroundColor: '#000000', borderRadius: '0px' };
   const html = blockToHtml(button);
@@ -85,7 +86,7 @@ test('按钮、图片、分割线的元素样式与容器样式分离', () => {
   assert.doesNotMatch(anchor, /background-color|padding:|border-radius|text-align:left|#abcdef/);
   const fresh = createBlockNode('button');
   delete fresh.style.element.backgroundColor;
-  assert.match(renderBlock(fresh), /background-color:#005bd3/);
+  assert.match(renderBlock(fresh), /background-color:#000000/);
   const image = createBlockNode('image');
   image.style.element = { align: 'right', width: '120px', height: '80px', borderWidth: '3px' };
   const imageHtml = renderBlock(image);

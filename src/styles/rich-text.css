@@ -14,8 +14,9 @@
   left: 0;
   visibility: hidden;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
   width: auto;
   margin: 0;
   padding: 4px;
@@ -32,19 +33,27 @@
   visibility: visible;
 }
 
-.ree-rte-row {
+.ree-rte-group {
   display: flex;
-  align-items: center;
+  flex: 0 0 auto;
   flex-wrap: wrap;
+  align-items: center;
   gap: 2px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 4px;
 }
 
-.ree-rte-sep {
+.ree-rte-group + .ree-rte-group {
+  border-inline-start: 1px solid var(--ree-border);
+}
+
+.ree-rte-group.is-row-start {
+  border-inline-start-color: transparent;
+}
+
+.ree-rte-group > * {
   flex-shrink: 0;
-  align-self: stretch;
-  width: 1px;
-  margin: 4px 4px;
-  background: var(--ree-border);
 }
 
 .ree-tool-btn,
@@ -158,12 +167,6 @@
   right: 0;
 }
 
-.ree-rte-menu.is-link {
-  min-width: 0;
-  padding: 0;
-  overflow: visible;
-}
-
 .ree-rte-pop.is-up .ree-rte-menu {
   top: auto;
   bottom: calc(100% + 6px);
@@ -192,46 +195,6 @@
   font-weight: 600;
 }
 
-.ree-rte-swatches {
-  display: grid;
-  grid-template-columns: repeat(6, 22px);
-  gap: 6px;
-  padding: 4px;
-}
-
-.ree-rte-swatch {
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: 1px solid rgba(32, 34, 35, 0.16);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.ree-rte-swatch.is-active {
-  outline: 2px solid #202223;
-  outline-offset: 1px;
-}
-
-.ree-rte-color-actions {
-  display: flex;
-  gap: 6px;
-  padding: 4px;
-}
-
-.ree-rte-color-actions .ree-btn {
-  padding: 6px 10px;
-  font-size: 13px;
-}
-
-.ree-rte-color-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-
 .ree-rte-emoji-grid {
   display: grid;
   grid-template-columns: repeat(8, 28px);
@@ -252,24 +215,6 @@
 
 .ree-rte-emoji:hover {
   background: var(--ree-panel-secondary);
-}
-
-.ree-rte-link {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 280px;
-  padding: 6px;
-}
-
-.ree-rte-link-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.ree-rte-link-actions .ree-btn {
-  padding: 6px 12px;
 }
 
 .ree-rte-variables {
@@ -300,10 +245,17 @@
 
 .ree-rte-metric-label {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   color: var(--ree-muted);
   font-size: 12px;
+}
+
+.ree-rte-metric-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .ree-rte-option:disabled {

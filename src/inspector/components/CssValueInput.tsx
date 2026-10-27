@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { TextInput } from "../../components/TextInput";
 
 interface CssValueInputProps {
   label: string;
@@ -15,7 +16,7 @@ export function CssValueInput({ label, value, placeholder, onChange }: CssValueI
     setPreviousValue(value);
     setDraft(value);
   }
-  return <input className="ree-input" aria-label={label} value={draft} placeholder={placeholder ?? "0px"}
+  return <TextInput aria-label={label} value={draft} placeholder={placeholder ?? "0px"}
     onChange={(event) => setDraft(event.target.value)}
     onBlur={() => { onChange(draft.trim()); setDraft(value); }}
     onKeyDown={(event) => {

@@ -35,6 +35,7 @@ src/
   EmailEditor.tsx       对外组件入口
   index.ts              包公共导出，只保留稳定 API 的显式 re-export
   types/                公共数据模型、Props、渲染上下文和配置类型
+  components/           跨模块基础控件与共享展示组件
   shell/                编辑器会话、ref handle、主题栏和个性化入口
   stage/                画布、预览、富文本编辑和工具栏
   block-library/        可拖拽区块库
@@ -103,6 +104,7 @@ tests/
 
 ## React 与 UI
 
+- 基础控件统一复用 `src/components/` 的 `TextInput`、`SelectControl`、`CheckboxControl`、`ColorControl`、`RangeControl` 和 `Button`；同外观、同交互的控件不得在业务模块重复实现。尺寸差异通过共享组件明确的 variant/compact 参数表达；工具栏菜单、图标按钮等已有专用封装继续按其职责复用。基础样式集中于 `src/styles/form-controls.css` 和 `src/styles/buttons.css`，聚焦使用无外围间距的黑色 border，业务样式只负责布局。
 - 这是一个无 UI 框架的组件库，不要引入 Tailwind、CSS-in-JS 或新的组件库来替代现有 CSS 体系。静态编辑器布局、间距、状态、响应式规则写入 `src/styles/`；运行时动态值可按现有模式使用 CSS 变量或内联样式。
 - 项目自有编辑器 CSS 类名使用 `ree-` 前缀，CSS 变量使用 `--ree-` 前缀。TipTap/CodeMirror 等依赖生成的 `.ProseMirror`、`.cm-*` 等类名保留原名，对其样式覆盖必须限定在 `.ree-*` 容器内，避免污染消费方页面。新增样式按功能放入对应文件，并在 `src/styles.css` 中维护导入顺序。不要在组件内写大段静态 style object。
 - 画布显示和邮件渲染是两套消费场景：编辑辅助样式只能留在编辑器 CSS；邮件渲染需要明确的内联 CSS 或渲染器输出。

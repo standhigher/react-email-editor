@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { TextInput } from "../components/TextInput";
 import { SUBJECT_MAX_LENGTH } from "../constants/editor";
 import { PERSONALIZATION_HINT } from "./constants";
 import { PersonalizationMenu } from "./PersonalizationMenu";
@@ -8,14 +9,12 @@ interface SubjectBarProps {
   subject: string;
   variables: Variable[];
   onSubjectChange: (subject: string) => void;
-  onReset: () => void;
 }
 
 export function SubjectBar({
   subject,
   variables,
   onSubjectChange,
-  onReset,
 }: SubjectBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -40,7 +39,7 @@ export function SubjectBar({
       <label className="ree-subject-label" htmlFor="ree-email-subject">
         Email subject
       </label>
-      <input
+      <TextInput
         id="ree-email-subject"
         ref={inputRef}
         className="ree-subject-input"
@@ -57,9 +56,6 @@ export function SubjectBar({
           <p className="ree-subject-hint">{PERSONALIZATION_HINT}</p>
         </>
       ) : null}
-      <button type="button" className="ree-btn ree-subject-reset" onClick={onReset}>
-        Reset
-      </button>
     </div>
   );
 }

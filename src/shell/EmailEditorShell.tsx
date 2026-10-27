@@ -78,7 +78,6 @@ export const EmailEditorShell = forwardRef<EmailEditorHandle, EmailEditorProps>(
           subject={session.document.subject ?? ""}
           variables={session.variables}
           onSubjectChange={session.setSubject}
-          onReset={session.reset}
         />
         <div className="ree-body">
           <EditorDnd

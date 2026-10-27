@@ -17,6 +17,8 @@ export function VariablesDropdown({ variables, onInsert }: VariablesDropdownProp
         className="ree-var-btn"
         onClick={() => setOpen((current) => !current)}
         title="Insert variable"
+        aria-label="Insert variable"
+        aria-expanded={open}
       >
         {"{ }"}
       </button>

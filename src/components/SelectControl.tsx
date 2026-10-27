@@ -1,17 +1,22 @@
-import type { FieldOption } from "../../types/block";
+import type { FieldOption } from "../types/block";
 
 interface SelectControlProps {
+  id?: string;
   label?: string;
   value: string;
-  options: FieldOption[];
+  options: readonly FieldOption[];
+  compact?: boolean;
+  disabled?: boolean;
   onChange: (value: string) => void;
 }
 
-export function SelectControl({ label, value, options, onChange }: SelectControlProps) {
+export function SelectControl({ id, label, value, options, compact = false, disabled, onChange }: SelectControlProps) {
   return (
-    <div className="ree-select">
+    <span className={`ree-select${compact ? " is-compact" : ""}`}>
       <select
+        id={id}
         aria-label={label}
+        disabled={disabled}
         className="ree-input"
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -33,6 +38,6 @@ export function SelectControl({ label, value, options, onChange }: SelectControl
           />
         </svg>
       </span>
-    </div>
+    </span>
   );
 }

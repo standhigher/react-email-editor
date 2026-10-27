@@ -18,7 +18,7 @@ export const buttonBlock: BlockDefinition = {
   inlineEditProfile: "button",
   defaultFields: { html: '<p><span style="font-size:16px;color:#ffffff">Buy now</span></p>' },
   fields: [
-    { type: "url", name: "href", label: "Link", defaultValue: "https://example.com" },
+    { type: "url", name: "href", label: "Link", defaultValue: "", placeholder: "https://example.com" },
   ],
   defaultStyle: {
     element: { ...BUTTON_BOX_DEFAULTS },
@@ -27,7 +27,9 @@ export const buttonBlock: BlockDefinition = {
   render: ({ block, global }) => {
     const { element, width, text, box } = buttonStyles(block, global);
     const px = pixelLength(width);
-    const anchor = `<a href="${esc(String(block.fields.href ?? "#"))}" style="display:block;text-decoration:none;${styleToCss(text)};">${buttonInlineHtml(buttonContent(block))}</a>`;
+    const href = String(block.fields.href ?? "").trim();
+    const tag = href ? "a" : "span";
+    const anchor = `<${tag}${href ? ` href="${esc(href)}"` : ""} style="display:block;text-decoration:none;${styleToCss(text)};">${buttonInlineHtml(buttonContent(block))}</${tag}>`;
     const cell = `<td align="center"${px ? ` width="${px}"` : ""} style="${styleToCss(box)};">${anchor}</td>`;
     return renderAligned("button", { align: element.align, width, content: cell });
   },

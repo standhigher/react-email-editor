@@ -1,5 +1,11 @@
 /* ---------- 配置区 ---------- */
 
+.ree-col-right {
+  --ree-primary: #202223;
+  --ree-primary-hover: #303030;
+  --ree-primary-soft: #f6f6f7;
+}
+
 .ree-inspector {
   --ree-inspector-section-space: 16px;
   padding: 20px 16px;
@@ -116,4 +122,26 @@
 
 .ree-inspector-advanced[open] summary {
   margin-bottom: 14px;
+}
+
+.ree-field-label:has(> .ree-var-wrap) {
+  position: relative;
+  justify-content: flex-start;
+}
+
+.ree-field-label > .ree-var-wrap {
+  position: static;
+}
+
+.ree-field-label .ree-var-menu {
+  left: 0;
+  width: min(280px, 100%);
+  min-width: 0;
+}
+
+.ree-field-label .ree-var-name,
+.ree-field-label .ree-var-label {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }

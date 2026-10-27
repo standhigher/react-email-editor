@@ -3,6 +3,8 @@ export type ToolbarIconName =
   | "align-center"
   | "align-right"
   | "align-justify"
+  | "space-before"
+  | "line-height"
   | "list-bullet"
   | "list-ordered"
   | "emoji"
@@ -31,6 +33,20 @@ function iconPaths(name: ToolbarIconName) {
     strokeLinejoin: "round" as const,
   };
   switch (name) {
+    case "space-before":
+      return (
+        <g {...stroke}>
+          <path d="M4 4h16M4 15h16M4 20h10" />
+          <path d="M12 7v5m-3-3 3 3 3-3" />
+        </g>
+      );
+    case "line-height":
+      return (
+        <g {...stroke}>
+          <path d="M11 5h9M11 12h9M11 19h9" />
+          <path d="M5 4v16M2 7l3-3 3 3M2 17l3 3 3-3" />
+        </g>
+      );
     case "align-left":
       return (
         <g {...stroke}>

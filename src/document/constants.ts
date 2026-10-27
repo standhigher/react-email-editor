@@ -52,7 +52,7 @@ export const DEFAULT_EMAIL_GLOBAL: EmailGlobalSettings = {
   listIndent: "22px",
   borderWidth: "0px",
   borderStyle: BORDER_STYLES.solid,
-  borderColor: "#000000",
+  borderColor: "transparent",
   borderRadius: "0px",
   fontFamily: "Arial, Helvetica, sans-serif",
   fontWeight: FONT_WEIGHTS.normal,

@@ -16,7 +16,7 @@ export const imageBlock: BlockDefinition = {
   fields: [
     { type: "url", name: "src", label: "Image URL", defaultValue: "https://placehold.co/560x200?text=Image" },
     { type: "text", name: "alt", label: "Alt text", defaultValue: "Image" },
-    { type: "url", name: "link", label: "Link", defaultValue: "" },
+    { type: "url", name: "link", label: "Link", defaultValue: "", placeholder: "https://example.com" },
   ],
   defaultStyle: { dimension: { padding: "8px" } },
   styleFields: [...WRAPPER_STYLE_FIELDS, ELEMENT_ALIGN, ...IMAGE_STYLE_FIELDS],
@@ -36,7 +36,7 @@ export const imageBlock: BlockDefinition = {
     const widthAttr = pixelLength(width);
     const heightAttr = pixelLength(height);
     const image = `<img src="${esc(String(fields.src ?? ""))}" alt="${esc(String(fields.alt ?? ""))}"${widthAttr ? ` width="${widthAttr}"` : ""}${heightAttr ? ` height="${heightAttr}"` : ""} border="0" style="outline:none;text-decoration:none;${css};" />`;
-    const link = String(fields.link ?? "");
+    const link = String(fields.link ?? "").trim();
     const content = link ? `<a href="${esc(link)}" style="text-decoration:none;${box.display === "block" ? "display:block;" : ""}">${image}</a>` : image;
     return renderAligned("image", { align: element.align, width, content });
   },

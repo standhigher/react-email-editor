@@ -2,11 +2,11 @@ import { useId } from "react";
 import { cornerRadii, cssLength, formatCssLength, readCssLength } from "../utils/css-values";
 import { CORNER_SIDES } from "./constants";
 import { AlignControl } from "./components/AlignControl";
-import { ColorControl } from "./components/ColorControl";
+import { ColorControl } from "../components/ColorControl";
 import { CssValueInput } from "./components/CssValueInput";
 import { LengthControl } from "./components/LengthControl";
-import { ResetButton } from "./components/ResetButton";
-import { SelectControl } from "./components/SelectControl";
+import { ResetButton } from "../components/ResetButton";
+import { SelectControl } from "../components/SelectControl";
 import { SpacingControl } from "./components/SpacingControl";
 import type { StyleFieldConfig } from "../types/block";
 
@@ -43,7 +43,7 @@ export function StyleControl({ config, value, fallback, resetLabel = "Reset", re
   if (config.control === "color") {
     return (
       <div className="ree-color-chip-row">
-        <ColorControl label={config.label} value={actual} onChange={onChange} />
+        <ColorControl label={config.label} value={actual} resetTo={resetTo ?? ""} onChange={onChange} />
         {reset}
       </div>
     );

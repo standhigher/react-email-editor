@@ -44,3 +44,5 @@ export function isStyleValue<const T extends Record<string, string>>(
 ): value is T[keyof T] {
   return typeof value === "string" && (Object.values(values) as string[]).includes(value);
 }
+
+export const HEX_COLOR = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;

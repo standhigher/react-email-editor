@@ -43,23 +43,18 @@ export function useEditorSession({
   onGlobalChange,
 }: UseEditorSessionOptions): EditorSession {
   const definitions = useMemo(() => mergeBlockDefinitions(blocks), [blocks]);
-  const [baseline] = useState<EmailDocument>(() => {
+  const [document, setDocument] = useState<EmailDocument>(() => {
     const base = ensureEmailDocument(
       structuredClone(initialDocument ?? createEmptyDocument()),
     );
     if (global === undefined) return base;
     return { ...base, global: mergeEmailGlobal(base.global, global) };
   });
-  const [document, setDocument] = useState<EmailDocument>(() =>
-    structuredClone(baseline),
-  );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const documentRef = useRef(document);
-  const globalPropRef = useRef(global);
   useLayoutEffect(() => {
     documentRef.current = document;
-    globalPropRef.current = global;
-  }, [document, global]);
+  }, [document]);
 
   const commit = useCallback(
     (next: EmailDocument) => {
@@ -157,16 +152,6 @@ export function useEditorSession({
     [commit],
   );
 
-  const reset = useCallback(() => {
-    const restored = structuredClone(baseline);
-    const incoming = globalPropRef.current;
-    const next = incoming === undefined
-      ? restored
-      : { ...restored, global: mergeEmailGlobal(restored.global, incoming) };
-    commit(next);
-    setSelectedId(null);
-  }, [baseline, commit]);
-
   const resolvedDocument = useMemo(() => ensureEmailDocument(document), [document]);
   const selectedBlock =
     resolvedDocument.blocks.find((block) => block.id === selectedId) ?? null;
@@ -192,6 +177,5 @@ export function useEditorSession({
     removeBlock,
     reorderBlocks,
     setSubject,
-    reset,
   };
 }

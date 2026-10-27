@@ -15,6 +15,8 @@ export function AlignControl({ value, onChange }: AlignControlProps) {
           className={`ree-align-btn${value === option.value ? " is-active" : ""}`}
           onClick={() => onChange(option.value)}
           title={option.label}
+          aria-label={option.label}
+          aria-pressed={value === option.value}
         >
           {option.glyph}
         </button>

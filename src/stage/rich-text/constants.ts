@@ -8,6 +8,13 @@ export interface TextAlignOption {
 
 export const PARAGRAPH_SPACING_MAX = 48;
 
+export const DEFAULT_LINK_TARGET = "_blank";
+
+export const LINK_TARGETS = [
+  { value: "_self", label: "Current page" },
+  { value: "_blank", label: "New page" },
+];
+
 export const LINE_HEIGHT_RANGE = { min: 1, max: 2.5, step: 0.05 } as const;
 
 export const FONT_SIZES = [
@@ -23,18 +30,6 @@ export const FONT_SIZES = [
   "32px",
   "36px",
   "48px",
-];
-
-export const TEXT_COLORS = [
-  "#202223",
-  "#303030",
-  "#6d7175",
-  "#d72c0d",
-  "#b98900",
-  "#008060",
-  "#005bd3",
-  "#6d28d9",
-  "#ffffff",
 ];
 
 export const EMOJIS = [

@@ -29,6 +29,7 @@ export function readToolbarState(editor: Editor): ToolbarState {
     fontWeight: markWeight(textStyle.fontWeight),
     color: textAttribute(textStyle.color),
     linkHref: textAttribute(link.href),
+    linkTarget: textAttribute(link.target),
     linkColor: textAttribute(link.color),
     linkDecoration: textAttribute(link.decoration),
     listSpacing: textAttribute(list.listSpacing),
@@ -36,8 +37,4 @@ export function readToolbarState(editor: Editor): ToolbarState {
     spacing: textAttribute(editor.getAttributes("paragraph").spacing),
     lineHeight: textAttribute(editor.getAttributes("paragraph").lineHeight),
   };
-}
-
-export function toColorInputValue(value: string, fallback: string): string {
-  return /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
 }

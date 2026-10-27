@@ -1,0 +1,102 @@
+.ree-color-picker {
+  position: fixed;
+  inset: auto;
+  width: min(256px, calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid var(--ree-border, #e3e3e5);
+  border-radius: 10px;
+  background: var(--ree-panel, #ffffff);
+  box-shadow: var(--ree-shadow-lg, 0 6px 32px rgba(31, 33, 36, 0.16));
+  color: var(--ree-text, #202223);
+  font: 400 13px/1.4 var(--ree-font, Arial, sans-serif);
+}
+
+.ree-color-picker:popover-open {
+  display: grid;
+  gap: 12px;
+}
+
+.ree-color-saturation {
+  position: relative;
+  height: 144px;
+  border-radius: 6px;
+  background: linear-gradient(to top, #000000, transparent), linear-gradient(to right, #ffffff, transparent), var(--ree-color-hue);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.ree-color-saturation:focus-visible {
+  outline: 2px solid #202223;
+  outline-offset: 2px;
+}
+
+.ree-color-cursor {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ree-color-hue .ree-range::-webkit-slider-runnable-track {
+  height: 10px;
+  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+
+.ree-color-hue .ree-range::-moz-range-track {
+  height: 10px;
+  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+
+.ree-color-hue .ree-range::-moz-range-progress {
+  background: transparent;
+}
+
+.ree-color-hue .ree-range::-webkit-slider-thumb {
+  margin-top: -2px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #6d7175;
+}
+
+.ree-color-hue .ree-range::-moz-range-thumb {
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #6d7175;
+}
+
+.ree-color-hex-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ree-color-preview {
+  flex: 0 0 28px;
+  height: 28px;
+  border: 1px solid var(--ree-border);
+  border-radius: 6px;
+}
+
+.ree-color-hex-field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ree-color-hex-field .ree-input {
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.ree-color-error {
+  margin: 0;
+  color: var(--ree-danger, #d72c0d);
+  font-size: 12px;
+}

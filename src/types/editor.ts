@@ -60,5 +60,4 @@ export interface EditorSession {
   removeBlock: (id: string) => void;
   reorderBlocks: (activeId: string, overId: string) => void;
   setSubject: (subject: string) => void;
-  reset: () => void;
 }

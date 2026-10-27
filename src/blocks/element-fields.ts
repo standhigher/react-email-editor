@@ -12,10 +12,10 @@ const elementDecoration = createDecorationFields({
 /** 按钮盒子的初始外观。重置和缺省渲染都回到这组值，而不是透明底。 */
 export const BUTTON_BOX_DEFAULTS = {
   align: HORIZONTAL_ALIGNS.center,
-  backgroundColor: "#005bd3",
+  backgroundColor: "#000000",
   borderRadius: "8px",
   borderWidth: "1px",
-  borderColor: "#005bd3",
+  borderColor: "transparent",
   padding: "12px 32px",
 } as const satisfies EmailElementStyle;
 

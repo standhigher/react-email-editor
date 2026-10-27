@@ -21,7 +21,7 @@ export const TEXT_ALIGN: StyleFieldConfig = { id: "typography.textAlign", group:
 export const BG_COLOR: StyleFieldConfig = { id: "decorations.backgroundColor", group: "decorations", label: "Background", control: "color", defaultValue: "transparent" };
 export const BORDER_RADIUS: StyleFieldConfig = { id: "decorations.borderRadius", group: "decorations", label: "Block corner radius", control: "corners", max: 48, defaultValue: "0px" };
 export const BORDER_WIDTH: StyleFieldConfig = { id: "decorations.borderWidth", group: "decorations", label: "Block border width", control: "range", unit: "px", min: 0, max: 12, defaultValue: "0px" };
-export const BORDER_COLOR: StyleFieldConfig = { id: "decorations.borderColor", group: "decorations", label: "Border", control: "color", defaultValue: "#000000" };
+export const BORDER_COLOR: StyleFieldConfig = { id: "decorations.borderColor", group: "decorations", label: "Border", control: "color", defaultValue: "transparent" };
 export const BORDER_STYLE: StyleFieldConfig = {
   id: "decorations.borderStyle",
   group: "decorations",

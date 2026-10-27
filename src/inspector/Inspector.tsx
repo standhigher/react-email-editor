@@ -42,15 +42,16 @@ export function Inspector({
           >
             GLOBAL
           </button>
-          <button
-            type="button"
-            className={`ree-inspector-tab${showBlock ? " is-active" : ""}`}
-            aria-pressed={Boolean(showBlock)}
-            disabled={!block || !definition}
-            onClick={() => onPanelChange("block")}
-          >
-            BLOCK
-          </button>
+          {block && definition ? (
+            <button
+              type="button"
+              className={`ree-inspector-tab${showBlock ? " is-active" : ""}`}
+              aria-pressed={Boolean(showBlock)}
+              onClick={() => onPanelChange("block")}
+            >
+              BLOCK
+            </button>
+          ) : null}
         </div>
       </div>
       <div className="ree-inspector-scroll">

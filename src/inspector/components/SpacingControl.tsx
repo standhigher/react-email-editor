@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { readCssLength, spacingSides } from "../../utils/css-values";
 import { SPACING_MAX, SPACING_SIDES } from "../constants";
-import { RangeControl } from "./RangeControl";
+import { RangeControl } from "../../components/RangeControl";
+import { CheckboxControl } from "../../components/CheckboxControl";
 
 interface SpacingControlProps {
   label: string;
@@ -45,17 +46,15 @@ export function SpacingControl({
   };
   return (
     <div className="ree-spacing-control">
-      <label className="ree-spacing-link">
-        <input
-          type="checkbox"
-          checked={!independent && equal}
-          onChange={(event) => {
-            setIndependent(!event.target.checked);
-            if (event.target.checked) onChange(`${sideAmount(sides[0] ?? "0px", max)}px`);
-          }}
-        />
-        {linkLabel}
-      </label>
+      <CheckboxControl
+        className="ree-spacing-link"
+        label={linkLabel}
+        checked={!independent && equal}
+        onChange={(checked) => {
+          setIndependent(!checked);
+          if (checked) onChange(`${sideAmount(sides[0] ?? "0px", max)}px`);
+        }}
+      />
       {!independent && equal
         ? slider(uniformLabel ?? `${label} all sides`, sides[0] ?? "0px", onChange)
         : (

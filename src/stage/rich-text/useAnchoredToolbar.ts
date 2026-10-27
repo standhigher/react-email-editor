@@ -27,6 +27,11 @@ export function useAnchoredToolbar(
       const width = Math.min(rect.width, ownerWindow.innerWidth - 16);
       toolbar.style.width = compact ? "max-content" : `${width}px`;
       toolbar.style.maxWidth = `${width}px`;
+      let previousBottom: number | null = null;
+      for (const group of toolbar.querySelectorAll<HTMLElement>(":scope > .ree-rte-group")) {
+        group.classList.toggle("is-row-start", previousBottom === null || group.offsetTop >= previousBottom);
+        previousBottom = group.offsetTop + group.offsetHeight;
+      }
       const height = toolbar.offsetHeight;
       let top = rect.top - height - 4;
       if (top < 8) {
@@ -45,6 +50,7 @@ export function useAnchoredToolbar(
     place();
     const observer = new ResizeObserver(place);
     observer.observe(toolbar);
+    for (const group of toolbar.querySelectorAll(".ree-rte-group")) observer.observe(group);
     observer.observe(anchor.closest(".ree-block") ?? anchor);
     ownerDocument.addEventListener("scroll", place, true);
     ownerWindow.addEventListener("resize", place);

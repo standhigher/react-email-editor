@@ -1,5 +1,6 @@
 import { formatCssLength } from "../../utils/css-values";
-import { RangeControl } from "./RangeControl";
+import { RangeControl } from "../../components/RangeControl";
+import { SelectControl } from "../../components/SelectControl";
 
 interface LengthControlProps {
   id?: string;
@@ -57,21 +58,17 @@ export function LengthControl({
         <RangeControl id={id} label={label} value={shown} min={range.min} max={range.max} step={range.step} onChange={(next) => commit(next, unit)} />
       )}
       {units.length > 1 ? (
-        <select
-          className="ree-unit-select"
-          aria-label={`${label} unit`}
+        <SelectControl
+          compact
+          label={`${label} unit`}
           value={unit}
-          onChange={(event) => {
-            const nextUnit = event.target.value;
+          options={units.map((option) => ({ value: option, label: option }))}
+          onChange={(nextUnit) => {
             if (nextUnit === unit) return;
             const seed = unit === "auto" ? (nextUnit === "%" ? 100 : Math.min(max, 160)) : amount;
             commit(seed, nextUnit);
           }}
-        >
-          {units.map((option) => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
+        />
       ) : null}
     </div>
   );

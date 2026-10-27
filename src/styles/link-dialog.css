@@ -1,0 +1,57 @@
+/* 原生 modal dialog 进入 top layer，覆盖整个视口并隔离背景交互。 */
+.ree-rte-link {
+  position: fixed;
+  inset: 0;
+  width: min(440px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  background: var(--ree-panel, #ffffff);
+  border: 1px solid var(--ree-border, #e3e3e5);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+  color: var(--ree-text, #202223);
+  font: 400 14px/1.5 var(--ree-font, Arial, sans-serif);
+  visibility: visible;
+}
+
+.ree-rte-link::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.ree-rte-link-title {
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--ree-border);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ree-rte-link-fields {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+}
+
+.ree-rte-link-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--ree-border);
+}
+
+.ree-rte-link-actions .ree-btn {
+  min-width: 80px;
+}
+
+.ree-rte-link-error {
+  margin: -12px 0 0;
+  color: var(--ree-danger);
+  font-size: 12px;
+}
