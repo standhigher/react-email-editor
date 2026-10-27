@@ -19,9 +19,8 @@ export function SubjectBar({
 }: SubjectBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const insertVariable = (name: string) => {
+  const insertVariable = (token: string) => {
     const input = inputRef.current;
-    const token = `{{${name}}}`;
     const start = input?.selectionStart ?? subject.length;
     const end = input?.selectionEnd ?? subject.length;
     const next = (subject.slice(0, start) + token + subject.slice(end)).slice(

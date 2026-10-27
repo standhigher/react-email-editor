@@ -16,7 +16,7 @@
 - 编辑器由区块库、画布/预览、检查器和 shell 组成。
 - 区块通过 `BlockDefinition` 注册，字段和样式配置驱动检查器，`render(ctx)` 生成 HTML 字符串。
 - `render(ctx)` 的 `mode` 为 `canvas` 或 `email`；画布展示编辑辅助界面，邮件模式生成可交付 HTML。
-- HTML 区块可以包含 Go template 风格变量，例如 `{{.customer_name}}`、`{{range .products}}`。导出应保留模板，只有预览或显式请求时才解析模板。
+- HTML 区块可以包含 Go template 风格变量，例如 `{{.customer_name}}`、`{{range .products}}`。导出保留模板，只有预览或显式请求时才解析模板值。`variables` 使用 `name`、可选的 `description` 和 `value`：`name` 是 `{{  store_name }}` 这类原文，编辑区原样显示；`value` 是预览替换文本；`description` 为空或不传时不渲染副文案。导出 HTML 只给 `variables` 里的原文补点并保留空格，例如 `{{  store_name }}` 写成 `{{  .store_name }}`；列表外的 Go template 保持原样。
 - `getData()`、`getDocument()`、`getJson()`、`getHtml()` 等公开 API 返回独立数据快照；不得让调用方修改快照时意外改变编辑器内部状态。
 - 包不内置 React、React DOM、TipTap、dnd-kit、CodeMirror 或 Lezer。React 与 React DOM 保持 peer dependency，其余保持 dependency；构建时这些包都列入 external，由消费方的包管理器解析。
 

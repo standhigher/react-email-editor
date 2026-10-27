@@ -13,6 +13,7 @@ import type { TemplateData } from "./template-preview";
 export interface BlockRenderOptions {
   resolveHtmlTemplate?: boolean;
   templateData?: TemplateData;
+  variables?: Variable[];
   global?: EmailGlobalSettings;
 }
 
@@ -26,25 +27,64 @@ function normalizeBlockRenderOptions(
     : options;
 }
 
+const LISTED_TOKEN = /^(\{\{-?)([\s\S]*?)(-?\}\})$/;
+
+function variableFieldName(name: string): string | null {
+  const token = /^\{\{-?\s*([\s\S]*?)\s*-?\}\}$/.exec(name.trim());
+  const inner = (token ? token[1] : name).trim();
+  const field = inner.startsWith(".") ? inner.slice(1) : inner;
+  if (!field || !/^[A-Za-z_][\w.]*$/.test(field)) return null;
+  return field;
+}
+
+function dottedListedToken(name: string): string | null {
+  const match = LISTED_TOKEN.exec(name);
+  if (!match) return null;
+  const [, open, raw, close] = match;
+  const field = variableFieldName(name);
+  if (!field || raw.trim().startsWith(".")) return null;
+  const start = raw.search(/\S/);
+  if (start < 0) return null;
+  const dotted = `${open}${raw.slice(0, start)}.${raw.slice(start)}${close}`;
+  return dotted === name ? null : dotted;
+}
+
+/** 只把变量列表里的原文补成带点字段，保留空格和 {{- -}}。列表外的模板不改。 */
+function applyListedVariableDots(html: string, variables: Variable[]): string {
+  const replacements = variables
+    .map((variable) => ({ from: variable.name, to: dottedListedToken(variable.name) }))
+    .filter((item): item is { from: string; to: string } => item.to != null)
+    .sort((left, right) => right.from.length - left.from.length);
+  return replacements.reduce(
+    (current, item) => current.split(item.from).join(item.to),
+    html,
+  );
+}
+
+function assignTemplateField(data: TemplateData, field: string, value: string) {
+  const parts = field.split(".");
+  if (parts.length === 1) {
+    data[field] = value;
+    return;
+  }
+  let current = data;
+  for (let index = 0; index < parts.length - 1; index += 1) {
+    const key = parts[index];
+    const next = current[key];
+    if (!next || typeof next !== "object" || Array.isArray(next)) current[key] = {};
+    current = current[key] as TemplateData;
+  }
+  current[parts[parts.length - 1]] = value;
+}
+
+/** 用变量 name 里的字段名作为键，value 作为预览替换值。 */
 export function variablesToTemplateData(variables: Variable[]): TemplateData {
   const data: TemplateData = {};
   for (const variable of variables) {
     if (variable.value === undefined) continue;
-    data[variable.name] = variable.value;
-    const path = variable.name.split(".");
-    if (path.length < 2) continue;
-    let current = data;
-    path.forEach((key, index) => {
-      if (index === path.length - 1) {
-        current[key] = variable.value;
-        return;
-      }
-      const next = current[key];
-      if (!next || typeof next !== "object" || Array.isArray(next)) {
-        current[key] = {};
-      }
-      current = current[key] as TemplateData;
-    });
+    const field = variableFieldName(variable.name);
+    if (!field) continue;
+    assignTemplateField(data, field, variable.value);
   }
   return data;
 }
@@ -74,9 +114,9 @@ export function renderBlockContent(
     normalizedOptions.global ?? DEFAULT_EMAIL_GLOBAL,
   );
   // 预览展开作用于每个区块 render 产出的 HTML，不限于 HTML 区块。
-  // getHtml 不传 resolveHtmlTemplate，Go template 原文保留。
+  // 导出不替换 value，只给变量列表中的原文补点。
   if (!normalizedOptions.resolveHtmlTemplate) {
-    return rendered;
+    return applyListedVariableDots(rendered, normalizedOptions.variables ?? []);
   }
   return renderTemplatePreview(
     rendered,

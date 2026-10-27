@@ -32,8 +32,8 @@ export function VariablesDropdown({ variables, onInsert }: VariablesDropdownProp
                 setOpen(false);
               }}
             >
-              <span className="ree-var-name">{`{{${variable.name}}}`}</span>
-              <span className="ree-var-label">{variable.label}</span>
+              <span className="ree-var-name">{variable.name}</span>
+              {variable.description ? <span className="ree-var-label">{variable.description}</span> : null}
             </button>
           ))}
         </div>

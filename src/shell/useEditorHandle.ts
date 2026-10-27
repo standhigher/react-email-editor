@@ -12,7 +12,7 @@ export function useEditorHandle(
       return {
         document,
         json: JSON.stringify(document, null, 2),
-        html: documentToHtml(document, definitions),
+        html: documentToHtml(document, definitions, { variables }),
         renderedHtml: documentToHtml(document, definitions, {
           resolveHtmlTemplates: true,
           variables,
@@ -21,7 +21,7 @@ export function useEditorHandle(
     },
     getDocument,
     getJson: () => JSON.stringify(getDocument(), null, 2),
-    getHtml: () => documentToHtml(getDocument(), definitions),
+    getHtml: () => documentToHtml(getDocument(), definitions, { variables }),
     getRenderedHtml: () => documentToHtml(getDocument(), definitions, {
       resolveHtmlTemplates: true,
       variables,

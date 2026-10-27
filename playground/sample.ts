@@ -27,13 +27,13 @@ function sampleBlock(type: string, patch: SampleBlockPatch): EmailBlockNode {
 }
 
 export const sampleVariables: Variable[] = [
-  { name: "customer_name", label: "客户名称", value: "张三" },
+  { name: "{{  store_name }}", description: "", value: "店铺名称" },
 ];
 
 export const sampleDocument: EmailDocument = {
   ...createEmailDocument([
     sampleBlock(BLOCK_TYPES.heading, {
-      fields: { html: "<p>你好，{{.customer_name}}</p>" },
+      fields: { html: "<p>{{  store_name }}</p>" },
     }),
     sampleBlock(BLOCK_TYPES.text, {
       fields: { html: "<p>这封邮件用于本地预览画布、检查器和模板预览。</p>" },

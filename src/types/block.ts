@@ -88,9 +88,10 @@ export interface BlockDefinition {
 }
 
 export interface Variable {
+  /** 下拉展示并插入的变量，例如 `{{  store_name }}`。 */
   name: string;
-  label: string;
+  /** 下拉选项副文案。空字符串或不传时不渲染。 */
   description?: string;
-  /** Global sample value used when rendering HTML block templates. */
-  value?: unknown;
+  /** 预览时替换该变量的文本。 */
+  value?: string;
 }

@@ -22,9 +22,8 @@ export function FieldControl({
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const stringValue = value == null ? "" : String(value);
 
-  const insertVariable = (name: string) => {
+  const insertVariable = (token: string) => {
     const element = ref.current;
-    const token = `{{${name}}}`;
     if (element && "selectionStart" in element) {
       const start = element.selectionStart ?? stringValue.length;
       const end = element.selectionEnd ?? stringValue.length;

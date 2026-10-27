@@ -36,6 +36,7 @@ export function documentToHtml(
       const block = blockToHtml(node, definitions, "email", {
         resolveHtmlTemplate: options.resolveHtmlTemplates,
         global,
+        variables: options.variables,
         templateData: mergeTemplateData(
           options.variables ?? [],
           Object.keys(blockData).length > 0 ? blockData : undefined,

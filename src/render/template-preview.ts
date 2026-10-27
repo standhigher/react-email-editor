@@ -146,40 +146,6 @@ function resolveExpression(expression: string, root: TemplateData, current: unkn
   return readPath(current, trimmed);
 }
 
-/** Normalizes both `{{name}}` and `{{.name}}` to the Go-template dot form. */
-function normalizeExpression(expression: string): string {
-  const trimmed = expression.trim();
-  if (
-    trimmed === "" ||
-    trimmed === "." ||
-    trimmed.startsWith(".") ||
-    trimmed.startsWith("$") ||
-    /^(if|range|with|else|end)\b/.test(trimmed) ||
-    /^(true|false|nil)$/.test(trimmed) ||
-    /^[-+]?\d/.test(trimmed) ||
-    ((trimmed.startsWith('"') || trimmed.startsWith("'")) &&
-      trimmed.endsWith(trimmed[0]))
-  ) {
-    return trimmed;
-  }
-  return `.${trimmed}`;
-}
-
-function normalizeTemplateNodes(nodes: TemplateNode[]): TemplateNode[] {
-  return nodes.map((node) => {
-    if (node.kind === "text") return node;
-    if (node.kind === "expression") {
-      return { ...node, expression: normalizeExpression(node.expression) };
-    }
-    return {
-      ...node,
-      expression: normalizeExpression(node.expression),
-      children: normalizeTemplateNodes(node.children),
-      alternate: normalizeTemplateNodes(node.alternate),
-    };
-  });
-}
-
 function isTruthy(value: unknown): boolean {
   if (value == null || value === false || value === "" || value === 0) return false;
   return !Array.isArray(value) || value.length > 0;
@@ -228,6 +194,5 @@ export function renderTemplatePreview(
   defaultData?: TemplateData,
 ): string {
   if (defaultData === undefined) return html;
-  const nodes = normalizeTemplateNodes(parseNodes(tokenize(html), 0).nodes);
-  return renderNodes(nodes, defaultData, defaultData);
+  return renderNodes(parseNodes(tokenize(html), 0).nodes, defaultData, defaultData);
 }

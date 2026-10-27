@@ -7,6 +7,7 @@ import { DEFAULT_EMAIL_GLOBAL } from "../../document/constants";
 import type { Variable } from "../../types/block";
 import { RichTextToolbar } from "./components/RichTextToolbar";
 import { createRichTextExtensions } from "./extensions";
+import { preserveTemplateSpaces, restoreTemplateSpaces } from "./template-spaces";
 import type { RichTextInheritedStyle } from "./types";
 
 export interface RichTextProps {
@@ -41,9 +42,9 @@ export function RichText({
   const [host, setHost] = useState<HTMLElement | null>(null);
   const editor = useEditor({
     extensions: createRichTextExtensions(placeholder ?? "Type something…"),
-    content: initialHtml,
+    content: preserveTemplateSpaces(initialHtml),
     immediatelyRender: false,
-    onUpdate: ({ editor: current }) => onCommit(current.getHTML()),
+    onUpdate: ({ editor: current }) => onCommit(restoreTemplateSpaces(current.getHTML())),
   });
 
   useLayoutEffect(() => {
@@ -53,8 +54,8 @@ export function RichText({
   }, []);
 
   useEffect(() => {
-    if (!editor || editor.getHTML() === initialHtml) return;
-    editor.commands.setContent(initialHtml, { emitUpdate: false });
+    if (!editor || restoreTemplateSpaces(editor.getHTML()) === initialHtml) return;
+    editor.commands.setContent(preserveTemplateSpaces(initialHtml), { emitUpdate: false });
   }, [editor, initialHtml]);
 
   return (

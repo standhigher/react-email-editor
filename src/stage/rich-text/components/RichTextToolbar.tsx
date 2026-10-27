@@ -19,6 +19,7 @@ import { ToolbarButton } from "./ToolbarButton";
 import { ToolbarIcon } from "./ToolbarIcon";
 import { ToolbarMenu } from "./ToolbarMenu";
 import { ParagraphMetricMenus } from "./ParagraphMetricMenus";
+import { preserveTemplateSpaces } from "../template-spaces";
 import { VariableMenu } from "./VariableMenu";
 
 interface RichTextToolbarProps {
@@ -315,8 +316,8 @@ export function RichTextToolbar({
         >
           <VariableMenu
             variables={variables}
-            onInsert={(name) =>
-              run(() => editor.chain().focus().insertContent(`{{${name}}}`).run())
+            onInsert={(token) =>
+              run(() => editor.chain().focus().insertContent(preserveTemplateSpaces(token)).run())
             }
           />
         </ToolbarMenu>
