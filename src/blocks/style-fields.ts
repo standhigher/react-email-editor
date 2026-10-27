@@ -71,9 +71,10 @@ export const TYPOGRAPHY_FIELDS: StyleFieldConfig[] = [
   PARAGRAPH_SPACING, LIST_SPACING, LIST_INDENT, LINK_COLOR, LINK_DECORATION,
 ];
 
-/** 富文本工具栏负责文字与段落格式，右侧仅保留尚未覆盖的排版能力。 */
-export const RICH_TEXT_STYLE_FIELDS: StyleFieldConfig[] = [
-  LIST_SPACING, LIST_INDENT, LINK_COLOR, LINK_DECORATION,
+/** 内置区块按需声明，不包含固定高度或文字排版。 */
+export const WRAPPER_STYLE_FIELDS: StyleFieldConfig[] = [
+  { ...PADDING, label: "Block padding" }, MARGIN,
+  { ...BG_COLOR, label: "Block background" }, BORDER_WIDTH, BORDER_STYLE, { ...BORDER_COLOR, label: "Block border" }, BORDER_RADIUS,
 ];
 
 function copyStyleField(field: StyleFieldConfig, overrides?: Partial<StyleFieldConfig>): StyleFieldConfig {

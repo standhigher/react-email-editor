@@ -5,12 +5,25 @@ import { TextStyleKit } from "@tiptap/extension-text-style";
 import type { Extensions } from "@tiptap/react";
 import { TEXT_ALIGNS } from "../../constants/style-values";
 import { FontWeight } from "./font-weight";
+import type { RichTextProfile } from "../../types/block";
+import { ButtonDocument } from "./button-document";
+import { ListStyle, StyledLink } from "./content-attributes";
 import { ParagraphStyle } from "./paragraph-style";
 
-export function createRichTextExtensions(placeholder: string): Extensions {
+export function createRichTextExtensions(placeholder: string, profile: RichTextProfile = "text"): Extensions {
+  const button = profile === "button";
+  const text = profile === "text";
   return [
     StarterKit.configure({
-      link: { openOnClick: false, autolink: true },
+      document: button ? false : undefined,
+      trailingNode: button ? false : undefined,
+      link: false,
+      bulletList: text ? undefined : false,
+      orderedList: text ? undefined : false,
+      listItem: text ? undefined : false,
+      listKeymap: text ? undefined : false,
+      strike: text ? undefined : false,
+      hardBreak: button ? false : undefined,
       blockquote: false,
       code: false,
       codeBlock: false,
@@ -19,11 +32,11 @@ export function createRichTextExtensions(placeholder: string): Extensions {
     }),
     TextStyleKit.configure({ backgroundColor: false, lineHeight: false }),
     FontWeight,
-    ParagraphStyle,
-    TextAlign.configure({
+    ...(button ? [ButtonDocument] : [ParagraphStyle, StyledLink, TextAlign.configure({
       types: ["paragraph"],
-      alignments: Object.values(TEXT_ALIGNS),
-    }),
+      alignments: text ? Object.values(TEXT_ALIGNS) : [TEXT_ALIGNS.left, TEXT_ALIGNS.center, TEXT_ALIGNS.right],
+    })]),
+    ...(text ? [ListStyle] : []),
     Placeholder.configure({ placeholder }),
   ];
 }

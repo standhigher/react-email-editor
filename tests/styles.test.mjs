@@ -34,18 +34,24 @@ test('新文档宽度默认 600，所有留白都允许清零', () => {
   assert.match(html, /height="0"/);
 });
 
-test('全部内置区块拥有独立容器样式和四边间距', () => {
+test('容器只渲染区块支持的样式，Spacer 和 Divider 不读取隐藏的边框或间距', () => {
   for (const definition of DEFAULT_BLOCKS) {
-    const ids = definition.styleFields.map(field => field.id);
-    for (const id of ['dimension.padding', 'dimension.margin', 'dimension.height', 'decorations.backgroundColor', 'decorations.borderWidth', 'decorations.borderStyle', 'decorations.borderColor', 'decorations.borderRadius']) assert.ok(ids.includes(id), `${definition.type}: ${id}`);
     const block = createBlockNode(definition.type);
     block.style = { ...block.style, dimension: { padding: '1px 2px 3px 4px', margin: '5px 6px 7px 8px' }, decorations: { backgroundColor: '#123456', borderWidth: '2px', borderStyle: 'dashed', borderRadius: '12px' } };
     const html = blockToHtml(block);
-    assert.match(html, /padding:1px 2px 3px 4px/);
-    assert.match(html, /padding:5px 6px 7px 8px/);
+    if (definition.type === 'spacer') {
+      assert.doesNotMatch(html, /padding:1px 2px 3px 4px|padding:5px 6px 7px 8px/);
+    } else {
+      assert.match(html, /padding:1px 2px 3px 4px/);
+      assert.match(html, /padding:5px 6px 7px 8px/);
+    }
     assert.match(html, /background-color:#123456/);
-    assert.match(html, /border-style:dashed/);
-    assert.match(html, /border-radius:12px/);
+    if (['spacer', 'divider'].includes(definition.type)) {
+      assert.doesNotMatch(html, /border-style:dashed|border-radius:12px/);
+    } else {
+      assert.match(html, /border-style:dashed/);
+      assert.match(html, /border-radius:12px/);
+    }
     assert.doesNotMatch(html, /valign="top"/);
     assert.doesNotMatch(html, /width="600"/);
   }
@@ -60,9 +66,9 @@ test('Text 继承全局排版，覆盖与显式富文本样式保持优先级', 
   assert.doesNotMatch(html, /margin:0 0 0px/);
   block.fields.html = '<p>A</p><p>B</p>';
   block.style.typography = { paragraphSpacing: '8px' };
-  assert.match(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /<p style="margin:0;">A<\/p><p style="margin:8px 0 0 0;">B<\/p>/);
+  assert.match(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /<p style="margin:0;">A<\/p><p style="margin:0;">B<\/p>/);
   block.style.typography = { fontSize: '30px', paragraphSpacing: '5px' };
-  assert.match(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /font-size:30px/);
+  assert.doesNotMatch(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /font-size:30px|margin:5px/);
 });
 
 test('按钮、图片、分割线的元素样式与容器样式分离', () => {
@@ -113,7 +119,7 @@ test('HTML 模板预览解析数据，导出保留变量且没有嵌套文档', 
   assert.match(preview, /测试客户/);
   assert.match(preview, /<head>[\s\S]*<style>\.title\{color:red\}<\/style>[\s\S]*<\/head>/);
   assert.doesNotMatch(preview, /:where\(|<!--ree-head-->/);
-  assert.match(preview, /<p class="title" style="margin:0;">测试客户<\/p>/);
+  assert.match(preview, /<p class="title">测试客户<\/p>/);
   assert.equal((preview.match(/<body\b/g) ?? []).length, 1);
   assert.equal((preview.match(/<html\b/g) ?? []).length, 1);
 });
@@ -138,7 +144,7 @@ test('自定义区块按容器槽位合并样式，并返回独立副本', () =>
   assert.deepEqual(resolveBlockStyleFields(undefined, true), []);
   assert.deepEqual(resolveBlockStyleFields().map((field) => field.id), containerIds);
   const text = DEFAULT_BLOCKS.find((definition) => definition.type === 'text');
-  assert.deepEqual(resolveBlockStyleFields(text.styleFields).map((field) => field.id), text.styleFields.map((field) => field.id));
+  assert.deepEqual(resolveBlockStyleFields(text.styleFields, text.exactStyleFields).map((field) => field.id), text.styleFields.map((field) => field.id));
   const cardBlock = {
     type: 'card',
     title: 'Card',
@@ -176,7 +182,7 @@ test('自定义区块按容器槽位合并样式，并返回独立副本', () =>
   assert.equal(button.styleFields.find((field) => field.id === 'element.borderColor').label, 'Outline');
 });
 
-test('圆角可分四角，区块高度写在单元格上，段落可单独设置间距和行高', () => {
+test('圆角可分四角，内置区块忽略容器高度，段落支持间距和行高', () => {
   assert.equal(resolveEmailGlobal({ borderRadius: '8px' }).borderRadius, '8px');
   assert.equal(resolveEmailGlobal({ borderRadius: '8px 8px 0 0' }).borderRadius, '8px 8px 0px 0px');
   assert.equal(resolveEmailGlobal({ borderRadius: '8px 0' }).borderRadius, '0px');
@@ -186,11 +192,7 @@ test('圆角可分四角，区块高度写在单元格上，段落可单独设�
   const block = createBlockNode('text');
   block.style = { dimension: { height: '216px' }, decorations: { borderRadius: '8px 8px 0 0' } };
   const html = blockToHtml(block);
-  assert.match(html, /height="216"/);
-  assert.match(html, /valign="top"/);
-  assert.match(html, /box-sizing:border-box/);
-  assert.match(html, /height:216px/);
-  assert.match(html, /vertical-align:top/);
+  assert.doesNotMatch(html, /height="216"|valign="top"|height:216px|vertical-align:top/);
   assert.match(html, /border-top-left-radius:8px/);
   assert.match(html, /border-top-right-radius:8px/);
   assert.match(html, /border-bottom-right-radius:0px/);
@@ -236,9 +238,9 @@ test('自定义区块的邮件模板在预览时展开，导出保留变量', ()
   assert.doesNotMatch(preview, /\{\{\.title\}\}/);
 });
 
-test('Heading 默认加粗，画布段落继承区块字重而不吃宿主重置', async () => {
+test('Heading 默认格式存入富文本，画布段落继承全局值而保留行内粗体', async () => {
   const block = createBlockNode('heading');
-  assert.match(renderBlock(block), /font-weight:bold/);
+  assert.match(renderBlock(block), /<strong>Heading<\/strong>/);
   assert.match(renderBlock(block), /font-size:26px/);
   const css = await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8');
   assert.match(css, /\.ree-block-content :is\(p, h1, h2, h3, h4, h5, h6, li\) \{[^}]*font-weight: inherit/);
@@ -255,15 +257,15 @@ test('构建产物包含展开后的画布、滑动条和配置控件 CSS', asyn
   assert.match(css, /#303030 var\(--ree-range-progress\), #e3e3e5/);
 });
 
-test('Text 和 Heading 移除重复排版入口，但保留旧文档排版渲染', () => {
+test('Text 和 Heading 只从富文本内容读取文字格式', () => {
   for (const type of ['text', 'heading']) {
     const definition = getBlockDefinition(type);
     const typographyIds = definition.styleFields.filter((field) => field.group === 'typography').map((field) => field.id);
-    assert.deepEqual(typographyIds, ['typography.listSpacing', 'typography.listIndent', 'typography.linkColor', 'typography.linkDecoration']);
+    assert.deepEqual(typographyIds, []);
     const block = createBlockNode(type);
     block.fields.html = '<p>Legacy</p>';
     block.style.typography = { fontFamily: 'Georgia, serif', fontSize: '10px', fontWeight: 'bold', color: '#123456', textAlign: 'right', lineHeight: '1.8' };
     const html = renderBlock(block, DEFAULT_BLOCKS, 'email', resolveEmailGlobal());
-    for (const css of ['font-family:Georgia, serif', 'font-size:10px', 'font-weight:bold', 'color:#123456', 'text-align:right', 'line-height:1.8']) assert.ok(html.includes(css), css);
+    for (const css of ['font-family:Georgia, serif', 'font-size:10px', 'font-weight:bold', 'color:#123456', 'text-align:right', 'line-height:1.8']) assert.equal(html.includes(css), false, css);
   }
 });

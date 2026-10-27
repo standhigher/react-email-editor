@@ -33,7 +33,7 @@ export const sampleVariables: Variable[] = [
 export const sampleDocument: EmailDocument = {
   ...createEmailDocument([
     sampleBlock(BLOCK_TYPES.heading, {
-      fields: { html: "<p>{{  store_name }}</p>" },
+      fields: { html: '<p style="line-height:1.25"><span style="font-size:26px"><strong>{{  store_name }}</strong></span></p>' },
     }),
     sampleBlock(BLOCK_TYPES.text, {
       fields: { html: "<p>这封邮件用于本地预览画布、检查器和模板预览。</p>" },

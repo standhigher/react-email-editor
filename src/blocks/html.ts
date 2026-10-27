@@ -1,10 +1,13 @@
+import { HTML_SECTIONS } from "./inspector-sections";
 import { BLOCK_TYPES } from "../constants/block-types";
 import type { BlockDefinition } from "../types/block";
 import { htmlContent } from "../render/html-content";
 import { ICON_HTML } from "./icons";
-import { COMMON_STYLE_FIELDS, TYPOGRAPHY_FIELDS } from "./style-fields";
+import { WRAPPER_STYLE_FIELDS } from "./style-fields";
 
 export const htmlBlock: BlockDefinition = {
+  exactStyleFields: true,
+  inspectorSections: HTML_SECTIONS,
   type: BLOCK_TYPES.html,
   title: "HTML",
   icon: ICON_HTML,
@@ -20,6 +23,6 @@ export const htmlBlock: BlockDefinition = {
     },
   ],
   defaultStyle: { dimension: { padding: "8px" } },
-  styleFields: [...COMMON_STYLE_FIELDS, ...TYPOGRAPHY_FIELDS],
-  render: ({ fields, style, global, block }) => htmlContent(String(fields.html ?? ""), style, global, block.id),
+  styleFields: WRAPPER_STYLE_FIELDS,
+  render: ({ fields, global, block }) => htmlContent(String(fields.html ?? ""), global, block.id),
 };

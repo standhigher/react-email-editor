@@ -64,7 +64,7 @@ export interface EmailTypographyStyle {
 }
 
 /** 按钮、图片和分割线自身的样式，与区块容器样式独立。 */
-export interface EmailElementStyle extends EmailDecorationStyle, EmailTypographyStyle {
+export interface EmailElementStyle extends EmailDecorationStyle {
   padding?: string;
   width?: string;
   height?: string;
@@ -74,12 +74,13 @@ export interface EmailElementStyle extends EmailDecorationStyle, EmailTypography
 export interface EmailSpacingStyle {
   padding?: string;
   margin?: string;
-  /** 内层单元格高度，只使用 px。缺省时不输出 height。 */
+  /** 自定义区块可通过 styleFields 启用；内置区块不支持。只使用 px。 */
   height?: string;
 }
 
 export interface EmailBlockStyle {
   dimension?: EmailSpacingStyle;
+  /** 自定义区块可显式启用；内置区块的文字格式存于 fields.html。 */
   typography?: EmailTypographyStyle;
   decorations?: EmailDecorationStyle;
   element?: EmailElementStyle;

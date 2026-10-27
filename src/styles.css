@@ -7,4 +7,5 @@
 @import "./styles/rich-text.css";
 @import "./styles/variables.css";
 @import "./styles/inspector.css";
+@import "./styles/inspector-controls.css";
 @import "./styles/drag.css";

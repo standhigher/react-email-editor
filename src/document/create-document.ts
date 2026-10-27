@@ -56,5 +56,8 @@ export function createEmptyDocument(): EmailDocument {
 }
 
 export function ensureEmailDocument(document: EmailDocument): EmailDocument {
+  if (document.version !== DOCUMENT_VERSION) {
+    throw new Error(`Unsupported email document version: ${document.version}. Expected ${DOCUMENT_VERSION}.`);
+  }
   return { ...document, global: resolveEmailGlobal(document.global) };
 }

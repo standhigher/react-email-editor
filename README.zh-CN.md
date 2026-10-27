@@ -136,12 +136,12 @@ export function TemplateEmailPage() {
 
 | 文档字段 | 类型 | 说明 |
 | --- | --- | --- |
-| `version` | `typeof DOCUMENT_VERSION` | 当前版本为 `1`，由 `createEmailDocument()` 填充。 |
+| `version` | `typeof DOCUMENT_VERSION` | 当前版本为 `2`，由 `createEmailDocument()` 填充。 |
 | `subject` | `string`，可选 | 邮件主题，编辑器输入上限为 128 个字符。 |
 | `global` | `EmailGlobalSettings` | 邮件全局样式，创建函数会补齐默认值。 |
 | `blocks` | `EmailBlockNode[]` | 按展示顺序排列的区块。每项包含唯一 `id`、`type`、`fields`，以及可选的 `style` 和预览数据 `defaultData`。 |
 
-文档结构仍处于开发阶段，不会自动迁移旧版区块字段。完整模型见[文档类型定义](./src/types/document.ts)。
+文档结构仍处于开发阶段，仅接受当前版本 `2`，不会自动迁移旧版文档或区块字段。完整模型见[文档类型定义](./src/types/document.ts)。
 
 ### 全局样式
 
@@ -208,12 +208,25 @@ export const variables: Variable[] = [
 | --- | --- |
 | `style.dimension` | 容器内边距 `padding`、外侧留白 `margin`，以及可选的 px 高度 `height`；高度包含内边距，作为最小高度。 |
 | `style.decorations` | 容器背景、边框和圆角。 |
-| `style.typography` | 区块文字样式，覆盖全局排版设置。 |
+| `style.typography` | 自定义区块显式声明的文字样式；内置区块的文字格式只写入 `fields.html`。 |
 | `style.element` | 按钮、图片和分割线等元素自身的样式，例如尺寸和对齐。 |
 
-Heading 和 Text 共用富文本工具栏管理字体、字号、粗细、文字颜色、对齐、行高和段间距，BLOCK 检查器不再重复显示这些配置。未选中文字时，格式操作作用于当前整个区块；选中部分文字时，只修改对应文字或段落。格式操作后恢复原光标或选区。Emoji、变量和链接保留光标插入或选区操作；光标位于链接内时编辑该链接。字号沿用 12–48px 预设，已有文档中的其他字号保持原样。BLOCK 检查器保留列表间距、列表缩进、链接外观和容器样式。GLOBAL 默认排版及已有 `style.typography` 的渲染支持保持不变。
+内置区块按能力分别声明检查器分组，不再统一展示四类配置，也不再提供固定区块高度。画布和邮件渲染仅使用区块启用的 `styleFields`；未声明的容器、元素及文字样式不会生效。Spacer 只支持高度与背景，Divider 容器只支持间距与背景。GLOBAL 默认排版继续生效。
 
-Heading 和 Text 默认包含 `16px` 内边距。HTML 区块保留作者显式编写的内联样式。各字段见 [EmailBlockStyle](./src/types/document.ts)。
+| 区块 | BLOCK 检查器 |
+| --- | --- |
+| Heading / Text | Spacing、Block appearance。文字在画布内编辑。 |
+| Button | Link、Button（位置、宽度、按钮内边距、填充、边框、圆角）、Spacing、Block appearance（容器边框折叠在高级项中）。 |
+| Image | Image（URL、替代文本、链接）、Size & position、Image appearance、Spacing、Block appearance（容器边框折叠在高级项中）。 |
+| Divider | Line（颜色、粗细、线型、宽度、位置）、Spacing、Block appearance（仅背景）。 |
+| Spacer | Spacer（高度、背景）。不再叠加另一套高度、内外边距或边框。 |
+| HTML | HTML 源码、Spacing、Block appearance。不提供内部元素的排版配置。 |
+
+Heading、Text、Button 的基础富文本工具栏包含字体、12–48px 预设字号、粗体、斜体、下划线、颜色、Emoji 和变量。Heading 另有左中右对齐、行高和链接；Text 另有删除线、两端对齐、段落菜单（段前距、行高）和列表。列表间距与缩进只在列表上下文菜单中出现；链接颜色与装饰在链接弹层中配置。未选中文字时，格式操作作用于整个区块；有选区时只修改所选文字或段落，并恢复光标或选区。
+
+Button 文案直接在画布编辑；仅允许单段内容，按宽度自然换行，回车不新建段落。列表、删除线、段落格式、对齐和内部链接不进入按钮编辑能力；粘贴多个段落时用空格连接，保留基础文字格式。整个按钮的目标链接仍在右侧配置，邮件输出只有一个外层链接。新建与编辑内容统一写入 `fields.html`，不读取 `fields.label` 或 `style.element` 文字样式。缺失或为空时显示空内容。按钮导出保留模板表达式内的引号、比较符、注释和空格。
+
+Heading 和 Text 默认包含 `16px` 内边距；Heading 的 `26px`、粗体及 `1.25` 行高写在初始富文本内容中，Button 的白色 `16px` 文案同样写在初始富文本中。列表类型切换保留各列表的间距与缩进，自动整块切换不包含末尾辅助空段。HTML 保留源码内部的段落、列表、链接及显式样式，不再使用正文排版器注入默认样式；未声明的文字属性仍可继承容器及邮件环境。完整 HTML 文档合并、head 样式提取和模板预览/导出规则保持不变。GLOBAL 默认排版仍然保留。各数据字段见 [EmailBlockStyle](./src/types/document.ts)。
 
 通过 `blocks` 传入稳定的 `BlockDefinition[]` 添加自定义区块。必填项为 `type`、`title` 和 `render(ctx)`；可选的 `fields`、`styleFields` 配置检查器，`defaultFields`、`defaultStyle`、`defaultData` 设置新建节点的初始值。`render(ctx)` 返回 HTML 字符串，接收 `mode: "canvas" | "email"`。
 
@@ -232,7 +245,7 @@ export function CustomEmailPage() {
 }
 ```
 
-默认会为自定义区块补充通用容器间距和装饰控件。设置 `exactStyleFields: true` 后，只展示传入的样式字段；节点上已有样式仍会参与渲染。完整定义见 [BlockDefinition、FieldConfig 和 StyleFieldConfig](./src/types/block.ts)。
+默认会为自定义区块补充通用容器间距和装饰控件。设置 `exactStyleFields: true` 后，只启用传入的样式字段；新建默认样式、画布和邮件输出均受启用字段约束，未声明的字段不参与渲染。可选的 `inspectorSections: BlockInspectorSection[]` 按声明顺序组织右侧面板：`title` 是分组标题，`fieldNames` 引用内容字段，`styleIds` 引用样式字段，`advancedStyleIds` 放入折叠的高级容器边框区域；未配置时沿用原有分组。`inlineEditProfile: "text" | "heading" | "button"` 控制画布富文本能力，配合 `inlineEdit: true` 使用；独立导出的 `RichText` 也接受同名取值的 `profile`，默认 `"text"`。完整定义见 [BlockDefinition、FieldConfig 和 StyleFieldConfig](./src/types/block.ts)。
 
 ## 读取与导出数据
 

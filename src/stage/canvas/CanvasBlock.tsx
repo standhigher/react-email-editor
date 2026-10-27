@@ -4,9 +4,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { buildRenderContext } from "../../render/context";
 import { mergeTemplateData, renderBlockContent } from "../../render/block-html";
 import { cssSpacing } from "../../utils/css-values";
-import { contentDefaults } from "../../render/content-style";
-import { typographyStyle, resolvedFontWeight } from "../../utils/style";
-import { RichText } from "../rich-text/RichText";
+import { resolveBlockStyle } from "../../document/block-style";
+import { InlineCanvas } from "./components/InlineCanvas";
 import { HtmlCanvas } from "./components/HtmlCanvas";
 import { BlockActions } from "./components/BlockActions";
 import { canvasBlockStyle } from "./block-style";
@@ -29,7 +28,7 @@ interface CanvasBlockProps {
 }
 
 export function CanvasBlock({
-  block,
+  block: sourceBlock,
   global,
   definition,
   selected,
@@ -40,6 +39,7 @@ export function CanvasBlock({
   onDuplicate,
   onRemove,
 }: CanvasBlockProps) {
+  const block = { ...sourceBlock, style: resolveBlockStyle(sourceBlock.style, definition) };
   const toolbarId = useId();
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const dragData: CanvasDragData = { kind: "canvas" };
@@ -112,23 +112,14 @@ export function CanvasBlock({
         style={canvasBlockStyle(block, global)}
       >
         {definition?.inlineEdit ? (
-          <RichText
-            initialHtml={String(block.fields.html ?? "")}
+          <InlineCanvas
+            block={block}
+            global={global}
+            profile={definition.inlineEditProfile}
             variables={variables}
             selected={selected}
             toolbarId={toolbarId}
             toolbarCollapsed={toolbarCollapsed}
-            inherited={{
-              fontFamily: String(typographyStyle(block.style, global).fontFamily),
-              fontSize: String(typographyStyle(block.style, global).fontSize),
-              color: block.style?.typography?.color || global.textColor,
-              fontWeight: resolvedFontWeight(
-                block.style?.typography?.fontWeight,
-                global.fontWeight,
-              ),
-              lineHeight: String(typographyStyle(block.style, global).lineHeight ?? ""),
-              paragraphSpacing: contentDefaults(block.style, global).paragraph,
-            }}
             onSelect={onSelect}
             onCommit={(html) => onCommitField(block.id, "html", html)}
           />
@@ -142,7 +133,7 @@ export function CanvasBlock({
             className="ree-block-static"
             dangerouslySetInnerHTML={{
               __html: definition
-                ? definition.render(buildRenderContext(block, "canvas", global))
+                ? definition.render(buildRenderContext(block, "canvas", global, definition))
                 : `<!-- ${block.type} -->`,
             }}
           />

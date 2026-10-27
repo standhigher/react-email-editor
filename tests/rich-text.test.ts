@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyleKit, TextStyle } from "@tiptap/extension-text-style";
 import { currentSelection, formatText, toggleVisualBold } from "../src/stage/rich-text/formatting.ts";
+import { toggleTextList } from "../src/stage/rich-text/list-formatting.ts";
 
 function createEditor(texts = ["First", "Second"]) {
   return new Editor({
@@ -84,12 +85,12 @@ test("对齐操作区分整块和选区涉及的段落", () => {
 test("列表转换后映射原光标，连续切换列表不丢失文字", () => {
   const editor = createEditor();
   editor.commands.setTextSelection(3);
-  formatText(editor, (chain) => chain.toggleBulletList(), null, "paragraph");
+  toggleTextList(editor, "bulletList");
   assert.equal(editor.state.doc.firstChild?.type.name, "bulletList");
   assert.equal(editor.state.doc.firstChild?.childCount, 2);
   assert.equal(editor.state.selection.$from.parent.textContent, "First");
   assert.equal(editor.state.selection.$from.parentOffset, 2);
-  formatText(editor, (chain) => chain.toggleOrderedList(), null, "paragraph");
+  toggleTextList(editor, "orderedList");
   assert.equal(editor.state.doc.firstChild?.type.name, "orderedList");
   assert.equal(editor.state.doc.textContent, "FirstSecond");
   assert.equal(editor.state.selection.empty, true);

@@ -6,6 +6,7 @@ import { ToolbarMenu } from "./ToolbarMenu";
 
 interface ParagraphMetricMenusProps {
   menu: RichTextMenu | null;
+  showSpacing?: boolean;
   spacing: string;
   lineHeight: string;
   inheritedSpacing: string;
@@ -27,6 +28,7 @@ function formatStep(value: number, step: number): string {
 
 export function ParagraphMetricMenus({
   menu,
+  showSpacing = true,
   spacing,
   lineHeight,
   inheritedSpacing,
@@ -39,13 +41,13 @@ export function ParagraphMetricMenus({
   const lineHeightValue = clampAmount(lineHeight, inheritedLineHeight, LINE_HEIGHT_RANGE.min, LINE_HEIGHT_RANGE.max);
   const lineHeightLabel = formatStep(lineHeightValue, LINE_HEIGHT_RANGE.step);
   return (
-    <>
-      <ToolbarMenu
-        title="Paragraph spacing"
-        open={menu === "spacing"}
-        onToggle={() => onToggle("spacing")}
-        label={spacing || inheritedSpacing}
-      >
+    <ToolbarMenu
+      title={showSpacing ? "Paragraph settings" : "Line height"}
+      open={menu === "lineHeight"}
+      onToggle={() => onToggle("lineHeight")}
+      label={showSpacing ? "Paragraph" : lineHeight || inheritedLineHeight || lineHeightLabel}
+    >
+      {showSpacing ? (
         <MetricSlider
           label="Space before"
           value={spacingValue}
@@ -57,25 +59,18 @@ export function ParagraphMetricMenus({
           onChange={(next) => onSpacing(`${next}px`)}
           onReset={() => onSpacing(null)}
         />
-      </ToolbarMenu>
-      <ToolbarMenu
-        title="Line height"
-        open={menu === "lineHeight"}
-        onToggle={() => onToggle("lineHeight")}
-        label={lineHeight || inheritedLineHeight || lineHeightLabel}
-      >
-        <MetricSlider
-          label="Line height"
-          value={lineHeightValue}
-          min={LINE_HEIGHT_RANGE.min}
-          max={LINE_HEIGHT_RANGE.max}
-          step={LINE_HEIGHT_RANGE.step}
-          display={lineHeightLabel}
-          overridden={Boolean(lineHeight)}
-          onChange={(next) => onLineHeight(formatStep(next, LINE_HEIGHT_RANGE.step))}
-          onReset={() => onLineHeight(null)}
-        />
-      </ToolbarMenu>
-    </>
+      ) : null}
+      <MetricSlider
+        label="Line height"
+        value={lineHeightValue}
+        min={LINE_HEIGHT_RANGE.min}
+        max={LINE_HEIGHT_RANGE.max}
+        step={LINE_HEIGHT_RANGE.step}
+        display={lineHeightLabel}
+        overridden={Boolean(lineHeight)}
+        onChange={(next) => onLineHeight(formatStep(next, LINE_HEIGHT_RANGE.step))}
+        onReset={() => onLineHeight(null)}
+      />
+    </ToolbarMenu>
   );
 }

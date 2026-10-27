@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef, type RefObject } from "react";
 export function useAnchoredToolbar(
   anchorRef: RefObject<HTMLElement | null>,
   active: boolean,
+  compact = false,
 ) {
   const toolbarRef = useRef<HTMLDivElement>(null);
 
@@ -24,7 +25,8 @@ export function useAnchoredToolbar(
         return;
       }
       const width = Math.min(rect.width, ownerWindow.innerWidth - 16);
-      toolbar.style.width = `${width}px`;
+      toolbar.style.width = compact ? "max-content" : `${width}px`;
+      toolbar.style.maxWidth = `${width}px`;
       const height = toolbar.offsetHeight;
       let top = rect.top - height - 4;
       if (top < 8) {
@@ -32,7 +34,7 @@ export function useAnchoredToolbar(
         top = below + height <= ownerWindow.innerHeight - 8 ? below : 8;
       }
       let left = rect.left;
-      const maxLeft = Math.max(8, ownerWindow.innerWidth - width - 8);
+      const maxLeft = Math.max(8, ownerWindow.innerWidth - toolbar.offsetWidth - 8);
       if (left > maxLeft) left = maxLeft;
       if (left < 8) left = 8;
       toolbar.style.top = `${top}px`;
@@ -51,7 +53,7 @@ export function useAnchoredToolbar(
       ownerDocument.removeEventListener("scroll", place, true);
       ownerWindow.removeEventListener("resize", place);
     };
-  }, [active, anchorRef]);
+  }, [active, anchorRef, compact]);
 
   return toolbarRef;
 }

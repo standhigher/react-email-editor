@@ -288,3 +288,7 @@
   pointer-events: none;
 }
 
+.ree-button-canvas-row {
+  width: 100%;
+  border: 0;
+}

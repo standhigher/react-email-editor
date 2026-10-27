@@ -66,6 +66,8 @@ export type {
 } from "./types/document";
 export type {
   BlockDefinition,
+  BlockInspectorSection,
+  RichTextProfile,
   BlockRenderContext,
   FieldConfig,
   StyleFieldConfig,

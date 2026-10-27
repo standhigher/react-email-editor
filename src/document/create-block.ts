@@ -1,5 +1,6 @@
 import { getBlockDefinition } from "./registry";
 import { generateId } from "../utils/id";
+import { resolveBlockStyle } from "./block-style";
 import type { BlockDefinition } from "../types/block";
 import type { EmailBlockNode } from "../types/document";
 
@@ -25,7 +26,7 @@ export function createBlockNode(
     type,
     fields,
     style: definition.defaultStyle
-      ? structuredClone(definition.defaultStyle)
+      ? resolveBlockStyle(definition.defaultStyle, definition)
       : undefined,
     defaultData: definition.defaultData
       ? structuredClone(definition.defaultData)

@@ -136,12 +136,12 @@ Pass both `initialDocument` and `variables` as shown so the token has a preview 
 
 | Document field | Type | Description |
 | --- | --- | --- |
-| `version` | `typeof DOCUMENT_VERSION` | Current version: `1`. Set by `createEmailDocument()`. |
+| `version` | `typeof DOCUMENT_VERSION` | Current version: `2`. Set by `createEmailDocument()`. |
 | `subject` | `string` (optional) | Email subject. The editor input is limited to 128 characters. |
 | `global` | `EmailGlobalSettings` | Global email appearance; defaults are populated by the helper. |
 | `blocks` | `EmailBlockNode[]` | Ordered nodes, each with a unique `id`, a `type`, and `fields`, plus optional `style` and preview `defaultData`. |
 
-The document format is under development; older block fields are not migrated automatically. See the [document types](./src/types/document.ts) for the full model.
+The document format is under development. Only version `2` is accepted; older documents and block fields are not migrated automatically. See the [document types](./src/types/document.ts) for the full model.
 
 ### Global styles
 
@@ -208,12 +208,25 @@ Block node styles are grouped by purpose:
 | --- | --- |
 | `style.dimension` | Container `padding`, outer spacing via `margin`, and optional `height` in px. Height acts as a minimum including padding. |
 | `style.decorations` | Container background, border, and corner radius. |
-| `style.typography` | Block text styles overriding global typography. |
+| `style.typography` | Typography explicitly enabled by custom blocks; built-in text formatting lives only in `fields.html`. |
 | `style.element` | Element-specific styles for buttons, images, and dividers, such as size and alignment. |
 
-Heading and Text share the rich text toolbar for font family, size, weight, text color, alignment, line height, and paragraph spacing; these controls are omitted from the BLOCK inspector. With no text selected, formatting applies to the entire current block; with a selection, it applies to the selected text or paragraphs. The original caret or selection is restored after formatting. Emoji, variables, and links keep their insertion/selection behavior; a caret inside a link edits that link. Font size choices use the existing 12–48px presets; existing document sizes are preserved. The BLOCK inspector retains list spacing, list indentation, link appearance, and container styles. GLOBAL typography and existing `style.typography` rendering remain supported.
+Built-in blocks declare their own inspector sections and omit fixed block height controls. Canvas and email rendering only read enabled `styleFields`; undeclared container, element, and typography values are ignored. Spacer supports height and background only; Divider containers support spacing and background only. GLOBAL typography remains available.
 
-Heading and Text blocks start with `16px` padding. HTML blocks retain explicitly authored inline styles. See [EmailBlockStyle](./src/types/document.ts) for individual fields.
+| Block | BLOCK inspector |
+| --- | --- |
+| Heading / Text | Spacing, Block appearance. Edit text on the canvas. |
+| Button | Link, Button (position, width, padding, fill, border, corners), Spacing, Block appearance (container borders under Advanced). |
+| Image | Image (URL, alt text, link), Size & position, Image appearance, Spacing, Block appearance (container borders under Advanced). |
+| Divider | Line (color, thickness, style, width, position), Spacing, Block appearance (background only). |
+| Spacer | Spacer (height, background), without additional height, spacing, or border controls. |
+| HTML | HTML source, Spacing, Block appearance, without internal typography controls. |
+
+Heading, Text, and Button use basic rich text controls: font family, 12–48px size presets, bold, italic, underline, color, Emoji, and variables. Heading also supports left/center/right alignment, line height, and links. Text additionally supports strikethrough, justification, a Paragraph menu (space before and line height), and lists. List spacing and indentation appear in the list context menu; link colors and decoration belong to the link popover. With no selection, formatting applies to the entire block; with a selection, it affects selected text or paragraphs and restores the caret or selection.
+
+Edit button labels on the canvas. Button content is a single paragraph with natural wrapping; Enter does not create another paragraph. Lists, strikethrough, paragraph formatting, alignment, and inner links are excluded from its editor schema. Pasted paragraphs are joined with spaces, retaining basic text formatting. Configure the whole button URL in the inspector; email output contains one outer link. New and edited content uses `fields.html` exclusively. `fields.label` and `style.element` typography are not read. Missing or empty HTML produces empty content. Button export preserves quotes, comparison characters, comments, and spacing inside template expressions.
+
+Heading and Text start with `16px` padding. Heading’s initial rich text carries its `26px`, bold, and `1.25` line-height defaults; Button’s initial content carries its white `16px` text. Switching list types preserves each list’s spacing and indent, and automatic whole-block conversion excludes the trailing helper paragraph. HTML preserves source paragraphs, lists, links, and explicit styles without injecting body-text defaults. Unspecified text attributes may still inherit container and email defaults. Full-document merging, head styles, and template preview/export behavior are preserved. GLOBAL typography remains available. See [EmailBlockStyle](./src/types/document.ts) for data fields.
 
 To add a custom block, pass a stable `BlockDefinition[]` through `blocks`. `type`, `title`, and `render(ctx)` are required. Optional `fields` and `styleFields` configure the inspector; `defaultFields`, `defaultStyle`, and `defaultData` initialize new nodes. `render(ctx)` returns HTML and receives `mode: "canvas" | "email"`.
 
@@ -232,7 +245,7 @@ export function CustomEmailPage() {
 }
 ```
 
-By default, common container spacing and decoration controls are added to custom blocks. Set `exactStyleFields: true` to show only the supplied style fields; existing node styles still apply when rendering. Full definitions: [BlockDefinition, FieldConfig, and StyleFieldConfig](./src/types/block.ts).
+By default, common container spacing and decoration controls are added to custom blocks. Set `exactStyleFields: true` to enable only the supplied style fields. Block creation, canvas rendering, and email output only read enabled fields; undeclared values are ignored. Optional `inspectorSections: BlockInspectorSection[]` orders inspector sections: `title` names the section, `fieldNames` references content fields, `styleIds` references style fields, and `advancedStyleIds` goes into the collapsed advanced block border area. Without it, existing grouping is retained. Set `inlineEditProfile: "text" | "heading" | "button"` with `inlineEdit: true` to select rich text capabilities. The standalone `RichText` export also accepts `profile` with these values (default: `"text"`). Full definitions: [BlockDefinition, FieldConfig, and StyleFieldConfig](./src/types/block.ts).
 
 ## Reading and exporting data
 

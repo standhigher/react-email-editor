@@ -6,7 +6,7 @@ import { FieldControl } from "./FieldControl";
 import { InspectorSection } from "./components/InspectorSection";
 import { StyleFieldStack } from "./components/StyleFieldStack";
 import { StyleControl } from "./StyleControl";
-import type { BlockDefinition, StyleFieldConfig, Variable } from "../types/block";
+import type { BlockDefinition, BlockInspectorSection, StyleFieldConfig, Variable } from "../types/block";
 import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
 
 interface InspectorFieldsProps {
@@ -46,12 +46,15 @@ export function InspectorFields({
       />
     );
   };
-  const sections = STYLE_GROUPS.map((group) => ({
-    ...group,
-    fields: styleFields.filter((field) => field.group === group.group),
+  const sections: BlockInspectorSection[] = definition.inspectorSections ?? STYLE_GROUPS.map((group) => ({
+    title: group.label,
+    fieldNames: group.group === "general" ? contentFields.map((field) => field.name) : [],
+    styleIds: styleFields.filter((field) => field.group === group.group).map((field) => field.id),
   }));
-  const general = sections.find((section) => section.group === "general");
-  const showGeneral = contentFields.length > 0 || (general?.fields.length ?? 0) > 0;
+  const resolveStyles = (ids: string[] = []) => ids.flatMap((id) => {
+    const field = styleFields.find((item) => item.id === id);
+    return field ? [field] : [];
+  });
 
   return (
     <div className="ree-inspector">
@@ -60,26 +63,37 @@ export function InspectorFields({
         <span className="ree-inspector-title">{definition.title}</span>
       </div>
 
-      {showGeneral ? (
-        <InspectorSection title="General">
-          {contentFields.map((field) => (
-            <FieldControl
-              key={field.name}
-              field={field}
-              value={block.fields[field.name]}
-              variables={variables}
-              onChange={(value) => onCommitField(block.id, field.name, value)}
-            />
-          ))}
-          {general ? <StyleFieldStack fields={general.fields} renderField={renderStyle} /> : null}
-        </InspectorSection>
-      ) : null}
-
-      {sections.filter((section) => section.group !== "general" && section.fields.length > 0).map((section) => (
-        <InspectorSection key={section.group} title={section.label}>
-          <StyleFieldStack fields={section.fields} renderField={renderStyle} />
-        </InspectorSection>
-      ))}
+      {sections.map((section) => {
+        const fields = (section.fieldNames ?? []).flatMap((name) => {
+          const field = contentFields.find((item) => item.name === name);
+          return field ? [field] : [];
+        });
+        const styles = resolveStyles(section.styleIds);
+        const advanced = resolveStyles(section.advancedStyleIds);
+        if (!fields.length && !styles.length && !advanced.length) return null;
+        return (
+          <InspectorSection key={`${block.type}-${section.title}`} title={section.title}>
+            {fields.map((field) => (
+              <FieldControl
+                key={field.name}
+                field={field}
+                value={block.fields[field.name]}
+                variables={variables}
+                onChange={(value) => onCommitField(block.id, field.name, value)}
+              />
+            ))}
+            <StyleFieldStack fields={styles} renderField={renderStyle} />
+            {advanced.length ? (
+              <details className="ree-inspector-advanced">
+                <summary>Advanced block border</summary>
+                <div className="ree-inspector-section-body">
+                  <StyleFieldStack fields={advanced} renderField={renderStyle} />
+                </div>
+              </details>
+            ) : null}
+          </InspectorSection>
+        );
+      })}
     </div>
   );
 }

@@ -15,6 +15,7 @@ function markWeight(value: unknown): ToolbarState["fontWeight"] {
 export function readToolbarState(editor: Editor): ToolbarState {
   const textStyle = editor.getAttributes("textStyle");
   const link = editor.getAttributes("link");
+  const list = editor.getAttributes(editor.isActive("orderedList") ? "orderedList" : "bulletList");
   return {
     bold: editor.isActive("bold"),
     italic: editor.isActive("italic"),
@@ -28,6 +29,10 @@ export function readToolbarState(editor: Editor): ToolbarState {
     fontWeight: markWeight(textStyle.fontWeight),
     color: textAttribute(textStyle.color),
     linkHref: textAttribute(link.href),
+    linkColor: textAttribute(link.color),
+    linkDecoration: textAttribute(link.decoration),
+    listSpacing: textAttribute(list.listSpacing),
+    listIndent: textAttribute(list.listIndent),
     spacing: textAttribute(editor.getAttributes("paragraph").spacing),
     lineHeight: textAttribute(editor.getAttributes("paragraph").lineHeight),
   };

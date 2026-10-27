@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { DEFAULT_EMAIL_GLOBAL } from "../../document/constants";
-import type { Variable } from "../../types/block";
+import type { RichTextProfile, Variable } from "../../types/block";
 import { RichTextToolbar } from "./components/RichTextToolbar";
 import { createRichTextExtensions } from "./extensions";
 import { preserveTemplateSpaces, restoreTemplateSpaces } from "./template-spaces";
@@ -12,6 +12,7 @@ import type { RichTextInheritedStyle } from "./types";
 
 export interface RichTextProps {
   initialHtml: string;
+  profile?: RichTextProfile;
   placeholder?: string;
   variables: Variable[];
   selected: boolean;
@@ -33,6 +34,7 @@ const DEFAULT_INHERITED: RichTextInheritedStyle = {
 
 export function RichText({
   initialHtml,
+  profile = "text",
   placeholder,
   variables,
   selected,
@@ -45,11 +47,11 @@ export function RichText({
   const rootRef = useRef<HTMLDivElement>(null);
   const [host, setHost] = useState<HTMLElement | null>(null);
   const editor = useEditor({
-    extensions: createRichTextExtensions(placeholder ?? "Type something…"),
+    extensions: createRichTextExtensions(placeholder ?? "Type something…", profile),
     content: preserveTemplateSpaces(initialHtml),
     immediatelyRender: false,
     onUpdate: ({ editor: current }) => onCommit(restoreTemplateSpaces(current.getHTML())),
-  });
+  }, [profile]);
 
   useLayoutEffect(() => {
     const node = rootRef.current;
@@ -58,16 +60,17 @@ export function RichText({
   }, []);
 
   useEffect(() => {
-    if (!editor || restoreTemplateSpaces(editor.getHTML()) === initialHtml) return;
+    if (!editor || editor.isDestroyed || restoreTemplateSpaces(editor.getHTML()) === initialHtml) return;
     editor.commands.setContent(preserveTemplateSpaces(initialHtml), { emitUpdate: false });
   }, [editor, initialHtml]);
 
   return (
-    <div className="ree-rte" ref={rootRef} onClick={onSelect}>
+    <div className={`ree-rte ree-rte-${profile}`} ref={rootRef} onClick={onSelect}>
       {selected && !toolbarCollapsed && editor && host
         ? createPortal(
             <RichTextToolbar
               id={toolbarId}
+              profile={profile}
               editor={editor}
               variables={variables}
               anchorRef={rootRef}

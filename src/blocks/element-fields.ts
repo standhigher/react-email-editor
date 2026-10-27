@@ -1,7 +1,7 @@
 import { HORIZONTAL_ALIGNS } from "../constants/style-values";
 import type { StyleFieldConfig } from "../types/block";
 import type { EmailElementStyle } from "../types/document";
-import { createDecorationFields, createDimensionFields, createTypographyFields } from "./style-fields";
+import { createDecorationFields, createDimensionFields } from "./style-fields";
 
 const elementDecoration = createDecorationFields({
   borderWidth: { id: "element.borderWidth", label: "Border width" },
@@ -9,14 +9,6 @@ const elementDecoration = createDecorationFields({
   borderColor: { id: "element.borderColor", label: "Outline" },
   borderRadius: { id: "element.borderRadius", label: "Corner radius" },
 });
-const buttonTypography = createTypographyFields({
-  fontFamily: { id: "element.fontFamily" },
-  fontSize: { id: "element.fontSize" },
-  fontWeight: { id: "element.fontWeight" },
-  lineHeight: { id: "element.lineHeight" },
-  color: { id: "element.color" },
-});
-
 /** 按钮盒子的初始外观。重置和缺省渲染都回到这组值，而不是透明底。 */
 export const BUTTON_BOX_DEFAULTS = {
   align: HORIZONTAL_ALIGNS.center,
@@ -38,12 +30,7 @@ export const ELEMENT_WIDTH: StyleFieldConfig = { id: "element.width", group: "ge
 export const BUTTON_STYLE_FIELDS: StyleFieldConfig[] = [
   ELEMENT_ALIGN, ELEMENT_WIDTH,
   createDimensionFields({ padding: { id: "element.padding", label: "Button padding", defaultValue: BUTTON_BOX_DEFAULTS.padding } }).padding,
-  buttonTypography.fontFamily,
-  buttonTypography.fontSize,
-  buttonTypography.fontWeight,
-  buttonTypography.lineHeight,
-  buttonTypography.color,
-  createDecorationFields({ backgroundColor: { id: "element.backgroundColor", label: "Button", defaultValue: BUTTON_BOX_DEFAULTS.backgroundColor } }).backgroundColor,
+  createDecorationFields({ backgroundColor: { id: "element.backgroundColor", label: "Button fill", defaultValue: BUTTON_BOX_DEFAULTS.backgroundColor } }).backgroundColor,
   ...ELEMENT_BORDER_FIELDS.map((field) => ({
     ...field,
     defaultValue: field.id === "element.borderWidth" ? BUTTON_BOX_DEFAULTS.borderWidth

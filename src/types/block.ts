@@ -69,6 +69,16 @@ export interface BlockRenderContext {
   global: EmailGlobalSettings;
 }
 
+export type RichTextProfile = "text" | "heading" | "button";
+
+/** 显式控制检查器的分组及字段归属，分组按声明顺序展示。 */
+export interface BlockInspectorSection {
+  title: string;
+  fieldNames?: string[];
+  styleIds?: string[];
+  advancedStyleIds?: string[];
+}
+
 export interface BlockDefinition {
   type: string;
   title: string;
@@ -76,7 +86,8 @@ export interface BlockDefinition {
   description?: string;
   fields?: FieldConfig[];
   styleFields?: StyleFieldConfig[];
-  /** getBlockDefinition 只保留 styleFields，不补容器间距和装饰。 */
+  inspectorSections?: BlockInspectorSection[];
+  /** 只启用 styleFields，不补容器间距和装饰；渲染也只读取启用的字段。 */
   exactStyleFields?: boolean;
   defaultFields?: Record<string, unknown>;
   defaultStyle?: EmailBlockStyle;
@@ -84,6 +95,7 @@ export interface BlockDefinition {
   defaultData?: Record<string, unknown>;
   /** Content is edited inline on the canvas and stored in fields.html. */
   inlineEdit?: boolean;
+  inlineEditProfile?: RichTextProfile;
   render: (ctx: BlockRenderContext) => string;
 }
 

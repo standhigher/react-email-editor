@@ -3,7 +3,7 @@ import { BORDER_STYLES, FONT_WEIGHTS, HORIZONTAL_ALIGNS, LINK_DECORATIONS, TEXT_
 import type { FieldOption } from "../types/block";
 import type { EmailGlobalSettings } from "../types/document";
 
-export const DOCUMENT_VERSION = 1 as const;
+export const DOCUMENT_VERSION = 2 as const;
 
 function fontOption(label: string, value: string): FieldOption {
   return Object.freeze({ label, value });

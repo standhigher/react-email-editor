@@ -339,3 +339,7 @@
   font-size: 0.75em;
 }
 
+.ree-rte-button .ProseMirror p {
+  margin: 0;
+  text-align: center;
+}
