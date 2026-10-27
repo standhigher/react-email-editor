@@ -2,265 +2,131 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-A React email editor with drag-and-drop blocks, inline rich text, and desktop/mobile previews. Store content as JSON and export email HTML through a component ref.
+A React email template editor with drag-and-drop blocks, inline rich text, desktop/mobile previews, JSON storage, and HTML export.
 
-## Installation and integration
+## Installation
 
-Requires React 18 and React DOM 18. The package provides an ESM entry and TypeScript declarations.
+Requires React 18 and React DOM 18. Includes ESM and TypeScript declarations.
 
 ```bash
 pnpm add @standhigher/react-email-editor
 ```
 
-Import the stylesheet once in your application. This example renders an empty editor and reads its current data:
+## Quick start
+
+Import the stylesheet once in your application and use a ref to read the document and HTML. Your application handles persistence.
 
 ```tsx
 import { useRef } from "react";
 import {
+  BLOCK_TYPES,
   EmailEditor,
+  createBlockNode,
+  createEmailDocument,
   type EmailEditorHandle,
+  type Variable,
 } from "@standhigher/react-email-editor";
 import "@standhigher/react-email-editor/styles.css";
+
+const text = createBlockNode(BLOCK_TYPES.text);
+if (text) text.fields.html = "<p>Hello, {{ store_name }}</p>";
+const initialDocument = createEmailDocument(text ? [text] : []);
+const variables: Variable[] = [
+  { name: "{{ store_name }}", description: "Store name", value: "Example Store" },
+];
 
 export function EmailPage() {
   const editorRef = useRef<EmailEditorHandle>(null);
 
-  function readData() {
+  function save() {
     const data = editorRef.current?.getData();
     if (!data) return;
-    // Pass data.document, data.json, data.html, or data.renderedHtml
-    // to your application's save or export handler.
+    // Persist data.document in your app; use data.html to export the template.
     console.log(data);
   }
 
   return (
     <>
-      <EmailEditor ref={editorRef} height={720} />
-      <button type="button" onClick={readData}>Read data</button>
+      <EmailEditor
+        ref={editorRef}
+        initialDocument={initialDocument}
+        variables={variables}
+        height={720}
+      />
+      <button type="button" onClick={save}>Save</button>
     </>
   );
 }
 ```
 
-Saving is handled by your application. In Next.js App Router, put this integration in a Client Component with `"use client"`. When using `height="100%"`, give its parent a definite height.
+Omit `initialDocument` to start empty. In Next.js App Router, add `"use client"` to the integration component and import CSS from an allowed global stylesheet entry. When using `height="100%"`, give the parent a definite height.
+
+## Props
+
+All props are optional.
+
+| Prop | Type | Behavior |
+| --- | --- | --- |
+| `initialDocument` | `EmailDocument` | Read on first mount only. Remount with a new React `key` to switch documents. |
+| `height` | `number \| string` | Defaults to `"100%"`; numbers are pixels. |
+| `global` | `Partial<EmailGlobalSettings>` | Overrides global styles; later changes merge into the current document. Omitting a field does not restore its default. |
+| `variables` | `Variable[]` | Variables for insertion and preview. Defaults to `[]`; Personalization controls are hidden when empty. |
+| `blocks` | `BlockDefinition[]` | Adds custom blocks; matching types replace built-in definitions. |
+| `onChange` | `(document: EmailDocument) => void` | Called on document changes, including external `global` updates that change document values. |
+| `onGlobalChange` | `(global: EmailGlobalSettings) => void` | Called for global style edits inside the editor, excluding external `global` updates. |
+
+Global style example: `global={{ contentWidth: 640, outerPadding: "24px" }}`. Defaults are exported as `DEFAULT_EMAIL_GLOBAL`.
+
+Built-in blocks: `heading`, `text`, `button`, `image`, `divider`, `spacer`, and `html`, available through `BLOCK_TYPES`.
+
+## Save and export
+
+| Ref method | Returns |
+| --- | --- |
+| `getData()` | `{ document, json, html, renderedHtml }` |
+| `getDocument()` | An independent `EmailDocument` snapshot to persist and pass back as `initialDocument`. |
+| `getJson()` | A formatted document JSON string. |
+| `getHtml()` | A complete email HTML document preserving template expressions. |
+| `getRenderedHtml()` | A complete email HTML document with templates resolved using preview data. |
+
+Render a document without mounting the editor:
+
+```ts
+import { documentToHtml } from "@standhigher/react-email-editor";
+
+const html = documentToHtml(initialDocument, undefined, { variables });
+const previewHtml = documentToHtml(initialDocument, undefined, {
+  variables,
+  resolveHtmlTemplates: true,
+});
+```
+
+A variable's `name` is inserted verbatim; `description` and preview `value` are optional. Export adds a missing dot only to tokens matching `variables[].name` exactly, preserving whitespace: `{{ store_name }}` → `{{ .store_name }}`. Other Go template expressions remain unchanged. Preview supports a subset of Go template syntax; data precedence is block `defaultData` > `templateData` (`documentToHtml` option) > `variables`.
+
+The document format is under development. Only `version: 2` is accepted, with no automatic migration of older documents. Create data with `createEmailDocument()` and `createBlockNode()`. See [CHANGELOG](./CHANGELOG.md) for upgrade notes.
+
+## Custom blocks
+
+Pass `BlockDefinition[]` through `blocks`. Required fields are `type`, `title`, and `render(ctx)`, which returns HTML. Use `fields` / `styleFields` for inspector controls and `defaultFields` / `defaultStyle` / `defaultData` for initial values. The render context includes `mode: "canvas" | "email"`.
+
+Built-in text formatting lives in `fields.html`, container styles in `style.dimension` / `style.decorations`, and button, image, and divider element styles in `style.element`. Rendering uses only enabled style fields. See [BlockDefinition](https://github.com/standhigher/react-email-editor/blob/main/src/types/block.ts) and [EmailDocument](https://github.com/standhigher/react-email-editor/blob/main/src/types/document.ts) for full types. When calling `documentToHtml` directly, pass the complete definition list including custom blocks as its second argument.
 
 ## Local development
 
-Use pnpm and a current Node.js LTS release; Node.js 22.18+ is recommended for the repository's tooling and TypeScript tests.
+Node.js 22.18+ and pnpm are recommended:
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). The playground loads `src/` directly with hot reload; no initial build is needed. It is not included in the published package. Reuse an existing development server when one is already running.
+Open [http://localhost:5173](http://localhost:5173). The playground loads `src/` directly; reuse an existing server. Validation:
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Start the local playground on port 5173. |
-| `pnpm build` | Generate ESM, type declarations, and CSS in `dist/`. |
-| `pnpm build:watch` | Rebuild `dist/` when files in `src/` change; does not start a preview server. |
-| `pnpm typecheck` | Type-check the library and playground. |
-| `pnpm lint` | Check source, playground, scripts, configuration, and tests with Oxlint; warnings and unused disable directives fail the check. |
-| `pnpm lint:fix` | Apply safe Oxlint automatic fixes. |
-
-Oxlint uses `.oxlintrc.json` with native TypeScript, Unicorn, Oxc, and React correctness rules, plus explicit checks for `any` and Hook call order. React checks include Hook dependencies, refs, and effects; they do not cover every rule in the official React Compiler plugin. JavaScript uses `no-undef`; `pnpm typecheck` checks undefined TypeScript identifiers and component props. Generated output and the local pnpm store are excluded.
-
-To integrate with another local project, set its dependency to the library's root directory, adjusting the relative path as needed:
-
-```json
-{
-  "dependencies": {
-    "@standhigher/react-email-editor": "link:../react-email-editor"
-  }
-}
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+node --test tests/*.test.mjs tests/*.test.ts
 ```
 
-Run `pnpm build` in this repository first, then keep `pnpm build:watch` running during development. In the consuming project, run `pnpm install` and use its development server. Package imports, including CSS, resolve to `dist/`.
-
-Both projects must resolve the same React instance. For Vite consumers, use `resolve.dedupe: ["react", "react-dom"]` if needed. Next.js consumers can use `transpilePackages: ["@standhigher/react-email-editor"]`; when an external link is used with Turbopack, `turbopack.root` must include both projects.
-
-## Component props
-
-All props are optional. Types are exported from `@standhigher/react-email-editor`.
-
-| Prop | Type | Default / behavior |
-| --- | --- | --- |
-| `initialDocument` | `EmailDocument` | Empty document. Read only on the first mount. |
-| `global` | `Partial<EmailGlobalSettings>` | No external overrides. Supplied fields override the initial document's global settings; later updates merge into the current document. |
-| `blocks` | `BlockDefinition[]` | `[]`. Adds custom block types; matching types replace built-in definitions. Other built-in blocks remain available. |
-| `variables` | `Variable[]` | `[]`. Variables available for insertion and preview substitution. Personalization controls are hidden when empty. |
-| `height` | `number \| string` | `"100%"`. A number is interpreted as pixels; a string is a CSS height. |
-| `onChange` | `(document: EmailDocument) => void` | Called when the document changes, including edits and external global updates that change its values. |
-| `onGlobalChange` | `(global: EmailGlobalSettings) => void` | Called when global settings are edited in the editor. External `global` updates do not call it. |
-
-To load a different document, remount with a new React `key`, for example `<EmailEditor key={documentId} initialDocument={document} />`. Changing `initialDocument` alone does not replace the open document. Omitting a previously supplied `global` field does not restore its default.
-
-## Configuration
-
-### Document
-
-Use `createEmailDocument()` and `createBlockNode()` to populate defaults:
-
-```tsx
-import {
-  BLOCK_TYPES,
-  EmailEditor,
-  createBlockNode,
-  createEmailDocument,
-  type Variable,
-} from "@standhigher/react-email-editor";
-
-const text = createBlockNode(BLOCK_TYPES.text);
-if (text) text.fields.html = "<p>Hello {{  store_name }}</p>";
-
-export const initialDocument = createEmailDocument(text ? [text] : []);
-initialDocument.subject = "Welcome";
-
-const variables: Variable[] = [
-  { name: "{{  store_name }}", description: "Store name", value: "Demo Store" },
-];
-
-export function TemplateEmailPage() {
-  return (
-    <EmailEditor
-      initialDocument={initialDocument}
-      variables={variables}
-      height={720}
-    />
-  );
-}
-```
-
-Pass both `initialDocument` and `variables` as shown so the token has a preview value and can gain its missing dot on export. `createBlockNode()` returns `null` for an unknown block type. Built-in types are `heading`, `text`, `button`, `image`, `divider`, `spacer`, and `html`, also available through `BLOCK_TYPES`.
-
-| Document field | Type | Description |
-| --- | --- | --- |
-| `version` | `typeof DOCUMENT_VERSION` | Current version: `2`. Set by `createEmailDocument()`. |
-| `subject` | `string` (optional) | Email subject. The editor input is limited to 128 characters. |
-| `global` | `EmailGlobalSettings` | Global email appearance; defaults are populated by the helper. |
-| `blocks` | `EmailBlockNode[]` | Ordered nodes, each with a unique `id`, a `type`, and `fields`, plus optional `style` and preview `defaultData`. |
-
-The document format is under development. Only version `2` is accepted; older documents and block fields are not migrated automatically. See the [document types](./src/types/document.ts) for the full model.
-
-### Global styles
-
-Pass partial settings through `global`, for example `<EmailEditor global={{ contentWidth: 640, outerPadding: "24px" }} />`. `DEFAULT_EMAIL_GLOBAL` exposes all defaults; `resolveEmailGlobal()` fills missing values and normalizes input.
-
-These settings control email content. Editor selection outlines and toolbars are not included in exported HTML.
-
-| Parameter | Type / values | Default | Description |
-| --- | --- | --- | --- |
-| `contentWidth` | `number` | `600` | Content width in pixels, rounded and clamped to 320–900. |
-| `contentAlign` | `"left" \| "center" \| "right"` | `"center"` | Horizontal position of the content. |
-| `backgroundColor` | `string` | `"#ffffff"` | Outer email background. |
-| `contentBackgroundColor` | `string` | `"#ffffff"` | Content background. |
-| `contentPadding` | `string` | `"0px"` | Content inner spacing. |
-| `outerPadding` | `string` | `"0px"` | Spacing outside the content. |
-| `blockGap` | `string` | `"4px"` | Gap between blocks. |
-| `textColor` | `string` | `"#000000"` | Default text color. |
-| `textAlign` | `"left" \| "center" \| "right" \| "justify"` | `"left"` | Default text alignment. |
-| `fontFamily` | `string` | `"Arial, Helvetica, sans-serif"` | Default font stack. |
-| `fontWeight` | `"normal" \| "bold"` | `"normal"` | Default font weight. |
-| `defaultFontSize` | `string` | `"16px"` | Default font size. |
-| `defaultLineHeight` | `string` | `"1.5"` | Default line height. |
-| `paragraphSpacing` | `string` | `"6px"` | Gap between adjacent top-level paragraphs. |
-| `listSpacing` | `string` | `"4px"` | Top and bottom margins of the entire list (`ul` / `ol`). |
-| `listIndent` | `string` | `"22px"` | List indentation. |
-| `linkColor` | `string` | `"#005bd3"` | Default link color. |
-| `linkDecoration` | `"underline" \| "none"` | `"underline"` | Default link decoration. |
-| `borderWidth` | `string` | `"0px"` | Content border width. |
-| `borderStyle` | `"none" \| "solid" \| "dashed" \| "dotted"` | `"solid"` | Content border style. |
-| `borderColor` | `string` | `"transparent"` | Content border color. |
-| `borderRadius` | `string` | `"0px"` | One radius or four, ordered top-left, top-right, bottom-right, bottom-left. |
-
-Use CSS length strings such as `"16px"` for spacing and sizes. Padding accepts shorthand such as `"12px 24px"`; line height also accepts a unitless value. Desktop canvas and preview follow `contentWidth`; mobile uses a 360px viewport.
-
-Global spacing and length settings accept non-negative values in `px`, `em`, `rem`, or `%`; unitless lengths are normalized to px, except for line height. Unsupported values such as negative lengths, `calc()`, `var()`, `vh`, or `vw` fall back to the corresponding global default.
-
-### Variables and template data
-
-```tsx
-import type { Variable } from "@standhigher/react-email-editor";
-
-export const variables: Variable[] = [
-  { name: "{{  store_name }}", description: "Store name", value: "Demo Store" },
-];
-```
-
-Pass this array through `variables` on `EmailEditor`.
-
-| Field | Type | Description |
-| --- | --- | --- |
-| `name` | `string` | Required. Token displayed and inserted as written, including spaces. Example: `{{  store_name }}`. |
-| `description` | `string` (optional) | Secondary text in the variable menu; omitted when empty or absent. |
-| `value` | `string` (optional) | Replacement text used in previews. |
-
-Tokens may include a leading dot. Template HTML export preserves spaces and adds a missing dot only when the token exactly matches `variables[].name`, including spaces: `{{  store_name }}` becomes `{{  .store_name }}`. Other Go template actions are left unchanged. Export does not substitute preview values by default.
-
-Use a block node's `defaultData: Record<string, unknown>` for structured preview data, including arrays for `{{range .products}}`. Block data overrides variables with the same name. Preview resolution applies to every block's rendered HTML, including custom blocks. Write template expressions directly in an HTML block's `fields.html`; the preview renderer supports a subset of Go template syntax.
-
-### Block configuration
-
-Block node styles are grouped by purpose:
-
-| Style group | Purpose |
-| --- | --- |
-| `style.dimension` | Container `padding`, outer spacing via `margin`, and optional `height` in px. Height acts as a minimum including padding. |
-| `style.decorations` | Container background, border, and corner radius. |
-| `style.typography` | Typography explicitly enabled by custom blocks; built-in text formatting lives only in `fields.html`. |
-| `style.element` | Element-specific styles for buttons, images, and dividers, such as size and alignment. |
-
-Built-in blocks declare their own inspector sections and omit fixed block height controls. Canvas and email rendering only read enabled `styleFields`; undeclared container, element, and typography values are ignored. Spacer supports height and background only; Divider containers support spacing and background only. GLOBAL typography remains available.
-
-| Block | BLOCK inspector |
-| --- | --- |
-| Heading / Text | Spacing, Block appearance. Edit text on the canvas. |
-| Button | Link, Button (position, width, padding, fill, border, corners), Spacing, Block appearance (container borders under Advanced). |
-| Image | Image (URL, alt text, link), Size & position, Image appearance, Spacing, Block appearance (container borders under Advanced). |
-| Divider | Line (color, thickness, style, width, position), Spacing, Block appearance (background only). |
-| Spacer | Spacer (height, background), without additional height, spacing, or border controls. |
-| HTML | HTML source, Spacing, Block appearance, without internal typography controls. |
-
-Button fill defaults to black (`#000000`). Button, image, block, and global content borders default to a transparent color. Explicitly configured colors are preserved.
-
-Heading, Text, and Button use basic rich text controls: font family, 12–48px size presets, bold, italic, underline, color, Emoji, and variables. All color controls open the shared color picker directly with a HEX field by default, plus saturation/brightness and hue controls. HEX accepts 3 or 6 digits, with or without #; invalid input does not change the saved color. Color selections and valid HEX input apply immediately. Click outside or press Escape to close. The reset icon beside the HEX field restores the field default and closes the picker; text color resets remove the inline override and restore inheritance. RGB and HEX values are normalized for swatch display. Heading also supports left/center/right alignment, line height, and links. Text additionally supports strikethrough, justification, separate Space before and Line height icon menus, and lists. Metric menus use a reset icon beside each value to restore the inherited setting. Toolbar controls are grouped by function, wrap together when possible, and omit the separator at the start of each wrapped row. List spacing and indentation appear in the list context menu; links open a centered modal with a backdrop. It includes an empty URL field, a capsule color picker (blue by default), an Underline checkbox (enabled by default), and Current page / New page targets (New page by default). Cancel discards edits; the black Save button applies the settings. Clearing an existing URL and saving removes the link; Escape or clicking the backdrop dismisses the modal without saving. With no selection, formatting applies to the entire block; with a selection, it affects selected text or paragraphs and restores the caret or selection.
-
-Edit button labels on the canvas. Button content is a single paragraph with natural wrapping; Enter does not create another paragraph. Lists, strikethrough, paragraph formatting, alignment, and inner links are excluded from its editor schema. Pasted paragraphs are joined with spaces, retaining basic text formatting. Configure the whole button URL in the inspector; email output contains one outer link when a URL is supplied. Link fields start empty and show a placeholder; an empty or whitespace-only URL exports without a link. New and edited content uses `fields.html` exclusively. `fields.label` and `style.element` typography are not read. Missing or empty HTML produces empty content. Button export preserves quotes, comparison characters, comments, and spacing inside template expressions.
-
-Heading and Text start with `16px` padding. Heading’s initial rich text carries its `26px`, bold, and `1.25` line-height defaults; Button’s initial content carries its white `16px` text. Switching list types preserves each list’s spacing and indent, and automatic whole-block conversion excludes the trailing helper paragraph. HTML preserves source paragraphs, lists, links, and explicit styles without injecting body-text defaults. Unspecified text attributes may still inherit container and email defaults. Full-document merging, head styles, and template preview/export behavior are preserved. GLOBAL typography remains available. See [EmailBlockStyle](./src/types/document.ts) for data fields.
-
-To add a custom block, pass a stable `BlockDefinition[]` through `blocks`. `type`, `title`, and `render(ctx)` are required. Optional `fields` and `styleFields` configure the inspector; `defaultFields`, `defaultStyle`, and `defaultData` initialize new nodes. `render(ctx)` returns HTML and receives `mode: "canvas" | "email"`.
-
-```tsx
-import { EmailEditor, type BlockDefinition } from "@standhigher/react-email-editor";
-
-const customBlocks: BlockDefinition[] = [{
-  type: "notice",
-  title: "Notice",
-  defaultStyle: { dimension: { padding: "16px" } },
-  render: () => '<p style="margin:0;color:#555555;">Thanks for subscribing.</p>',
-}];
-
-export function CustomEmailPage() {
-  return <EmailEditor blocks={customBlocks} height={720} />;
-}
-```
-
-By default, common container spacing and decoration controls are added to custom blocks. Set `exactStyleFields: true` to enable only the supplied style fields. Block creation, canvas rendering, and email output only read enabled fields; undeclared values are ignored. Optional `inspectorSections: BlockInspectorSection[]` orders inspector sections: `title` names the section, `fieldNames` references content fields, `styleIds` references style fields, and `advancedStyleIds` goes into the collapsed advanced block border area. Without it, existing grouping is retained. Set `inlineEditProfile: "text" | "heading" | "button"` with `inlineEdit: true` to select rich text capabilities. The standalone `RichText` export also accepts `profile` with these values (default: `"text"`). Full definitions: [BlockDefinition, FieldConfig, and StyleFieldConfig](./src/types/block.ts).
-
-## Reading and exporting data
-
-Call these methods through `useRef<EmailEditorHandle>(null)`:
-
-| Method | Return type | Description |
-| --- | --- | --- |
-| `getData()` | `EmailEditorData` | Returns `{ document, json, html, renderedHtml }`. |
-| `getDocument()` | `EmailDocument` | Independent document snapshot for storage or later editing. |
-| `getJson()` | `string` | Formatted document JSON. |
-| `getHtml()` | `string` | Complete email HTML. Template actions stay in place; only tokens from `variables` gain a missing dot. |
-| `getRenderedHtml()` | `string` | Complete email HTML with templates resolved using variables and block preview data. |
-
-Mutating a returned document snapshot does not change the editor. Use `onChange` to subscribe to document changes.
-
-For rendering without mounting the editor, use `documentToHtml(document, definitions?, options?)`. Definitions default to `DEFAULT_BLOCKS`; include custom definitions when the document uses them. `options` accepts `resolveHtmlTemplates` (default `false`), `variables`, and `templateData`. When templates stay unresolved, `variables` supplies the only tokens that gain a missing dot. When resolving, data precedence is block `defaultData` over `templateData` over `variables`.
+For local consumers, use `link:../react-email-editor`, run `pnpm build` first, and keep `pnpm build:watch` running to update `dist/`. Both projects must share one React instance. Vite can use `resolve.dedupe: ["react", "react-dom"]`; Next.js can use `transpilePackages: ["@standhigher/react-email-editor"]`, with Turbopack's `root` covering the linked directory.
