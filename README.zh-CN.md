@@ -61,6 +61,10 @@ pnpm dev
 | `pnpm build` | 在 `dist/` 生成 ESM、类型声明和 CSS。 |
 | `pnpm build:watch` | 监听 `src/` 改动并重新构建 `dist/`，不启动预览服务。 |
 | `pnpm typecheck` | 检查组件库和 playground 的类型。 |
+| `pnpm lint` | 使用 Oxlint 检查源码、playground、脚本、配置和测试，warning 和无效禁用指令也视为失败。 |
+| `pnpm lint:fix` | 应用 Oxlint 支持的安全自动修复。 |
+
+Oxlint 使用 `.oxlintrc.json`，启用 TypeScript、Unicorn、Oxc 和 React 内置 Rust 插件的 correctness 规则，并显式检查 `any` 和 Hook 调用顺序。React 检查包括 Hook 依赖、ref 和 effect，不代表完整覆盖官方 React Compiler 插件的所有规则。JavaScript 启用 `no-undef`，TypeScript 未定义标识符和组件 Props 由 `pnpm typecheck` 检查。构建产物和本地 pnpm store 不参与检查。
 
 在另一个本地项目联调时，将其依赖指向组件库根目录，按实际位置调整相对路径：
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface CssValueInputProps {
   label: string;
@@ -10,7 +10,11 @@ interface CssValueInputProps {
 /** 在失焦或回车时提交，允许完整输入 12px、100%、auto 等值。 */
 export function CssValueInput({ label, value, placeholder, onChange }: CssValueInputProps) {
   const [draft, setDraft] = useState(value);
-  useEffect(() => setDraft(value), [value]);
+  const [previousValue, setPreviousValue] = useState(value);
+  if (previousValue !== value) {
+    setPreviousValue(value);
+    setDraft(value);
+  }
   return <input className="ree-input" aria-label={label} value={draft} placeholder={placeholder ?? "0px"}
     onChange={(event) => setDraft(event.target.value)}
     onBlur={() => { onChange(draft.trim()); setDraft(value); }}

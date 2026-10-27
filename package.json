@@ -27,7 +27,8 @@
     "build:watch": "tsup --watch src",
     "prepack": "pnpm build",
     "typecheck": "tsc --noEmit && tsc --noEmit -p playground",
-    "lint": "eslint src"
+    "lint": "oxlint . --deny-warnings --report-unused-disable-directives",
+    "lint:fix": "pnpm lint --fix"
   },
   "peerDependencies": {
     "react": "^18",
@@ -38,6 +39,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "^6.1.2",
+    "oxlint": "^1.90.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tsup": "^8",

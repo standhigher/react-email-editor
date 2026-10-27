@@ -30,7 +30,7 @@ export function documentToHtml(
   const rendered = source.blocks
     .map((node, index) => {
       const blockData = {
-        ...(options.templateData ?? {}),
+        ...options.templateData,
         ...node.defaultData,
       };
       const block = blockToHtml(node, definitions, "email", {

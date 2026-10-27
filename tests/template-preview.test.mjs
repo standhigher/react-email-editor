@@ -26,8 +26,8 @@ test("编辑保留变量原文，预览替换 value，导出只给变量列表�
   ].join("");
 
   const html = documentToHtml(document, undefined, { variables: [storeVariable] });
-  assert.match(html, /\{\{  \.store_name \}\}/);
-  assert.match(html, /\{\{  other_name \}\}/);
+  assert.match(html, /\{\{ {2}\.store_name \}\}/);
+  assert.match(html, /\{\{ {2}other_name \}\}/);
   assert.match(html, /\{\{- store_name -\}\}/);
   assert.match(html, /\{\{if not \.ready\}\}/);
   assert.match(html, /\{\{printf "%s" \.name\}\}/);
@@ -40,7 +40,7 @@ test("编辑保留变量原文，预览替换 value，导出只给变量列表�
     variables: [storeVariable, userVariable],
   });
   assert.match(preview, /店铺名称/);
-  assert.doesNotMatch(preview, /\{\{  store_name \}\}/);
+  assert.doesNotMatch(preview, /\{\{ {2}store_name \}\}/);
 
   assert.equal(
     renderTemplatePreview("{{ user.name }}", variablesToTemplateData([userVariable])),

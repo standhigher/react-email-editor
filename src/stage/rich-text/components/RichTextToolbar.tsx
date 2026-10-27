@@ -61,7 +61,7 @@ export function RichTextToolbar({
       ownerDocument.removeEventListener("pointerdown", onPointerDown, true);
       ownerDocument.removeEventListener("keydown", onKeyDown);
     };
-  }, [menu]);
+  }, [menu, rootRef]);
 
   if (!state) return null;
 

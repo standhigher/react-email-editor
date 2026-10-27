@@ -10,7 +10,7 @@ export function createBlockNode(
   const definition = getBlockDefinition(type, definitions);
   if (!definition) return null;
 
-  const fields: Record<string, unknown> = { ...(definition.defaultFields ?? {}) };
+  const fields: Record<string, unknown> = { ...definition.defaultFields };
   for (const field of definition.fields ?? []) {
     if (!(field.name in fields) && field.defaultValue !== undefined) {
       fields[field.name] = field.defaultValue;

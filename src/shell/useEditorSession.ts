@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { EMPTY_BLOCK_DEFINITIONS, EMPTY_VARIABLES } from "./constants";
 import { SUBJECT_MAX_LENGTH } from "../constants/editor";
 import { createBlockNode } from "../document/create-block";
@@ -55,9 +55,11 @@ export function useEditorSession({
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const documentRef = useRef(document);
-  documentRef.current = document;
   const globalPropRef = useRef(global);
-  globalPropRef.current = global;
+  useLayoutEffect(() => {
+    documentRef.current = document;
+    globalPropRef.current = global;
+  }, [document, global]);
 
   const commit = useCallback(
     (next: EmailDocument) => {

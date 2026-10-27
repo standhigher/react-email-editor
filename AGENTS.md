@@ -144,9 +144,9 @@ node --test tests/*.test.mjs tests/*.test.ts
 
 验证要求：
 
-- 当前工程缺口：`package.json` 声明了 `lint: eslint src`，但没有声明 ESLint 开发依赖，也未提供 ESLint 配置；干净环境下 lint 不能保证运行。遇到 `eslint: command not found` 等环境失败必须报告原因，并继续执行可用检查，不得标记为全部通过。不得依赖全局 ESLint或使用临时下载掩盖问题；在工程化任务中补齐仓库内依赖与配置后再更新本说明。
+- Oxlint 使用仓库内开发依赖及 `.oxlintrc.json`，启用 TypeScript、Unicorn、Oxc、React 内置 Rust 插件的 correctness 规则，并显式检查 `typescript/no-explicit-any` 和 `react/rules-of-hooks`；React 检查包括 Hook 依赖、ref 和 effect，不代表完整覆盖官方 React Compiler 插件的所有规则。JavaScript 启用 `no-undef`，TypeScript 文件的未定义标识符及组件 Props 交由 `pnpm typecheck` 检查。`pnpm lint` 检查源码、playground、脚本、配置及测试，任何 warning 和无效的禁用指令都视为失败；`pnpm lint:fix` 仅应用安全自动修复，不替代人工 review。构建产物和本地 pnpm store 不参与检查，不依赖全局工具或临时下载；有意忽略的诊断使用 `oxlint-disable-next-line` 并说明原因。
 - 文档-only 修改检查路径、命令、规则与源码是否一致，并运行 `git diff --check`；无需为纯文档改动添加实现测试或启动浏览器。
-- TypeScript、公共 API、文档模型或渲染逻辑变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build` 和相关 Node 测试；lint 暂不可用时按上述工程缺口报告。
+- TypeScript、公共 API、文档模型或渲染逻辑变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build` 和相关 Node 测试；检查因环境问题不可用时报告实际原因，并继续执行其他可用检查。
 - `pnpm typecheck` 同时检查 `src/` 和 `playground/`。UI/CSS/字段交互变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build`。有消费方页面时复用该服务；否则用 `pnpm dev` 打开 playground，在浏览器里核对 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景。
 - `tests/*.test.mjs` 依赖构建后的 `dist/index.js` 和 `dist/styles.css`，必须先构建再运行；不要只测试 `src` 的假入口。`tests/*.test.ts` 覆盖未从包入口导出的内部模块，由 Node 类型剥离直接执行，需要 Node 22.18 或更新版本。
 - 只运行了部分检查时，最终报告必须明确列出实际运行的命令和结果；不能把未运行的检查写成已通过。

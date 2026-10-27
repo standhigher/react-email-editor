@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useEffect, useState, type KeyboardEvent } from "react";
+import { forwardRef, useState, type KeyboardEvent } from "react";
 import { EditorDnd } from "../editor-dnd/EditorDnd";
 import { BlockLibrary } from "../block-library/BlockLibrary";
 import { Inspector, type InspectorPanel } from "../inspector/Inspector";
@@ -39,9 +39,11 @@ export const EmailEditorShell = forwardRef<EmailEditorHandle, EmailEditorProps>(
     const [device, setDevice] = useState<EditorDevice>("desktop");
     const [inspectorPanel, setInspectorPanel] = useState<InspectorPanel>("global");
 
-    useEffect(() => {
+    const [previousSelectedId, setPreviousSelectedId] = useState(session.selectedId);
+    if (previousSelectedId !== session.selectedId) {
+      setPreviousSelectedId(session.selectedId);
       if (!session.selectedId) setInspectorPanel("global");
-    }, [session.selectedId]);
+    }
 
     const selectBlock = (id: string | null) => {
       const hadSelection = session.selectedId !== null;

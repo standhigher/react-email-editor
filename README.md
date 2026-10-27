@@ -61,6 +61,10 @@ Open [http://localhost:5173](http://localhost:5173). The playground loads `src/`
 | `pnpm build` | Generate ESM, type declarations, and CSS in `dist/`. |
 | `pnpm build:watch` | Rebuild `dist/` when files in `src/` change; does not start a preview server. |
 | `pnpm typecheck` | Type-check the library and playground. |
+| `pnpm lint` | Check source, playground, scripts, configuration, and tests with Oxlint; warnings and unused disable directives fail the check. |
+| `pnpm lint:fix` | Apply safe Oxlint automatic fixes. |
+
+Oxlint uses `.oxlintrc.json` with native TypeScript, Unicorn, Oxc, and React correctness rules, plus explicit checks for `any` and Hook call order. React checks include Hook dependencies, refs, and effects; they do not cover every rule in the official React Compiler plugin. JavaScript uses `no-undef`; `pnpm typecheck` checks undefined TypeScript identifiers and component props. Generated output and the local pnpm store are excluded.
 
 To integrate with another local project, set its dependency to the library's root directory, adjusting the relative path as needed:
 

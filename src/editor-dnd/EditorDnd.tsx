@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -42,7 +42,9 @@ export function EditorDnd({
   children,
 }: EditorDndProps) {
   const blocksRef = useRef(blocks);
-  blocksRef.current = blocks;
+  useLayoutEffect(() => {
+    blocksRef.current = blocks;
+  }, [blocks]);
   const [activeDrag, setActiveDrag] = useState<BlockDragData | null>(null);
   const [indicator, setIndicator] = useState<DropTarget | null>(null);
 
