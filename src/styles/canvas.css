@@ -76,6 +76,9 @@
 .ree-email-viewport {
   box-sizing: border-box;
   flex: 1 0 auto;
+}
+
+.ree-canvas .ree-email-viewport {
   background: rgb(246, 246, 247);
   box-shadow: var(--ree-shadow-md);
 }
