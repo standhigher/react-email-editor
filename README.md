@@ -1,157 +1,68 @@
 # @standhigher/react-email-editor
 
-JSON-driven React email template editor. Zero UI framework, CSS-variable themed
-(`ree-` prefix). Shell plus three panels: blocks / canvas or preview / inspector.
+English | [简体中文](./README.zh-CN.md)
 
-- Drag & drop: `@dnd-kit`
-- Inline rich text: TipTap
-- Output: JSON (single source of truth) + HTML (deliverable), read through the
-  `EmailEditor` ref
-- Render contract: dual-mode `render(ctx)` — `canvas` (static demo) vs `email`
-  (Go template directives like `{{range}}` / `{{.customer_name}}`)
+A React email editor with drag-and-drop blocks, inline rich text, and desktop/mobile previews. Store content as JSON and export email HTML through a component ref.
 
-## Status
+## Installation and integration
 
-Document is the single source of truth. The shell owns subject, personalization,
-and reset. The center column switches between canvas editing and Go-template
-preview; desktop and mobile icons only change the canvas width.
+Requires React 18 and React DOM 18. The package provides an ESM entry and TypeScript declarations.
 
-## 外部读取数据
+```bash
+pnpm add @standhigher/react-email-editor
+```
 
-编辑器不提供 Save Action。集成方通过 `ref` 主动读取当前数据，自行决定如何保存：
+Import the stylesheet once in your application. This example renders an empty editor and reads its current data:
 
 ```tsx
 import { useRef } from "react";
-import { EmailEditor, type EmailEditorHandle } from "@standhigher/react-email-editor";
+import {
+  EmailEditor,
+  type EmailEditorHandle,
+} from "@standhigher/react-email-editor";
 import "@standhigher/react-email-editor/styles.css";
 
 export function EmailPage() {
   const editorRef = useRef<EmailEditorHandle>(null);
 
-  const readData = () => {
+  function readData() {
     const data = editorRef.current?.getData();
-    // data.document / data.json / data.html，可交给集成方的保存逻辑。
-  };
+    if (!data) return;
+    // Pass data.document, data.json, data.html, or data.renderedHtml
+    // to your application's save or export handler.
+    console.log(data);
+  }
 
   return (
     <>
       <EmailEditor ref={editorRef} height={720} />
-      <button type="button" onClick={readData}>获取数据</button>
+      <button type="button" onClick={readData}>Read data</button>
     </>
   );
 }
 ```
 
-也可分别调用 `getDocument()`、`getJson()`、`getHtml()`。返回的文档是独立快照，
-修改快照不会改变编辑器状态。`onChange` 仍可用于订阅内容变化。
+Saving is handled by your application. In Next.js App Router, put this integration in a Client Component with `"use client"`. When using `height="100%"`, give its parent a definite height.
 
-HTML 区块可以通过节点上的 `defaultData` 提供模板渲染数据。编辑区和预览区都会
-直接展示渲染后的 HTML；保存的 `fields.html` 以及 `getHtml()` 返回的邮件模板保持原样。
-全局变量通过 `variables` 传入，变量上的 `value` 参与预览渲染；区块级 `defaultData`
-优先覆盖同名全局变量。
+## Local development
 
-```tsx
-import { BLOCK_TYPES, createEmailDocument } from "@standhigher/react-email-editor";
-
-const initialDocument = createEmailDocument([{
-    id: "products",
-    type: BLOCK_TYPES.html,
-    defaultData: {
-      has_products: true,
-      products: [{ name: "示例商品", price: "¥99" }],
-    },
-    fields: {
-      html: "{{if .has_products}}{{range .products}}<p>{{.name}} {{.price}}</p>{{end}}{{else}}<p>暂无商品</p>{{end}}",
-    },
-  }]);
-```
-
-```tsx
-<EmailEditor
-  variables={[{ name: "customer_name", label: "客户名称", value: "张三" }]}
-/>
-```
-
-`getHtml()` 返回包含 Go template 变量的原始邮件模板；
-`getRenderedHtml()` 和 Preview 会展开每个区块渲染结果中的 Go template，
-数据来自全局 `variables` 与该区块的 `defaultData`。自定义区块在 `email`
-模式输出的模板同样适用。
-
-`initialDocument` 仅用于首次初始化；Reset 恢复该初始快照。切换另一份文档时，
-请通过 React `key` 创建新的编辑会话。Edit / Preview 切换只改变显示状态，
-保留富文本编辑器实例和撤销历史。Heading / Text 默认包含 `16px` padding。
-
-## 样式配置
-
-开发阶段直接使用新的文档结构，不迁移旧版区块字段。建议通过
-`createEmailDocument()` 和 `createBlockNode()` 创建文档与区块。内置区块类型使用
-`BLOCK_TYPES`，文档版本是 `DOCUMENT_VERSION`。全局和区块样式里的封闭取值使用
-`TEXT_ALIGNS`、`HORIZONTAL_ALIGNS`、`FONT_WEIGHTS`、`BORDER_STYLES`、
-`LINK_DECORATIONS` 和 `FONT_FAMILIES`。`EmailBlockNode.type` 仍是字符串，自定义区块不受这些常量限制。
-
-- `global.contentWidth` 是邮件内容外框宽度，默认 `600px`。邮件内容表同时写像素 `width` 和 `max-width`，Outlook 能认出宽度，窄屏仍可收缩。桌面画布与 Preview 跟随配置，移动视口为 `360px`。
-- `global.contentPadding` 默认四边 `0px`，`outerPadding` 默认 `0px`，`blockGap` 默认 `4px`，均可在 GLOBAL 面板修改或清零。
-- Global 同时管理内外背景、内容边框/圆角，以及字体、字号、行高、段落/列表间距、列表缩进、链接颜色和装饰。段落间距只加在相邻顶层段落之间，写在后一段的 `margin` 缩写上；列表项里的段落不加这段间距。圆角接受一个长度，或按左上、右上、右下、左下排列的四个长度。四角相同输出 `border-radius`，四角不同输出四个长属性。
-- 所有区块通过 `style.dimension` 配置 padding、四边外侧留白和可选的 `height`（px），通过 `style.decorations` 配置容器背景、边框和圆角。外侧留白在邮件中使用表格单元格 padding 实现，避免 margin 折叠。设置高度时，内层单元格同时写 `height` 属性和 `height` 样式，`box-sizing` 为 `border-box`，并顶对齐。这段高度包含 padding，作为最小高度；画布用同样的 `min-height`。未设置或 `0` 时不输出。按钮、图片的 `element.height` 仍是元素自身高度。区块圆角和全局圆角使用同一套取值和输出规则，元素圆角也走这套输出。
-- 富文本里每一段可以单独设置与上一段的间距和行高。未设置时，段落间距只加在相邻顶层段落之间；列表项里的段落不加。顶层段落写了自己的段前距时，第一段和列表后面的段也会使用它，并替换该段已有的 margin。行高写在 `<p>` 上。
-- 自定义区块经 `getBlockDefinition()` 合并容器字段，检查器读取这份结果。合并顺序固定为 Padding、Outer spacing、Block height、Background、边框宽度、边框样式、边框颜色、圆角。调用方声明了相同 `id` 时，用调用方的标签、控件和默认值占住该槽位；其余字段按原顺序排在这些容器字段后面。`exactStyleFields: true` 时只保留传入的 `styleFields`。这个开关只决定检查器展示哪些字段，邮件包裹层仍会应用区块 `style` 上已有的间距和装饰。区块定义上的原始 `styleFields` 保持调用方写入的内容。
-- `createDimensionFields()`、`createDecorationFields()`、`createTypographyFields()` 每次返回独立副本，例如 `createDimensionFields().padding`。要改 `id`、标签或默认值时，按字段名传入覆盖项。`resolveBlockStyleFields()` 返回同一套合并规则下的副本。
-- Heading、Text 和 HTML 使用 `style.typography` 覆盖全局排版；点击 Inherit Global 清除覆盖。Text 默认继承全局字号与行高。
-- Button、Image、Divider 使用 `style.element` 配置元素自身尺寸、对齐、边框等；按钮还支持独立字体、文字色、背景和内边距。
-- HTML 区块保留手写 HTML 的显式 inline style。段落、列表和链接的默认排版内联在标签上，并让位于作者已有的 style。完整文档 head 中的 style 会合并进邮件 head。
-
-```tsx
-import { createDecorationFields, createDimensionFields } from "@standhigher/react-email-editor";
-
-const styleFields = [
-  createDimensionFields().padding,
-  createDecorationFields().backgroundColor,
-  createDecorationFields().borderRadius,
-  createDimensionFields({
-    padding: { id: "element.padding", label: "Card padding", defaultValue: "16px" },
-  }).padding,
-];
-```
-
-编辑器工作区的留白、空画布拖入提示、选中边框和工具栏是编辑辅助界面，不进入邮件输出。
-配置在画布、Preview 与 `documentToHtml()` 中共用渲染规则。
-
-## Development
+Use pnpm and a current Node.js LTS release; Node.js 22.18+ is recommended for the repository's tooling and TypeScript tests.
 
 ```bash
-pnpm install
-pnpm dev
-pnpm typecheck
-pnpm build
-node --test tests/styles.test.mjs
-```
-
-## 本地预览
-
-`playground/` 只在本仓库里查看编辑器，不进入发布包，也不参与 `tsup` 构建。`pnpm dev` 用 Vite 直接加载 `src/`，改源码会热更新，不必先执行 `pnpm build`。
-
-```bash
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-浏览器打开 `http://localhost:5173`。页面是铺满视口的 `EmailEditor`，初始文档包含标题、正文和一个带 `defaultData` 的 HTML 区块，并传入全局变量 `customer_name`。发包和消费方 link 联调仍使用下面的 `pnpm build` / `pnpm build:watch`。
+Open [http://localhost:5173](http://localhost:5173). The playground loads `src/` directly with hot reload; no initial build is needed. It is not included in the published package. Reuse an existing development server when one is already running.
 
-## 构建与本地 link 联调
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start the local playground on port 5173. |
+| `pnpm build` | Generate ESM, type declarations, and CSS in `dist/`. |
+| `pnpm build:watch` | Rebuild `dist/` when files in `src/` change; does not start a preview server. |
+| `pnpm typecheck` | Type-check the library and playground. |
 
-构建产物位于 `dist/`，包含 ESM、TypeScript declaration、source map 和
-`styles.css`：
-
-```bash
-pnpm build
-```
-
-开发组件库时可以持续监听并重新生成 `dist/`：
-
-```bash
-pnpm build:watch
-```
-
-在另一个本地项目中使用构建后的包，可以直接配置 pnpm 的目录链接：
+To integrate with another local project, set its dependency to the library's root directory, adjusting the relative path as needed:
 
 ```json
 {
@@ -161,60 +72,174 @@ pnpm build:watch
 }
 ```
 
-然后执行：
+Run `pnpm build` in this repository first, then keep `pnpm build:watch` running during development. In the consuming project, run `pnpm install` and use its development server. Package imports, including CSS, resolve to `dist/`.
 
-```bash
-# 组件库目录
-pnpm install
-pnpm build:watch
+Both projects must resolve the same React instance. For Vite consumers, use `resolve.dedupe: ["react", "react-dom"]` if needed. Next.js consumers can use `transpilePackages: ["@standhigher/react-email-editor"]`; when an external link is used with Turbopack, `turbopack.root` must include both projects.
 
-# 消费方项目目录（另一个终端）
-pnpm install
-pnpm dev
+## Component props
+
+All props are optional. Types are exported from `@standhigher/react-email-editor`.
+
+| Prop | Type | Default / behavior |
+| --- | --- | --- |
+| `initialDocument` | `EmailDocument` | Empty document. Read only on the first mount. |
+| `global` | `Partial<EmailGlobalSettings>` | No external overrides. Supplied fields override the initial document's global settings; later updates merge into the current document. |
+| `blocks` | `BlockDefinition[]` | `[]`. Adds custom block types; matching types replace built-in definitions. Other built-in blocks remain available. |
+| `variables` | `Variable[]` | `[]`. Variables available for insertion and preview substitution. |
+| `height` | `number \| string` | `"100%"`. A number is interpreted as pixels; a string is a CSS height. |
+| `onChange` | `(document: EmailDocument) => void` | Called when the document changes, including edits, reset, and external global updates that change its values. |
+| `onGlobalChange` | `(global: EmailGlobalSettings) => void` | Called when global settings are edited in the editor. External `global` updates and reset do not call it. |
+
+Reset restores the initial document snapshot and reapplies the current `global` overrides. To load a different document, remount with a new React `key`, for example `<EmailEditor key={documentId} initialDocument={document} />`. Changing `initialDocument` alone does not replace the open document. Omitting a previously supplied `global` field does not restore its default.
+
+## Configuration
+
+### Document
+
+Use `createEmailDocument()` and `createBlockNode()` to populate defaults:
+
+```tsx
+import {
+  BLOCK_TYPES,
+  EmailEditor,
+  createBlockNode,
+  createEmailDocument,
+  type Variable,
+} from "@standhigher/react-email-editor";
+
+const text = createBlockNode(BLOCK_TYPES.text);
+if (text) text.fields.html = "<p>Hello {{  store_name }}</p>";
+
+export const initialDocument = createEmailDocument(text ? [text] : []);
+initialDocument.subject = "Welcome";
+
+const variables: Variable[] = [
+  { name: "{{  store_name }}", description: "Store name", value: "Demo Store" },
+];
+
+export function TemplateEmailPage() {
+  return (
+    <EmailEditor
+      initialDocument={initialDocument}
+      variables={variables}
+      height={720}
+    />
+  );
+}
 ```
 
-也可以使用 pnpm 的全局链接：
+Pass both `initialDocument` and `variables` as shown so the token has a preview value and can gain its missing dot on export. `createBlockNode()` returns `null` for an unknown block type. Built-in types are `heading`, `text`, `button`, `image`, `divider`, `spacer`, and `html`, also available through `BLOCK_TYPES`.
 
-```bash
-# 组件库目录
-pnpm build
-pnpm link --global
+| Document field | Type | Description |
+| --- | --- | --- |
+| `version` | `typeof DOCUMENT_VERSION` | Current version: `1`. Set by `createEmailDocument()`. |
+| `subject` | `string` (optional) | Email subject. The editor input is limited to 128 characters. |
+| `global` | `EmailGlobalSettings` | Global email appearance; defaults are populated by the helper. |
+| `blocks` | `EmailBlockNode[]` | Ordered nodes, each with a unique `id`, a `type`, and `fields`, plus optional `style` and preview `defaultData`. |
 
-# 消费方项目目录
-pnpm link --global @standhigher/react-email-editor
+The document format is under development; older block fields are not migrated automatically. See the [document types](./src/types/document.ts) for the full model.
+
+### Global styles
+
+Pass partial settings through `global`, for example `<EmailEditor global={{ contentWidth: 640, outerPadding: "24px" }} />`. `DEFAULT_EMAIL_GLOBAL` exposes all defaults; `resolveEmailGlobal()` fills missing values and normalizes input.
+
+These settings control email content. Editor selection outlines and toolbars are not included in exported HTML.
+
+| Parameter | Type / values | Default | Description |
+| --- | --- | --- | --- |
+| `contentWidth` | `number` | `600` | Content width in pixels, rounded and clamped to 320–900. |
+| `contentAlign` | `"left" \| "center" \| "right"` | `"center"` | Horizontal position of the content. |
+| `backgroundColor` | `string` | `"#ffffff"` | Outer email background. |
+| `contentBackgroundColor` | `string` | `"#ffffff"` | Content background. |
+| `contentPadding` | `string` | `"0px"` | Content inner spacing. |
+| `outerPadding` | `string` | `"0px"` | Spacing outside the content. |
+| `blockGap` | `string` | `"4px"` | Gap between blocks. |
+| `textColor` | `string` | `"#000000"` | Default text color. |
+| `textAlign` | `"left" \| "center" \| "right" \| "justify"` | `"left"` | Default text alignment. |
+| `fontFamily` | `string` | `"Arial, Helvetica, sans-serif"` | Default font stack. |
+| `fontWeight` | `"normal" \| "bold"` | `"normal"` | Default font weight. |
+| `defaultFontSize` | `string` | `"16px"` | Default font size. |
+| `defaultLineHeight` | `string` | `"1.5"` | Default line height. |
+| `paragraphSpacing` | `string` | `"6px"` | Gap between adjacent top-level paragraphs. |
+| `listSpacing` | `string` | `"4px"` | Top and bottom margins of the entire list (`ul` / `ol`). |
+| `listIndent` | `string` | `"22px"` | List indentation. |
+| `linkColor` | `string` | `"#005bd3"` | Default link color. |
+| `linkDecoration` | `"underline" \| "none"` | `"underline"` | Default link decoration. |
+| `borderWidth` | `string` | `"0px"` | Content border width. |
+| `borderStyle` | `"none" \| "solid" \| "dashed" \| "dotted"` | `"solid"` | Content border style. |
+| `borderColor` | `string` | `"#000000"` | Content border color. |
+| `borderRadius` | `string` | `"0px"` | One radius or four, ordered top-left, top-right, bottom-right, bottom-left. |
+
+Use CSS length strings such as `"16px"` for spacing and sizes. Padding accepts shorthand such as `"12px 24px"`; line height also accepts a unitless value. Desktop canvas and preview follow `contentWidth`; mobile uses a 360px viewport.
+
+Global spacing and length settings accept non-negative values in `px`, `em`, `rem`, or `%`; unitless lengths are normalized to px, except for line height. Unsupported values such as negative lengths, `calc()`, `var()`, `vh`, or `vw` fall back to the corresponding global default.
+
+### Variables and template data
+
+```tsx
+import type { Variable } from "@standhigher/react-email-editor";
+
+export const variables: Variable[] = [
+  { name: "{{  store_name }}", description: "Store name", value: "Demo Store" },
+];
 ```
 
-`package.json` 的 `exports` 已指向 `dist`，因此无论使用目录链接还是全局链接，
-都需要先执行一次 `pnpm build`；持续开发时使用 `pnpm build:watch`。
+Pass this array through `variables` on `EmailEditor`.
 
-链接目标是包含 `package.json` 的组件库根目录，不是 `dist/` 目录本身。
-JS、类型声明和 CSS 都通过包入口从 `dist/` 读取。监听命令会处理 `src/` 下的
-TypeScript、TSX 和 CSS 改动；它不会启动预览服务。在本仓库查看编辑器使用 `pnpm dev`；接到消费方时，页面仍由消费方的开发服务提供。
-已有服务正在运行时直接复用；消费方是否自动刷新取决于其对链接目录的监听配置。
+| Field | Type | Description |
+| --- | --- | --- |
+| `name` | `string` | Required. Token displayed and inserted as written, including spaces. Example: `{{  store_name }}`. |
+| `description` | `string` (optional) | Secondary text in the variable menu; omitted when empty or absent. |
+| `value` | `string` (optional) | Replacement text used in previews. |
 
-消费方需要安装 React 18 和 React DOM 18。构建产物不会内置 React、React DOM、
-TipTap、dnd-kit、CodeMirror 或 Lezer，这些依赖仍由包管理器解析。链接开发时应确保消费方和组件库使用
-同一个 React 实例，避免重复 React 导致的 `Invalid hook call`；Vite 可配置
-`resolve.dedupe: ["react", "react-dom"]`。
-Next.js 项目可保留 `transpilePackages: ["@standhigher/react-email-editor"]`；
-使用 Turbopack 且链接目录在项目外时，`turbopack.root` 应覆盖两者的共同父目录。
+Tokens may include a leading dot. Template HTML export preserves spaces and adds a missing dot only when the token exactly matches `variables[].name`, including spaces: `{{  store_name }}` becomes `{{  .store_name }}`. Other Go template actions are left unchanged. Export does not substitute preview values by default.
 
-目前同级 Shopify admin 项目使用 `link:../react-email-editor`。
-从原来的源码入口切换到此版本后，也需要先构建，并在开发时保持 `pnpm build:watch` 运行。
+Use a block node's `defaultData: Record<string, unknown>` for structured preview data, including arrays for `{{range .products}}`. Block data overrides variables with the same name. Preview resolution applies to every block's rendered HTML, including custom blocks. Write template expressions directly in an HTML block's `fields.html`; the preview renderer supports a subset of Go template syntax.
 
-## 打包与发布
+### Block configuration
 
-包目前提供 ESM 入口，不提供 CommonJS `require()` 入口。
-发布内容为 `dist/`、README 和许可证，不包含 `src/`。
+Block node styles are grouped by purpose:
 
-```bash
-# 生成可供其他项目安装验证的压缩包
-pnpm pack
+| Style group | Purpose |
+| --- | --- |
+| `style.dimension` | Container `padding`, outer spacing via `margin`, and optional `height` in px. Height acts as a minimum including padding. |
+| `style.decorations` | Container background, border, and corner radius. |
+| `style.typography` | Block text styles overriding global typography. |
+| `style.element` | Element-specific styles for buttons, images, and dividers, such as size and alignment. |
 
-# 在消费方安装上一步生成的压缩包（不是持续联调）
-pnpm add /absolute/path/to/standhigher-react-email-editor-0.1.0.tgz
+Heading and Text blocks start with `16px` padding. HTML blocks retain explicitly authored inline styles. See [EmailBlockStyle](./src/types/document.ts) for individual fields.
+
+To add a custom block, pass a stable `BlockDefinition[]` through `blocks`. `type`, `title`, and `render(ctx)` are required. Optional `fields` and `styleFields` configure the inspector; `defaultFields`, `defaultStyle`, and `defaultData` initialize new nodes. `render(ctx)` returns HTML and receives `mode: "canvas" | "email"`.
+
+```tsx
+import { EmailEditor, type BlockDefinition } from "@standhigher/react-email-editor";
+
+const customBlocks: BlockDefinition[] = [{
+  type: "notice",
+  title: "Notice",
+  defaultStyle: { dimension: { padding: "16px" } },
+  render: () => '<p style="margin:0;color:#555555;">Thanks for subscribing.</p>',
+}];
+
+export function CustomEmailPage() {
+  return <EmailEditor blocks={customBlocks} height={720} />;
+}
 ```
 
-`prepack` 会在 `pnpm pack` / `pnpm publish` 前自动运行构建，避免发布缺失或过期的
-`dist`。发布使用 `pnpm publish`；需要发布到 npm 公共 registry 时使用
-`pnpm publish --access public`。以上发布命令仅用于说明，开发和本地联调无需发布。
+By default, common container spacing and decoration controls are added to custom blocks. Set `exactStyleFields: true` to show only the supplied style fields; existing node styles still apply when rendering. Full definitions: [BlockDefinition, FieldConfig, and StyleFieldConfig](./src/types/block.ts).
+
+## Reading and exporting data
+
+Call these methods through `useRef<EmailEditorHandle>(null)`:
+
+| Method | Return type | Description |
+| --- | --- | --- |
+| `getData()` | `EmailEditorData` | Returns `{ document, json, html, renderedHtml }`. |
+| `getDocument()` | `EmailDocument` | Independent document snapshot for storage or later editing. |
+| `getJson()` | `string` | Formatted document JSON. |
+| `getHtml()` | `string` | Complete email HTML. Template actions stay in place; only tokens from `variables` gain a missing dot. |
+| `getRenderedHtml()` | `string` | Complete email HTML with templates resolved using variables and block preview data. |
+
+Mutating a returned document snapshot does not change the editor. Use `onChange` to subscribe to document changes.
+
+For rendering without mounting the editor, use `documentToHtml(document, definitions?, options?)`. Definitions default to `DEFAULT_BLOCKS`; include custom definitions when the document uses them. `options` accepts `resolveHtmlTemplates` (default `false`), `variables`, and `templateData`. When templates stay unresolved, `variables` supplies the only tokens that gain a missing dot. When resolving, data precedence is block `defaultData` over `templateData` over `variables`.
