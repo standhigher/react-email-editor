@@ -1,8 +1,10 @@
+import type { Mark } from "@tiptap/pm/model";
 import type { FontWeight, TextAlign } from "../../constants/style-values";
 
 export interface EditorTextRange {
-  from: number;
-  to: number;
+  anchor: number;
+  head: number;
+  storedMarks: readonly Mark[] | null;
 }
 
 export type RichTextMenu = "font" | "size" | "emoji" | "color" | "link" | "variable" | "spacing" | "lineHeight";

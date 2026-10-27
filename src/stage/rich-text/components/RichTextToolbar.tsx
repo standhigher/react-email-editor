@@ -5,13 +5,8 @@ import type { Variable } from "../../../types/block";
 import { FONT_SIZES, TEXT_ALIGNS, TEXT_COLORS } from "../constants";
 import type { EditorTextRange, RichTextInheritedStyle, RichTextMenu } from "../types";
 import { useAnchoredToolbar } from "../useAnchoredToolbar";
-import {
-  currentSelection,
-  focusSelection,
-  isVisuallyBold,
-  readToolbarState,
-  toggleVisualBold,
-} from "../utils";
+import { readToolbarState } from "../utils";
+import { currentSelection, focusSelection, formatText, isVisuallyBold, toggleVisualBold } from "../formatting";
 import { ColorMenu } from "./ColorMenu";
 import { EmojiMenu } from "./EmojiMenu";
 import { LinkPopover } from "./LinkPopover";
@@ -79,7 +74,7 @@ export function RichTextToolbar({
         setLinkUrl(state.linkHref || "https://");
         linkRange.current = range;
       }
-      if (next === "color" || next === "spacing" || next === "lineHeight") markRange.current = range;
+      if (next === "font" || next === "size" || next === "color" || next === "spacing" || next === "lineHeight") markRange.current = range;
     }
     setMenu((current) => (current === next ? null : next));
   };
@@ -89,7 +84,7 @@ export function RichTextToolbar({
     if (!href) return;
     const range = linkRange.current;
     const chain = focusSelection(editor, range);
-    if (range && range.from === range.to) {
+    if (range && range.anchor === range.head && !state.linkHref) {
       chain
         .insertContent({
           type: "text",
@@ -148,7 +143,7 @@ export function RichTextToolbar({
               className={`ree-rte-option${fontFamily === font.value ? " is-active" : ""}`}
               style={{ fontFamily: font.value }}
               onClick={() =>
-                run(() => editor.chain().focus().setFontFamily(font.value).run())
+                run(() => formatText(editor, (chain) => chain.setFontFamily(font.value), markRange.current))
               }
             >
               {font.label}
@@ -166,7 +161,7 @@ export function RichTextToolbar({
               key={size}
               type="button"
               className={`ree-rte-option${fontSize === size ? " is-active" : ""}`}
-              onClick={() => run(() => editor.chain().focus().setFontSize(size).run())}
+              onClick={() => run(() => formatText(editor, (chain) => chain.setFontSize(size), markRange.current))}
             >
               {size}
             </button>
@@ -183,21 +178,21 @@ export function RichTextToolbar({
         <ToolbarButton
           title="Italic"
           active={state.italic}
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={() => formatText(editor, (chain) => chain.toggleItalic())}
         >
           <span className="ree-tool-italic">I</span>
         </ToolbarButton>
         <ToolbarButton
           title="Underline"
           active={state.underline}
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
+          onClick={() => formatText(editor, (chain) => chain.toggleUnderline())}
         >
           <span className="ree-tool-underline">U</span>
         </ToolbarButton>
         <ToolbarButton
           title="Strikethrough"
           active={state.strike}
-          onClick={() => editor.chain().focus().toggleStrike().run()}
+          onClick={() => formatText(editor, (chain) => chain.toggleStrike())}
         >
           <span className="ree-tool-strike">S</span>
         </ToolbarButton>
@@ -222,7 +217,7 @@ export function RichTextToolbar({
             key={align.value}
             title={align.title}
             active={state.align === align.value}
-            onClick={() => editor.chain().focus().toggleTextAlign(align.value).run()}
+            onClick={() => formatText(editor, (chain) => chain.toggleTextAlign(align.value), null, "paragraph")}
           >
             <ToolbarIcon name={align.icon} />
           </ToolbarButton>
@@ -236,28 +231,28 @@ export function RichTextToolbar({
           inheritedLineHeight={inherited.lineHeight}
           onToggle={toggleMenu}
           onSpacing={(value) => {
-            const chain = focusSelection(editor, markRange.current);
-            if (value) chain.updateAttributes("paragraph", { spacing: value }).run();
-            else chain.resetAttributes("paragraph", "spacing").run();
+            formatText(editor, (chain) => value
+              ? chain.updateAttributes("paragraph", { spacing: value })
+              : chain.resetAttributes("paragraph", "spacing"), markRange.current, "paragraph");
           }}
           onLineHeight={(value) => {
-            const chain = focusSelection(editor, markRange.current);
-            if (value) chain.updateAttributes("paragraph", { lineHeight: value }).run();
-            else chain.resetAttributes("paragraph", "lineHeight").run();
+            formatText(editor, (chain) => value
+              ? chain.updateAttributes("paragraph", { lineHeight: value })
+              : chain.resetAttributes("paragraph", "lineHeight"), markRange.current, "paragraph");
           }}
         />
         <span className="ree-rte-sep" />
         <ToolbarButton
           title="Bulleted list"
           active={state.bulletList}
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          onClick={() => formatText(editor, (chain) => chain.toggleBulletList(), null, "paragraph")}
         >
           <ToolbarIcon name="list-bullet" />
         </ToolbarButton>
         <ToolbarButton
           title="Numbered list"
           active={state.orderedList}
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          onClick={() => formatText(editor, (chain) => chain.toggleOrderedList(), null, "paragraph")}
         >
           <ToolbarIcon name="list-ordered" />
         </ToolbarButton>
@@ -279,10 +274,10 @@ export function RichTextToolbar({
             value={state.color}
             fallback={inherited.color}
             onSelect={(color) =>
-              run(() => focusSelection(editor, markRange.current).setColor(color).run())
+              run(() => formatText(editor, (chain) => chain.setColor(color), markRange.current))
             }
             onClear={() =>
-              run(() => focusSelection(editor, markRange.current).unsetColor().run())
+              run(() => formatText(editor, (chain) => chain.unsetColor(), markRange.current))
             }
           />
         </ToolbarMenu>

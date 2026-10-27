@@ -211,6 +211,8 @@ export const variables: Variable[] = [
 | `style.typography` | 区块文字样式，覆盖全局排版设置。 |
 | `style.element` | 按钮、图片和分割线等元素自身的样式，例如尺寸和对齐。 |
 
+Heading 和 Text 共用富文本工具栏管理字体、字号、粗细、文字颜色、对齐、行高和段间距，BLOCK 检查器不再重复显示这些配置。未选中文字时，格式操作作用于当前整个区块；选中部分文字时，只修改对应文字或段落。格式操作后恢复原光标或选区。Emoji、变量和链接保留光标插入或选区操作；光标位于链接内时编辑该链接。字号沿用 12–48px 预设，已有文档中的其他字号保持原样。BLOCK 检查器保留列表间距、列表缩进、链接外观和容器样式。GLOBAL 默认排版及已有 `style.typography` 的渲染支持保持不变。
+
 Heading 和 Text 默认包含 `16px` 内边距。HTML 区块保留作者显式编写的内联样式。各字段见 [EmailBlockStyle](./src/types/document.ts)。
 
 通过 `blocks` 传入稳定的 `BlockDefinition[]` 添加自定义区块。必填项为 `type`、`title` 和 `render(ctx)`；可选的 `fields`、`styleFields` 配置检查器，`defaultFields`、`defaultStyle`、`defaultData` 设置新建节点的初始值。`render(ctx)` 返回 HTML 字符串，接收 `mode: "canvas" | "email"`。

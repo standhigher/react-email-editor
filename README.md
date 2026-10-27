@@ -211,6 +211,8 @@ Block node styles are grouped by purpose:
 | `style.typography` | Block text styles overriding global typography. |
 | `style.element` | Element-specific styles for buttons, images, and dividers, such as size and alignment. |
 
+Heading and Text share the rich text toolbar for font family, size, weight, text color, alignment, line height, and paragraph spacing; these controls are omitted from the BLOCK inspector. With no text selected, formatting applies to the entire current block; with a selection, it applies to the selected text or paragraphs. The original caret or selection is restored after formatting. Emoji, variables, and links keep their insertion/selection behavior; a caret inside a link edits that link. Font size choices use the existing 12–48px presets; existing document sizes are preserved. The BLOCK inspector retains list spacing, list indentation, link appearance, and container styles. GLOBAL typography and existing `style.typography` rendering remain supported.
+
 Heading and Text blocks start with `16px` padding. HTML blocks retain explicitly authored inline styles. See [EmailBlockStyle](./src/types/document.ts) for individual fields.
 
 To add a custom block, pass a stable `BlockDefinition[]` through `blocks`. `type`, `title`, and `render(ctx)` are required. Optional `fields` and `styleFields` configure the inspector; `defaultFields`, `defaultStyle`, and `defaultData` initialize new nodes. `render(ctx)` returns HTML and receives `mode: "canvas" | "email"`.

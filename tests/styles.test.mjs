@@ -254,3 +254,16 @@ test('构建产物包含展开后的画布、滑动条和配置控件 CSS', asyn
   assert.doesNotMatch(css, /p:has\(\+ p\)/);
   assert.match(css, /#303030 var\(--ree-range-progress\), #e3e3e5/);
 });
+
+test('Text 和 Heading 移除重复排版入口，但保留旧文档排版渲染', () => {
+  for (const type of ['text', 'heading']) {
+    const definition = getBlockDefinition(type);
+    const typographyIds = definition.styleFields.filter((field) => field.group === 'typography').map((field) => field.id);
+    assert.deepEqual(typographyIds, ['typography.listSpacing', 'typography.listIndent', 'typography.linkColor', 'typography.linkDecoration']);
+    const block = createBlockNode(type);
+    block.fields.html = '<p>Legacy</p>';
+    block.style.typography = { fontFamily: 'Georgia, serif', fontSize: '10px', fontWeight: 'bold', color: '#123456', textAlign: 'right', lineHeight: '1.8' };
+    const html = renderBlock(block, DEFAULT_BLOCKS, 'email', resolveEmailGlobal());
+    for (const css of ['font-family:Georgia, serif', 'font-size:10px', 'font-weight:bold', 'color:#123456', 'text-align:right', 'line-height:1.8']) assert.ok(html.includes(css), css);
+  }
+});
