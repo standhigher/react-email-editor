@@ -148,7 +148,7 @@ pnpm build
 node --test tests/*.test.mjs tests/*.test.ts
 ```
 
-`pnpm check` 按上述顺序执行完整校验；`pnpm test` 只执行 Node 测试，运行前需要已有构建产物。`prepack` 构建发布产物，`prepublishOnly` 执行完整校验。npm 发布及 Trusted Publishing 配置见 `docs/release.zh-CN.md`；GitHub 发布工作流只接受与包版本匹配的版本标签，并由手动触发执行。
+`pnpm check` 按上述顺序执行完整校验；`pnpm test` 只执行 Node 测试，运行前需要已有构建产物。`prepack` 构建发布产物，`prepublishOnly` 执行完整校验。npm 使用本地手动发布，流程见 `docs/release.zh-CN.md`。
 
 验证要求：
 
