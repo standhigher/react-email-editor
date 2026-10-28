@@ -1,12 +1,10 @@
-import { useId, useState, type SyntheticEvent } from "react";
+import { useId, useMemo, useState, type SyntheticEvent } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { buildRenderContext } from "../../render/context";
-import { mergeTemplateData, renderBlockContent } from "../../render/block-html";
 import { cssSpacing } from "../../utils/css-values";
 import { resolveBlockStyle } from "../../document/block-style";
-import { InlineCanvas } from "./components/InlineCanvas";
-import { HtmlCanvas } from "./components/HtmlCanvas";
+import { PluginCanvasContent } from "./components/PluginCanvasContent";
+import { BlockErrorBoundary } from "../../plugins/components/BlockErrorBoundary";
 import { BlockActions } from "./components/BlockActions";
 import { canvasBlockStyle } from "./block-style";
 import type { DropEdge } from "../../editor-dnd/drop-target";
@@ -22,7 +20,9 @@ interface CanvasBlockProps {
   dropEdge: DropEdge | null;
   variables: Variable[];
   onSelect: () => void;
-  onCommitField: (id: string, name: string, value: unknown) => void;
+  onCommitControl: (id: string, name: string, value: unknown) => void;
+  onCommitControls: (id: string, patch: Record<string, unknown>) => void;
+  onCommitStyle: (id: string, name: string, value: string) => void;
   onDuplicate: () => void;
   onRemove: () => void;
 }
@@ -35,11 +35,13 @@ export function CanvasBlock({
   dropEdge,
   variables,
   onSelect,
-  onCommitField,
+  onCommitControl,
+  onCommitControls,
+  onCommitStyle,
   onDuplicate,
   onRemove,
 }: CanvasBlockProps) {
-  const block = { ...sourceBlock, style: resolveBlockStyle(sourceBlock.style, definition) };
+  const block = useMemo(() => ({ ...sourceBlock, style: resolveBlockStyle(sourceBlock.style, definition) }), [sourceBlock, definition]);
   const toolbarId = useId();
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const dragData: CanvasDragData = { kind: "canvas" };
@@ -50,15 +52,6 @@ export function CanvasBlock({
     event?.stopPropagation();
     onSelect();
   };
-  const renderedHtml = definition
-    ? renderBlockContent(block, [definition], "canvas", {
-        resolveHtmlTemplate: block.type === "html",
-        templateData: mergeTemplateData(variables, block.defaultData),
-        body,
-      })
-    : "";
-  const usesTemplatePreview = block.type === "html";
-
   return (
     <div
       ref={setNodeRef}
@@ -99,7 +92,7 @@ export function CanvasBlock({
 
       {selected ? (
         <BlockActions
-          inlineEdit={Boolean(definition?.inlineEdit)}
+          inlineEdit={Boolean(definition?.controls?.some((control) => control.kind === "richText"))}
           toolbarId={toolbarId}
           toolbarCollapsed={toolbarCollapsed}
           onToggleToolbar={() => setToolbarCollapsed((collapsed) => !collapsed)}
@@ -109,36 +102,12 @@ export function CanvasBlock({
       ) : null}
 
       <div
-        className={`ree-block-content${definition?.inlineEdit ? " is-inline" : ""}`}
+        className={`ree-block-content${definition?.inlineControl ? " is-inline" : ""}`}
         style={canvasBlockStyle(block, body)}
       >
-        {definition?.inlineEdit ? (
-          <InlineCanvas
-            block={block}
-            body={body}
-            profile={definition.inlineEditProfile}
-            variables={variables}
-            selected={selected}
-            toolbarId={toolbarId}
-            toolbarCollapsed={toolbarCollapsed}
-            onSelect={onSelect}
-            onCommit={(html) => onCommitField(block.id, "html", html)}
-          />
-        ) : usesTemplatePreview ? (
-          <HtmlCanvas
-            html={renderedHtml}
-            onSelect={select}
-          />
-        ) : (
-          <div
-            className="ree-block-static"
-            dangerouslySetInnerHTML={{
-              __html: definition
-                ? definition.render(buildRenderContext(block, "canvas", body, definition))
-                : `<!-- ${block.type} -->`,
-            }}
-          />
-        )}
+        <BlockErrorBoundary identity={sourceBlock} resetKey={definition}>
+          <PluginCanvasContent block={block} body={body} definition={definition} variables={variables} selected={selected} toolbarId={toolbarId} toolbarCollapsed={toolbarCollapsed} select={onSelect} onCommitControl={onCommitControl} onCommitControls={onCommitControls} onCommitStyle={onCommitStyle} />
+        </BlockErrorBoundary>
       </div>
 
       {definition ? <span className="ree-block-badge">{definition.title}</span> : null}

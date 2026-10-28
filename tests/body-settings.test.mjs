@@ -4,11 +4,11 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import * as editor from '../dist/index.js';
 
-const { createBlockNode, createEmailDocument, resolveEmailBody, documentToHtml, DEFAULT_EMAIL_BODY, DEFAULT_BLOCKS, buildRenderContext } = editor;
+const { defineBlock, createBlockNode, createEmailDocument, resolveEmailBody, documentToHtml, DEFAULT_EMAIL_BODY, DEFAULT_BLOCKS, buildRenderContext } = editor;
 
 test('Body 文档只存主体配置，公开入口不再提供 Global API', () => {
   const doc = createEmailDocument();
-  assert.equal(doc.version, 3);
+  assert.equal(doc.version, 4);
   assert.deepEqual(Object.keys(doc).sort(), ['blocks', 'body', 'version']);
   assert.deepEqual(Object.keys(doc.body).sort(), [
     'textColor', 'backgroundColor', 'contentWidth', 'fontFamily', 'fontWeight', 'linkColor', 'linkDecoration',
@@ -65,7 +65,7 @@ test('画布和邮件主体使用一致的相对尺寸与基础排版', (t) => {
 
 test('Body 布局和外观进入邮件与预览，富文本显式格式保持优先', () => {
   const text = createBlockNode('text');
-  text.fields.html = '<p style="text-align:right"><span style="font-size:24px;color:#123456">{{.name}}</span></p>';
+  text.controls.html = '<p style="text-align:right"><span style="font-size:24px;color:#123456">{{.name}}</span></p>';
   const doc = createEmailDocument([text, createBlockNode('text')]);
   doc.body = resolveEmailBody({ backgroundColor: '#eeeeee', contentWidth: 640, contentPadding: '8px', blockGap: '10px', borderWidth: '2px', borderColor: '#abcdef' });
   const before = structuredClone(doc);
@@ -83,14 +83,14 @@ test('Body 布局和外观进入邮件与预览，富文本显式格式保持优
 });
 
 test('自定义区块通过 body 上下文读取主体设置', () => {
-  const definition = { type: 'body-width', title: 'Body width', render: ({ body, mode }) => `<p>${mode}:${body.contentWidth}</p>` };
+  const definition = defineBlock({ type: 'body-width', title: 'Body width', renderEmail: ({ body, mode }) => `<p>${mode}:${body.contentWidth}</p>` });
   const block = createBlockNode(definition.type, [definition]);
   const body = resolveEmailBody({ contentWidth: 680 });
   for (const mode of ['canvas', 'email']) {
     const context = buildRenderContext(block, mode, body, definition);
     assert.deepEqual(context.body, body);
     assert.equal('global' in context, false);
-    assert.equal(definition.render(context), `<p>${mode}:680</p>`);
+    assert.equal(definition.renderEmail(context), `<p>${mode}:680</p>`);
   }
   assert.match(editor.blockToHtml(block, [definition], 'email', { body }), /email:680/);
   const doc = { ...createEmailDocument([block]), body };
@@ -101,7 +101,7 @@ test('General 默认文字和链接格式用于画布、邮件和模板预览，
   const body = resolveEmailBody({ textColor: '#123456', fontFamily: 'Georgia, serif', fontWeight: 'bold', linkColor: '#654321', linkDecoration: 'none' });
   for (const type of ['text', 'heading']) {
     const block = createBlockNode(type);
-    block.fields.html = '<p>{{.name}} <a href="https://example.com">Default</a> <a href="https://example.com/custom" style="color:#abcdef;text-decoration:underline">Custom</a><span style="color:#fedcba;font-family:Verdana;font-weight:normal">Explicit</span></p>';
+    block.controls.html = '<p>{{.name}} <a href="https://example.com">Default</a> <a href="https://example.com/custom" style="color:#abcdef;text-decoration:underline">Custom</a><span style="color:#fedcba;font-family:Verdana;font-weight:normal">Explicit</span></p>';
     for (const mode of ['canvas', 'email']) {
       const html = editor.blockToHtml(block, DEFAULT_BLOCKS, mode, { body });
       for (const css of ['color:#123456', 'font-family:Georgia, serif', 'font-weight:bold', 'color:#654321;text-decoration:none;', 'color:#abcdef;text-decoration:underline', 'color:#fedcba;font-family:Verdana;font-weight:normal']) assert.ok(html.includes(css), `${type}:${mode}:${css}`);
@@ -120,9 +120,9 @@ test('General 默认文字和链接格式用于画布、邮件和模板预览，
 test('按钮继承主体字体和字重，保留自身文字颜色与链接外观；HTML 保留作者格式', () => {
   const body = resolveEmailBody({ textColor: '#123456', fontFamily: 'Georgia, serif', fontWeight: 'bold', linkColor: '#654321', linkDecoration: 'underline' });
   const button = createBlockNode('button');
-  button.fields.href = 'https://example.com/buy';
+  button.controls.href = 'https://example.com/buy';
   const raw = createBlockNode('html');
-  raw.fields.html = '<p style="font-weight:normal;color:#abcdef">Author</p><a href="https://example.com" style="color:red">Link</a>';
+  raw.controls.html = '<p style="font-weight:normal;color:#abcdef">Author</p><a href="https://example.com" style="color:red">Link</a>';
   for (const mode of ['canvas', 'email']) {
     const html = editor.renderBlock(button, DEFAULT_BLOCKS, mode, body);
     assert.ok(html.includes('font-family:Georgia, serif'));
@@ -131,7 +131,7 @@ test('按钮继承主体字体和字重，保留自身文字颜色与链接外�
     assert.ok(html.includes('text-decoration:none;'));
     assert.doesNotMatch(html, /color:#654321|text-decoration:underline/);
     const authored = editor.renderBlock(raw, DEFAULT_BLOCKS, mode, body);
-    assert.ok(authored.includes(raw.fields.html));
+    assert.ok(authored.includes(raw.controls.html));
     assert.ok(authored.includes('font-family:Georgia, serif'));
   }
 });

@@ -15,6 +15,6 @@
     "resolveJsonModule": true,
     "types": ["react", "react-dom"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "tests/plugin-types.ts"],
   "exclude": ["node_modules"]
 }

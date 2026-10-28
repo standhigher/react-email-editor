@@ -3,16 +3,17 @@ import { extractHeadStyles } from "../../../render/head-styles";
 
 interface HtmlCanvasProps {
   html: string;
+  baseCss?: string;
   onSelect: () => void;
 }
 
-function frameHtml(html: string): string {
+function frameHtml(html: string, baseCss: string): string {
   const { html: body, styles } = extractHeadStyles(html);
-  return `<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;}body{display:flow-root;}</style>${styles}</head><body>${body}</body></html>`;
+  return `<!DOCTYPE html><html><head><style>html,body{margin:0;padding:0;}body{display:flow-root;${baseCss}}</style>${styles}</head><body>${body}</body></html>`;
 }
 
 /** HTML 标签内容用 iframe 隔离 CSS，纯文本直接渲染；事件交给外层区块。 */
-export function HtmlCanvas({ html, onSelect }: HtmlCanvasProps) {
+export function HtmlCanvas({ html, baseCss = "", onSelect }: HtmlCanvasProps) {
   const hasHtmlTag = /<\/?[a-z][\w:-]*(?:\s[^>]*)?>/i.test(html);
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
@@ -85,7 +86,7 @@ export function HtmlCanvas({ html, onSelect }: HtmlCanvasProps) {
       <button
         type="button"
         className="ree-html-canvas-hitbox"
-        aria-label="Select HTML block"
+        aria-label="Select block"
         tabIndex={-1}
         onPointerDown={() => onSelect()}
         onClick={() => onSelect()}
@@ -94,7 +95,7 @@ export function HtmlCanvas({ html, onSelect }: HtmlCanvasProps) {
         ref={frameRef}
         className="ree-html-canvas-frame"
         title="HTML block preview"
-        srcDoc={frameHtml(html)}
+        srcDoc={frameHtml(html, baseCss)}
         sandbox="allow-same-origin"
         tabIndex={-1}
         onLoad={observeContent}

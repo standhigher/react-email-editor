@@ -22,7 +22,7 @@ import type { BlockDragData } from "../types/editor";
 
 interface EditorDndProps {
   blocks: EmailBlockNode[];
-  definitions: BlockDefinition[];
+  definitions: readonly BlockDefinition[];
   onInsertBlock: (type: string, index?: number) => void;
   onReorder: (activeId: string, overId: string) => void;
   onLibraryDragStart: () => void;

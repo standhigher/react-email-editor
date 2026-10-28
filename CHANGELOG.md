@@ -1,16 +1,29 @@
 # 更新日志
 
-## 未发布
+## 0.3.0 — 2026-10-28
+
+### 新增与改进
+
+- 新增 `defineBlock()`、`EmailControls` 和 `createEmailEditorConfig()`，编辑器与独立邮件导出共用插件配置；内置区块库支持筛选、排序和显式覆盖。
+- 区块插件支持自定义控件组件、React Canvas/Inspector、多区域 `EditableRichText`、`ControlEditor`、声明式嵌套列表、图片资源选择器与统一邮件 HTML 工具。
+- 新增 `config.validate()`，汇总数字范围、选项、URL/图片协议、列表数量及业务校验问题；`setControls()` 支持一次更新多个关联控件。
+- 补充中英文自定义区块 API 文档、优惠券及商品卡片示例，以及组件级回归测试。
 
 ### 修复
 
 - 修改链接 URL 或打开方式时保留已有的显式颜色和下划线，重置后恢复继承 BODY。
 - 画布主体使用与预览及邮件导出一致的基础排版，修复 `em` 内边距、边框等尺寸的计算差异。
+- 修复列表异步回写覆盖后续编辑或排序的问题；按稳定行标识合并最新值，删除或卸载后忽略过期结果，新行不复用已删除行的标识。
+- 自定义控件接收独立的值、主体配置和变量快照，避免直接修改参数污染宿主；自定义 Canvas/Inspector 的变量同步隔离。
+- 可选下拉框显示空选项并支持清空；控件标签正确关联下拉框。
+- 检查器富文本继承主体及已启用的区块排版、段落、列表和链接样式，主体配置变化后同步更新。
+- 缺失插件或邮件导出失败时明确报错；画布和检查器异常按区块隔离，并保留原始节点数据。
 
 ### 不兼容变更
 
+- 自定义区块改为 `defineBlock` + `EmailControls` + `createEmailEditorConfig`，组件接收 `config`；移除旧 `blocks` Prop、公开 `BlockDefinition/FieldConfig/FieldType` 和 `resolveBlockStyleFields`，不保留适配层。控件工厂使用 `EmailControls.text(...)`，区块及列表通过 `controls` 声明控件（不保留 `field` / `fields` 别名）；运行时、持久化节点统一使用 `controls`，样式声明使用 `styleControls`，更新方法使用 `setControl/setControls`，配套类型、`ControlEditor` 和 `controlPath` 同步更名。内容默认值来自控件声明，渲染函数改为 `renderEmail`，文档格式升为 v4，不兼容旧数据、不提供自动迁移。
 - 邮件主体设置统一改为 `body`：文档使用 `EmailDocument.body`，组件使用 `body` / `onBodyChange`，类型及工具改为 `EmailBodySettings`、`DEFAULT_EMAIL_BODY`、`resolveEmailBody`；区块渲染上下文和 `BlockRenderOptions` 同步使用 `body`。移除旧 Global API，不保留别名或迁移代码。
-- 文档版本升为 `3`，不支持旧版本。BODY 的 General 提供文字颜色、链接颜色、字体、字重和链接下划线开关；Content 提供唯一主体 Background、内容宽度、Padding 和区块间距，边框颜色、宽度及样式收进默认折叠的 Advanced: Border。配置同步用于画布、预览和导出，内容显式格式保持优先。仅保留 `contentPadding` 内边距，移除 `outerPadding`、主体对齐、外侧背景和圆角配置；主体固定居中，外侧固定白色。
+- 文档版本升为 `4`，不支持旧版本。BODY 的 General 提供文字颜色、链接颜色、字体、字重和链接下划线开关；Content 提供唯一主体 Background、内容宽度、Padding 和区块间距，边框颜色、宽度及样式收进默认折叠的 Advanced: Border。配置同步用于画布、预览和导出，内容显式格式保持优先。仅保留 `contentPadding` 内边距，移除 `outerPadding`、主体对齐、外侧背景和圆角配置；主体固定居中，外侧固定白色。
 
 ## 0.2.0 — 2026-10-27
 

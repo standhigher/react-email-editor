@@ -1,4 +1,4 @@
-import type { BlockDefinition } from "../types/block";
+import type { BlockPlugin } from "../plugins/types";
 import { buttonBlock } from "./button";
 import { dividerBlock } from "./divider";
 import { headingBlock } from "./heading";
@@ -7,7 +7,7 @@ import { imageBlock } from "./image";
 import { spacerBlock } from "./spacer";
 import { textBlock } from "./text";
 
-export const DEFAULT_BLOCKS: BlockDefinition[] = [
+export const DEFAULT_BLOCKS: BlockPlugin[] = [
   headingBlock,
   textBlock,
   buttonBlock,

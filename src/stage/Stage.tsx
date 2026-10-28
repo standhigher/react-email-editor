@@ -1,3 +1,4 @@
+import { BlockErrorBoundary } from "../plugins/components/BlockErrorBoundary";
 import { Canvas } from "./canvas/Canvas";
 import { Preview } from "./preview/Preview";
 import { StageHeader } from "./StageHeader";
@@ -43,19 +44,22 @@ export function Stage({
             variables={session.variables}
             device={device}
             onSelect={onSelectBlock}
-            onCommitField={session.updateField}
+            onCommitControl={session.updateControl} onCommitControls={session.updateControls}
+            onCommitStyle={session.updateStyle}
             onDuplicate={session.duplicateBlock}
             onRemove={session.removeBlock}
           />
         </div>
       ) : (
         <div className="ree-stage-view">
+          <BlockErrorBoundary identity={session.document} resetKey={session.definitions}>
           <Preview
             document={session.document}
             definitions={session.definitions}
             variables={session.variables}
             device={device}
           />
+          </BlockErrorBoundary>
         </div>
       )}
     </div>

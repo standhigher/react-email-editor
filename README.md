@@ -29,7 +29,7 @@ import {
 import "@standhigher/react-email-editor/styles.css";
 
 const text = createBlockNode(BLOCK_TYPES.text);
-if (text) text.fields.html = "<p>Hello, {{ store_name }}</p>";
+if (text) text.controls.html = "<p>Hello, {{ store_name }}</p>";
 const initialDocument = createEmailDocument(text ? [text] : []);
 const variables: Variable[] = [
   { name: "{{ store_name }}", description: "Store name", value: "Example Store" },
@@ -71,7 +71,7 @@ All props are optional.
 | `height` | `number \| string` | Defaults to `"100%"`; numbers are pixels. |
 | `body` | `Partial<EmailBodySettings>` | Overrides email body layout, appearance, and default typography; later changes merge into the current document. Omitting a field does not restore its default. |
 | `variables` | `Variable[]` | Variables for insertion and preview. Defaults to `[]`; Personalization controls are hidden when empty. |
-| `blocks` | `BlockDefinition[]` | Adds custom blocks; matching types replace built-in definitions. |
+| `config` | `EmailEditorConfig` | Registers plugins, resource adapters, and library order through `createEmailEditorConfig()`. |
 | `onChange` | `(document: EmailDocument) => void` | Called on document changes, including external `body` updates that change document values. |
 | `onBodyChange` | `(body: EmailBodySettings) => void` | Called for body style edits inside the editor, excluding external `body` updates. |
 
@@ -110,13 +110,33 @@ const previewHtml = documentToHtml(initialDocument, undefined, {
 
 A variable's `name` is inserted verbatim; `description` and preview `value` are optional. Export adds a missing dot only to tokens matching `variables[].name` exactly, preserving whitespace: `{{ store_name }}` → `{{ .store_name }}`. Other Go template expressions remain unchanged. Preview supports a subset of Go template syntax; data precedence is block `defaultData` > `templateData` (`documentToHtml` option) > `variables`.
 
-The document format is under development. Only `version: 3` is accepted, with no automatic migration of older documents. Create data with `createEmailDocument()` and `createBlockNode()`. See [CHANGELOG](./CHANGELOG.md) for upgrade notes.
+The document format is under development. Only `version: 4` is accepted, with no automatic migration of older documents. Create data with `createEmailDocument()` and `createBlockNode()`. See [CHANGELOG](./CHANGELOG.md) for upgrade notes.
 
 ## Custom blocks
 
-Pass `BlockDefinition[]` through `blocks`. Required fields are `type`, `title`, and `render(ctx)`, which returns HTML. Use `fields` / `styleFields` for inspector controls and `defaultFields` / `defaultStyle` / `defaultData` for initial values. The render context includes `mode: "canvas" | "email"` and `body: EmailBodySettings` for the current email body settings.
+Declare controls and email output with `defineBlock()`, then register once:
 
-Built-in text formatting lives in `fields.html`, container styles in `style.dimension` / `style.decorations`, and button, image, and divider element styles in `style.element`. Rendering uses only enabled style fields. See [BlockDefinition](https://github.com/standhigher/react-email-editor/blob/main/src/types/block.ts) and [EmailDocument](https://github.com/standhigher/react-email-editor/blob/main/src/types/document.ts) for full types. When calling `documentToHtml` directly, pass the complete definition list including custom blocks as its second argument.
+```tsx
+const coupon = defineBlock({
+  type: "my-app.coupon",
+  title: "Coupon",
+  controls: {
+    code: EmailControls.text({ label: "Code", defaultValue: "SAVE20" }),
+  },
+  renderEmail: ({ controls, email }) => email.html`<p>${controls.code}</p>`,
+});
+const config = createEmailEditorConfig({ plugins: [coupon] });
+
+<EmailEditor config={config} />;
+const block = config.createBlock("my-app.coupon");
+const html = config.toHtml(createEmailDocument([block]));
+```
+
+Import `defineBlock`, `EmailControls`, and `createEmailEditorConfig` from the package. Control values are inferred; the inspector and canvas work automatically. Plugins support rich text, editable lists, image resource adapters, custom control components, and optional React `Inspector` / `Canvas` components. `EditableRichText` supports multiple editing regions, while `ControlEditor` reuses declared controls inside custom inspectors.
+
+`config.validate(document)` returns `ValidationIssue[]` with block IDs and control paths for export preflight. Number ranges, options, URL/image protocols, list counts, and custom validation also apply to the inspector and email export. Custom Canvas/Inspector components can call `setControls(patch)` to update related controls in one document change and one `onChange` callback. Declaration metadata is copied and frozen, parsed controls are reused within each context, and `onChange` / `onBodyChange` receive independent data snapshots.
+
+The editor and standalone export share one configuration. Use `builtins` to filter and order the library; replacing a built-in requires `override: true`. Declarations, runtime contexts, and persisted nodes all use `controls`. Documents use v4, with no old-data compatibility. The old `blocks`, `defaultFields`, `inlineEdit`, and `render()` integration is removed. See the [custom block API guide](./docs/custom-blocks.md) ([简体中文](./docs/custom-blocks.zh-CN.md)) and runnable `playground/plugins/` examples.
 
 ## Local development
 

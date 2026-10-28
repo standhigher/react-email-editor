@@ -14,8 +14,8 @@
 
 - 邮件文档是 JSON 数据，`EmailDocument` 是编辑器状态的单一事实源。
 - 编辑器由区块库、画布/预览、检查器和 shell 组成。
-- 区块通过 `BlockDefinition` 注册，字段和样式配置驱动检查器，`render(ctx)` 生成 HTML 字符串。
-- `render(ctx)` 的 `mode` 为 `canvas` 或 `email`；画布展示编辑辅助界面，邮件模式生成可交付 HTML。
+- 区块通过 `defineBlock()` 声明、`createEmailEditorConfig({ plugins })` 注册，`EmailControls` 创建控件，区块声明、运行时上下文和持久化节点统一使用 `controls`，控件声明是类型和默认值的唯一来源，`renderEmail(ctx)` 返回 HTML 字符串或 `EmailMarkup`。内置区块走同一注册链；不保留 `field/fields`、`Field*`、`setField/setFields` 等旧控件命名或数据兼容；旧 `blocks` Prop、`defaultFields`、`inlineEdit` 和 `render` 不保留兼容。内部 `BlockDefinition` 只用于归一化后的运行时定义，不对外导出。
+- `renderEmail(ctx)` 的 `mode` 为 `canvas` 或 `email`；画布展示编辑辅助界面，邮件模式生成可交付 HTML。
 - HTML 区块可以包含 Go template 风格变量，例如 `{{.customer_name}}`、`{{range .products}}`。导出保留模板，只有预览或显式请求时才解析模板值。`variables` 使用 `name`、可选的 `description` 和 `value`：`name` 是 `{{  store_name }}` 这类原文，编辑区原样显示；`value` 是预览替换文本；`description` 为空或不传时不渲染副文案。导出 HTML 只给 `variables` 里的原文补点并保留空格，例如 `{{  store_name }}` 写成 `{{  .store_name }}`；列表外的 Go template 保持原样。
 - `getData()`、`getDocument()`、`getJson()`、`getHtml()` 等公开 API 返回独立数据快照；不得让调用方修改快照时意外改变编辑器内部状态。
 - 包不内置 React、React DOM、TipTap、dnd-kit、CodeMirror 或 Lezer。React 与 React DOM 保持 peer dependency，其余保持 dependency；构建时这些包都列入 external，由消费方的包管理器解析。
@@ -42,6 +42,7 @@ src/
   editor-dnd/           拖拽上下文和拖拽数据
   inspector/            主体/区块字段、样式控制器及检查器组件
   blocks/               内置区块定义、字段配置、图标和注册表
+  plugins/              插件声明、字段工厂、统一配置、邮件工具及 React 编辑扩展
   document/             文档/区块创建、默认值、注册表和 mutations
   render/               画布/邮件渲染、模板预览和文档 HTML 输出
   utils/                跨模块且无业务界限的工具函数
@@ -78,7 +79,7 @@ tests/
 
 - `tsconfig.json` 开启 `strict`、`isolatedModules` 和 `moduleResolution: bundler`；新增代码必须通过严格类型检查，不得通过关闭配置来绕过错误。
 - 对象形状默认使用 `interface`：Props、State、文档模型、接口结果、配置项和上下文都遵循此规则。联合类型、函数类型、交叉/映射类型以及 `Pick`/`Omit` 等工具类型使用 `type`。
-- 优先使用已有的 `EmailDocument`、`EmailBlockNode`、`EmailBlockStyle`、`BlockDefinition`、`FieldConfig`、`StyleFieldConfig` 等类型，不要在不同文件重复声明同一对象结构。
+- 优先使用已有的 `EmailDocument`、`EmailBlockNode`、`EmailBlockStyle`、`BlockDefinition`、`ControlConfig`、`StyleControlConfig` 等类型，不要在不同文件重复声明同一对象结构。
 - 对外类型变化必须同步检查 `src/index.ts` 导出、README 示例和测试；能保持向后兼容时不要无理由破坏现有字段。
 - 不使用 `any` 掩盖类型问题。确需处理未知外部数据时先使用 `unknown`，再通过类型守卫、默认值归一化或明确的窄化处理。
 - 保持现有 ESM import 风格和 `.ts/.tsx` 源码导入方式；不要为了个人工具链添加 CommonJS 入口。
@@ -86,10 +87,10 @@ tests/
 ## 文档与数据模型
 
 - 文档创建和归一化统一经过 `src/document/create-document.ts` 的 `createEmailDocument`、`resolveEmailBody`、`ensureEmailDocument` 等函数；不要在组件中复制默认值或自行拼装不完整文档。
-- 区块创建统一优先使用 `createBlockNode()`，默认字段、默认样式和 `defaultData` 必须从 `BlockDefinition` 派生，并在需要时使用深拷贝，避免共享可变对象。
+- 区块创建统一优先使用配置的 `config.createBlock()`（底层复用 `createBlockNode()`），默认字段、默认样式和 `defaultData` 必须从插件声明派生，并在需要时使用深拷贝，避免共享可变对象。
 - `EmailDocument.version` 是持久化版本字段。变更数据结构时必须检查默认值、导出兼容性和版本语义，并补充测试。当前 README 明确处于开发阶段、不迁移旧版区块字段；不要无需求增加迁移框架。若任务涉及存量文档兼容，先明确支持范围，再实现归一化或迁移。
 - mutations 应保持状态更新边界清晰，避免直接修改不属于当前操作的对象。对外快照和重置逻辑必须保持独立引用。
-- 邮件主体与区块样式分层：`EmailDocument.body` / `EmailBodySettings` 保存主体布局、外观及文字颜色、字体、字重、链接颜色和下划线默认值；其余基础排版使用内部 `DEFAULT_TYPOGRAPHY`，富文本显式格式优先。主体只有一个 `backgroundColor`，固定居中，不支持主体圆角。内置区块容器使用 `dimension`、`decorations`，按钮/图片/分割线等元素自身样式使用 `element`；文字格式只存于 `fields.html`，不读取旧 `label` 或区块文字样式。自定义区块可以显式声明 `typography` 字段。新建默认样式、画布和邮件渲染只读取该区块启用的 `styleFields`。文档当前版本为 `3`，不迁移旧版文档。
+- 邮件主体与区块样式分层：`EmailDocument.body` / `EmailBodySettings` 保存主体布局、外观及文字颜色、字体、字重、链接颜色和下划线默认值；其余基础排版使用内部 `DEFAULT_TYPOGRAPHY`，富文本显式格式优先。主体只有一个 `backgroundColor`，固定居中，不支持主体圆角。内置区块容器使用 `dimension`、`decorations`，按钮/图片/分割线等元素自身样式使用 `element`；文字格式只存于 `controls.html`，不读取旧 `label` 或区块文字样式。自定义区块可以显式声明 `typography` 字段。新建默认样式、画布和邮件渲染只读取该区块启用的 `styleControls`。文档当前版本为 `4`，不迁移旧版文档。
 - CSS 值应使用现有 `src/utils/css-values.ts` 的归一化和校验函数；不要在多个模块重复实现长度、颜色、边框或间距解析。
 
 ## 渲染与邮件 HTML
@@ -98,7 +99,7 @@ tests/
 - `blockToHtml`、`renderBlock`、`documentToHtml` 以及模板预览的职责必须保持清晰。修改渲染链时同时检查 canvas、email、preview 三种使用路径。
 - 邮件 HTML 使用表格布局和内联样式以兼容邮件客户端。不要把编辑器的拖拽边框、选中态、工具栏、空画布提示或其他 `ree-*` 编辑辅助 UI 输出到邮件。
 - 文档导出必须只生成一个完整的 `<!DOCTYPE html>`、`<html>`、`<head>` 和 `<body>`；HTML 区块输入的完整文档需要按现有逻辑合并，不能产生嵌套 `html`/`head`/`body`。
-- 默认导出保留 Go template 原文。只有传入 `resolveHtmlTemplates` 或预览专用路径时才解析模板，解析对象是每个区块 `render` 产出的 HTML，不限于 HTML 区块；区块 `defaultData` 优先于同名全局变量，具体合并规则沿用现有实现。
+- 默认导出保留 Go template 原文。只有传入 `resolveHtmlTemplates` 或预览专用路径时才解析模板，解析对象是每个区块 `renderEmail` 产出的 HTML，不限于 HTML 区块；区块 `defaultData` 优先于同名全局变量，具体合并规则沿用现有实现。
 - 普通文本和属性插值使用 `src/utils/html.ts` 的现有转义工具，CSS 值先归一化再输出；URL 的协议安全与 HTML 转义是不同问题，新增 URL 入口需校验允许的协议。显式 HTML 区块和富文本按现有 HTML 内容路径处理，不能整体转义成纯文本，也不能把模板预览器当作完整 Go 引擎或安全沙箱。属性转义不等于 HTML 消毒，不得声称已有逻辑能安全执行任意不可信 HTML。
 - 新增区块必须完整考虑：定义、字段、默认字段、默认样式、注册表、画布展示、邮件输出、模板数据和测试；不得只让画布能显示而邮件导出缺失。
 
@@ -116,10 +117,10 @@ tests/
 
 ## 新增或修改区块
 
-区块定义通常放在 `src/blocks/<type>.ts`，公共字段配置放在 `style-fields.ts` 或同职责配置文件中。实现时遵循以下顺序：
+区块定义通常放在 `src/blocks/<type>.ts`，公共字段配置放在 `style-controls.ts` 或同职责配置文件中。实现时遵循以下顺序：
 
-1. 定义稳定的 `BlockDefinition`，包括 `type`、`title`、`fields`/`styleFields`、默认值、必要的 `defaultData` 和 `render`。
-2. 在 `src/blocks/registry.ts` 注册，必要时补充图标和创建逻辑。
+1. 使用 `defineBlock()` 声明插件，包括 `type`、`title`、字段对象及默认值、样式能力、必要的 `defaultData` 和 `renderEmail`；复杂编辑使用可选 Canvas/Inspector/字段组件。
+2. 内置区块在 `src/blocks/registry.ts` 注册；外部区块通过 `createEmailEditorConfig({ plugins })` 注册，并将同一配置用于编辑器与独立导出。覆盖内置区块必须显式声明 `override: true`。
 3. 确认 `createBlockNode()` 能产生独立的完整节点。
 4. 确认检查器能读写字段和样式，画布能编辑/选择，预览和 `documentToHtml()` 能输出正确邮件 HTML。
 5. 为默认值、样式继承、空值、模板变量和最终 HTML 写有意义的测试。
@@ -149,7 +150,7 @@ node --test tests/*.test.mjs tests/*.test.ts
 - Oxlint 使用仓库内开发依赖及 `.oxlintrc.json`，启用 TypeScript、Unicorn、Oxc、React 内置 Rust 插件的 correctness 规则，并显式检查 `typescript/no-explicit-any` 和 `react/rules-of-hooks`；React 检查包括 Hook 依赖、ref 和 effect，不代表完整覆盖官方 React Compiler 插件的所有规则。JavaScript 启用 `no-undef`，TypeScript 文件的未定义标识符及组件 Props 交由 `pnpm typecheck` 检查。`pnpm lint` 检查源码、playground、脚本、配置及测试，任何 warning 和无效的禁用指令都视为失败；`pnpm lint:fix` 仅应用安全自动修复，不替代人工 review。构建产物和本地 pnpm store 不参与检查，不依赖全局工具或临时下载；有意忽略的诊断使用 `oxlint-disable-next-line` 并说明原因。
 - 文档-only 修改检查路径、命令、规则与源码是否一致，并运行 `git diff --check`；无需为纯文档改动添加实现测试或启动浏览器。
 - TypeScript、公共 API、文档模型或渲染逻辑变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build` 和相关 Node 测试；检查因环境问题不可用时报告实际原因，并继续执行其他可用检查。
-- `pnpm typecheck` 同时检查 `src/` 和 `playground/`。UI/CSS/字段交互变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build`。有消费方页面时复用该服务；否则用 `pnpm dev` 打开 playground，在浏览器里核对 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景。
+- `pnpm typecheck` 同时检查 `src/`、`playground/` 和 `tests/plugin-types.ts` 的插件类型契约。UI/CSS/字段交互变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build`。有消费方页面时复用该服务；否则用 `pnpm dev` 打开 playground，在浏览器里核对 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景。
 - `tests/*.test.mjs` 依赖构建后的 `dist/index.js` 和 `dist/styles.css`，必须先构建再运行；不要只测试 `src` 的假入口。`tests/*.test.ts` 覆盖未从包入口导出的内部模块，由 Node 类型剥离直接执行，需要 Node 22.18 或更新版本。
 - 只运行了部分检查时，最终报告必须明确列出实际运行的命令和结果；不能把未运行的检查写成已通过。
 - 浏览器或跨域 iframe 无法操作时，明确记录限制和未覆盖的交互，不要声称完成了点击级验证。

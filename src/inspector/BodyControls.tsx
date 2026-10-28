@@ -2,28 +2,28 @@ import { DEFAULT_EMAIL_BODY } from "../document/constants";
 import { LINK_DECORATIONS } from "../constants/style-values";
 import { CheckboxControl } from "../components/CheckboxControl";
 import { resolveEmailBody } from "../document/create-document";
-import { BODY_FIELD_SECTIONS } from "./body-constants";
+import { BODY_CONTROL_SECTIONS } from "./body-constants";
 import { InspectorSection } from "./components/InspectorSection";
-import { StyleFieldStack } from "./components/StyleFieldStack";
+import { StyleControlStack } from "./components/StyleControlStack";
 import { StyleControl } from "./StyleControl";
-import type { StyleFieldConfig } from "../types/block";
+import type { StyleControlConfig } from "../types/block";
 import type { EmailBodySettings } from "../types/document";
 
-interface BodyFieldsProps {
+interface BodyControlsProps {
   body: EmailBodySettings;
   onChange: (patch: Partial<EmailBodySettings>) => void;
 }
 
-export function BodyFields({ body, onChange }: BodyFieldsProps) {
+export function BodyControls({ body, onChange }: BodyControlsProps) {
   const settings = resolveEmailBody(body);
-  const renderField = (field: StyleFieldConfig) => {
-    const key = field.id as keyof EmailBodySettings;
+  const renderControl = (control: StyleControlConfig) => {
+    const key = control.id as keyof EmailBodySettings;
     const current = String(settings[key]);
     const initial = String(DEFAULT_EMAIL_BODY[key]);
     return (
       <StyleControl
         key={key}
-        config={field}
+        config={control}
         value={current === initial ? "" : current}
         fallback={initial}
         resetLabel="Reset"
@@ -35,9 +35,9 @@ export function BodyFields({ body, onChange }: BodyFieldsProps) {
   };
   return (
     <div className="ree-inspector ree-inspector-body">
-      {BODY_FIELD_SECTIONS.map((section) => (
+      {BODY_CONTROL_SECTIONS.map((section) => (
         <InspectorSection key={section.title} title={section.title}>
-          <StyleFieldStack fields={section.fields} renderField={renderField} />
+          <StyleControlStack controls={section.controls} renderControl={renderControl} />
           {section.title === "General" ? (
             <CheckboxControl
               variant="switch"
@@ -46,11 +46,11 @@ export function BodyFields({ body, onChange }: BodyFieldsProps) {
               onChange={(checked) => onChange({ linkDecoration: checked ? LINK_DECORATIONS.underline : LINK_DECORATIONS.none })}
             />
           ) : null}
-          {section.advancedFields?.length ? (
+          {section.advancedControls?.length ? (
             <details className="ree-inspector-advanced">
               <summary>Advanced: Border</summary>
               <div className="ree-inspector-section-body">
-                <StyleFieldStack fields={section.advancedFields} renderField={renderField} />
+                <StyleControlStack controls={section.advancedControls} renderControl={renderControl} />
               </div>
             </details>
           ) : null}

@@ -1,12 +1,12 @@
 import type { CSSProperties } from "react";
-import { BUTTON_BOX_DEFAULTS } from "../blocks/element-fields";
+import { BUTTON_BOX_DEFAULTS } from "../blocks/element-controls";
 import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 import { cssLength, cssSpacing } from "../utils/css-values";
 import { decorationStyle, typographyStyle } from "../utils/style";
 
-/** 按钮文案只有 fields.html 一个来源。 */
+/** 按钮文案只有 controls.html 一个来源。 */
 export function buttonContent(block: EmailBlockNode): string {
-  return String(block.fields.html ?? "");
+  return String(block.controls.html ?? "");
 }
 
 export function buttonStyles(block: EmailBlockNode, body?: EmailBodySettings) {

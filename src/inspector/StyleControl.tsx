@@ -8,10 +8,10 @@ import { LengthControl } from "./components/LengthControl";
 import { ResetButton } from "../components/ResetButton";
 import { SelectControl } from "../components/SelectControl";
 import { SpacingControl } from "./components/SpacingControl";
-import type { StyleFieldConfig } from "../types/block";
+import type { StyleControlConfig } from "../types/block";
 
 interface StyleControlProps {
-  config: StyleFieldConfig;
+  config: StyleControlConfig;
   value: string;
   fallback?: string;
   resetLabel?: string;
@@ -22,7 +22,7 @@ interface StyleControlProps {
   onChange: (value: string) => void;
 }
 
-function lengthUnits(config: StyleFieldConfig): string[] {
+function lengthUnits(config: StyleControlConfig): string[] {
   if (config.units?.length) return config.units;
   if (config.unit) return [config.unit];
   return [];

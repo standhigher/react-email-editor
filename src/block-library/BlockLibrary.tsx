@@ -4,7 +4,7 @@ import { BlockLibraryItem } from "./BlockLibraryItem";
 import { BlockLibraryToggle } from "./BlockLibraryToggle";
 
 interface BlockLibraryProps {
-  definitions: BlockDefinition[];
+  definitions: readonly BlockDefinition[];
   onAdd: (type: string) => void;
 }
 

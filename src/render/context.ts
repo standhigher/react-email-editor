@@ -10,12 +10,13 @@ export function buildRenderContext(
   body: EmailBodySettings = DEFAULT_EMAIL_BODY,
   definition: BlockDefinition | undefined = getBlockDefinition(node.type),
 ): BlockRenderContext {
-  const block = { ...node, style: resolveBlockStyle(node.style, definition) };
+  const snapshot = structuredClone(node);
+  const block = { ...snapshot, controls: definition?.readControls(snapshot.controls ?? {}) ?? snapshot.controls ?? {}, style: resolveBlockStyle(snapshot.style, definition) };
   return {
     block,
-    fields: node.fields ?? {},
+    controls: block.controls,
     style: block.style,
     mode,
-    body,
+    body: { ...body },
   };
 }

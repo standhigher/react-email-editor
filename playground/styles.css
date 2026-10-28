@@ -12,3 +12,8 @@ body {
 body {
   background: #f1f1f1;
 }
+
+.ree-demo-product { display: grid; gap: 12px; }
+.ree-demo-product .ree-rte { min-height: 32px; }
+
+.ree-demo-product-inspector { display: grid; gap: 16px; padding: 16px 0; }

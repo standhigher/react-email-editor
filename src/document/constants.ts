@@ -1,15 +1,15 @@
 import { CANVAS_DEVICE_WIDTH } from "../constants/editor";
 import { BORDER_STYLES, FONT_WEIGHTS, LINK_DECORATIONS } from "../constants/style-values";
-import type { FieldOption } from "../types/block";
+import type { ControlOption } from "../types/block";
 import type { EmailBodySettings } from "../types/document";
 
-export const DOCUMENT_VERSION = 3 as const;
+export const DOCUMENT_VERSION = 4 as const;
 
-function fontOption(label: string, value: string): FieldOption {
+function fontOption(label: string, value: string): ControlOption {
   return Object.freeze({ label, value });
 }
 
-export const FONT_FAMILIES: readonly FieldOption[] = Object.freeze([
+export const FONT_FAMILIES: readonly ControlOption[] = Object.freeze([
   fontOption("Arial", "Arial, Helvetica, sans-serif"),
   fontOption("Helvetica", "Helvetica, Arial, sans-serif"),
   fontOption("Verdana", "Verdana, Geneva, sans-serif"),
@@ -20,7 +20,7 @@ export const FONT_FAMILIES: readonly FieldOption[] = Object.freeze([
   fontOption("Courier New", "'Courier New', Courier, monospace"),
 ]);
 
-export function copyFontFamilies(): FieldOption[] {
+export function copyFontFamilies(): ControlOption[] {
   return FONT_FAMILIES.map((font) => ({ label: font.label, value: font.value }));
 }
 
@@ -31,7 +31,7 @@ export function fontFamilyLabel(value: string): string {
   return name || "Arial";
 }
 
-export function fontFamilyOptions(value: string): FieldOption[] {
+export function fontFamilyOptions(value: string): ControlOption[] {
   const fonts = copyFontFamilies();
   if (fonts.some((font) => font.value === value)) return fonts;
   return [{ label: fontFamilyLabel(value), value }, ...fonts];

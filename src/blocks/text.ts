@@ -1,25 +1,24 @@
 import { TEXT_SECTIONS } from "./inspector-sections";
 import { BLOCK_TYPES } from "../constants/block-types";
-import type { BlockDefinition } from "../types/block";
+import { defineBlock } from "../plugins/define-block";
+import { EmailControls } from "../plugins/controls";
 import { typographyCss } from "../utils/style";
 import { ICON_TEXT } from "./icons";
-import { WRAPPER_STYLE_FIELDS } from "./style-fields";
+import { WRAPPER_STYLE_CONTROLS } from "./style-controls";
 import { styleRichText } from "../render/content-style";
 
-export const textBlock: BlockDefinition = {
-  exactStyleFields: true,
+export const textBlock = defineBlock({
+  containerStyles: false,
   inspectorSections: TEXT_SECTIONS,
   type: BLOCK_TYPES.text,
   title: "Text",
   icon: ICON_TEXT,
   description: "Paragraph of body text",
-  inlineEdit: true,
-  inlineEditProfile: "text",
-  defaultFields: { html: "<p>Type your paragraph here…</p>" },
+  controls: { html: EmailControls.richText({ label: "Content", defaultValue: "<p>Type your paragraph here…</p>", inline: true, profile: "text" }), },
   defaultStyle: {
     dimension: { padding: "16px" },
   },
-  styleFields: WRAPPER_STYLE_FIELDS,
-  render: ({ fields, body }) =>
-    `<div style="display:flow-root;${typographyCss(undefined, body)}">${styleRichText(String(fields.html ?? ""), undefined, body)}</div>`,
-};
+  styleControls: WRAPPER_STYLE_CONTROLS,
+  renderEmail: ({ controls, body }) =>
+    `<div style="display:flow-root;${typographyCss(undefined, body)}">${styleRichText(String(controls.html ?? ""), undefined, body)}</div>`,
+});

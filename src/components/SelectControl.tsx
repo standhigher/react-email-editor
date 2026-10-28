@@ -1,16 +1,17 @@
-import type { FieldOption } from "../types/block";
+import type { ControlOption } from "../types/block";
 
 interface SelectControlProps {
   id?: string;
   label?: string;
   value: string;
-  options: readonly FieldOption[];
+  options: readonly ControlOption[];
+  emptyLabel?: string;
   compact?: boolean;
   disabled?: boolean;
   onChange: (value: string) => void;
 }
 
-export function SelectControl({ id, label, value, options, compact = false, disabled, onChange }: SelectControlProps) {
+export function SelectControl({ id, label, value, options, emptyLabel, compact = false, disabled, onChange }: SelectControlProps) {
   return (
     <span className={`ree-select${compact ? " is-compact" : ""}`}>
       <select
@@ -21,6 +22,7 @@ export function SelectControl({ id, label, value, options, compact = false, disa
         value={value}
         onChange={(event) => onChange(event.target.value)}
       >
+        {emptyLabel !== undefined && !options.some((option) => option.value === "") ? <option value="">{emptyLabel}</option> : null}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

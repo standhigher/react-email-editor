@@ -1,3 +1,4 @@
+import { writeStyleValue } from "../utils/style";
 import { getBlockDefinition } from "./registry";
 import { generateId } from "../utils/id";
 import { resolveBlockStyle } from "./block-style";
@@ -6,28 +7,24 @@ import type { EmailBlockNode } from "../types/document";
 
 export function createBlockNode(
   type: string,
-  definitions?: BlockDefinition[],
+  definitions?: readonly BlockDefinition[],
 ): EmailBlockNode | null {
   const definition = getBlockDefinition(type, definitions);
   if (!definition) return null;
 
-  const fields: Record<string, unknown> = { ...definition.defaultFields };
-  for (const field of definition.fields ?? []) {
-    if (!(field.name in fields) && field.defaultValue !== undefined) {
-      fields[field.name] = field.defaultValue;
-    }
-  }
-  if (definition.inlineEdit && !("html" in fields)) {
-    fields.html = "<p></p>";
+  const controls = structuredClone(definition.readControls({}));
+  let style = resolveBlockStyle(definition.defaultStyle, definition);
+  for (const control of definition.styleControls ?? []) {
+    const [group, key] = control.id.split(".");
+    const stored = definition.defaultStyle?.[group as keyof typeof definition.defaultStyle];
+    if (control.defaultValue !== undefined && (!stored || !(key in stored))) style = writeStyleValue(style, control.id, control.defaultValue);
   }
 
   return {
     id: generateId(type),
     type,
-    fields,
-    style: definition.defaultStyle
-      ? resolveBlockStyle(definition.defaultStyle, definition)
-      : undefined,
+    controls,
+    style,
     defaultData: definition.defaultData
       ? structuredClone(definition.defaultData)
       : undefined,

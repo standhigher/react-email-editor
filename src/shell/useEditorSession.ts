@@ -1,5 +1,7 @@
+import { DEFAULT_EDITOR_CONFIG } from "../plugins/config";
+import type { EmailEditorConfig } from "../plugins/types";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { EMPTY_BLOCK_DEFINITIONS, EMPTY_VARIABLES } from "./constants";
+import { EMPTY_VARIABLES } from "./constants";
 import { SUBJECT_MAX_LENGTH } from "../constants/editor";
 import { createBlockNode } from "../document/create-block";
 import {
@@ -15,20 +17,20 @@ import {
   moveBlockBy,
   removeBlockNode,
   reorderBlockNodes,
-  updateBlockField,
+  updateBlockControls,
   updateBlockStyle,
   updateBodySettings,
   withSubject,
 } from "../document/mutations";
-import { getBlockDefinition, mergeBlockDefinitions } from "../document/registry";
-import type { BlockDefinition, Variable } from "../types/block";
+import { getBlockDefinition } from "../document/registry";
+import type { Variable } from "../types/block";
 import type { EmailDocument, EmailBodySettings } from "../types/document";
 import type { EditorSession } from "../types/editor";
 
 interface UseEditorSessionOptions {
   initialDocument?: EmailDocument;
   body?: Partial<EmailBodySettings>;
-  blocks?: BlockDefinition[];
+  config?: EmailEditorConfig;
   variables?: Variable[];
   onChange?: (document: EmailDocument) => void;
   onBodyChange?: (body: EmailBodySettings) => void;
@@ -37,12 +39,12 @@ interface UseEditorSessionOptions {
 export function useEditorSession({
   initialDocument,
   body,
-  blocks = EMPTY_BLOCK_DEFINITIONS,
+  config = DEFAULT_EDITOR_CONFIG,
   variables = EMPTY_VARIABLES,
   onChange,
   onBodyChange,
 }: UseEditorSessionOptions): EditorSession {
-  const definitions = useMemo(() => mergeBlockDefinitions(blocks), [blocks]);
+  const definitions = config.definitions;
   const [document, setDocument] = useState<EmailDocument>(() => {
     const base = ensureEmailDocument(
       structuredClone(initialDocument ?? createEmptyDocument()),
@@ -60,7 +62,7 @@ export function useEditorSession({
     (next: EmailDocument) => {
       documentRef.current = next;
       setDocument(next);
-      onChange?.(next);
+      onChange?.(structuredClone(next));
     },
     [onChange],
   );
@@ -93,11 +95,18 @@ export function useEditorSession({
     [commit, definitions],
   );
 
-  const updateField = useCallback(
-    (id: string, name: string, value: unknown) => {
-      commit(updateBlockField(documentRef.current, id, name, value));
+  const updateControls = useCallback(
+    (id: string, patch: Record<string, unknown>) => {
+      const current = documentRef.current;
+      const next = updateBlockControls(current, id, patch);
+      if (next !== current) commit(next);
     },
     [commit],
+  );
+
+  const updateControl = useCallback(
+    (id: string, name: string, value: unknown) => updateControls(id, { [name]: value }),
+    [updateControls],
   );
 
   const updateStyle = useCallback(
@@ -111,7 +120,7 @@ export function useEditorSession({
     (patch: Partial<EmailBodySettings>) => {
       const next = updateBodySettings(documentRef.current, patch);
       commit(next);
-      onBodyChange?.(next.body);
+      onBodyChange?.(structuredClone(next.body));
     },
     [commit, onBodyChange],
   );
@@ -163,13 +172,15 @@ export function useEditorSession({
     document: resolvedDocument,
     getDocument,
     definitions,
+    config,
     variables,
     selectedId,
     selectedBlock,
     selectedDefinition,
     selectBlock,
     insertBlock,
-    updateField,
+    updateControl,
+    updateControls,
     updateStyle,
     updateBody,
     moveBlock,

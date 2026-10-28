@@ -29,7 +29,7 @@ import {
 import "@standhigher/react-email-editor/styles.css";
 
 const text = createBlockNode(BLOCK_TYPES.text);
-if (text) text.fields.html = "<p>你好，{{ store_name }}</p>";
+if (text) text.controls.html = "<p>你好，{{ store_name }}</p>";
 const initialDocument = createEmailDocument(text ? [text] : []);
 const variables: Variable[] = [
   { name: "{{ store_name }}", description: "店铺名称", value: "示例店铺" },
@@ -71,7 +71,7 @@ export function EmailPage() {
 | `height` | `number \| string` | 默认 `"100%"`；数字为 px。 |
 | `body` | `Partial<EmailBodySettings>` | 覆盖邮件主体的布局、外观和默认排版，后续更新合并到当前文档；省略字段不会恢复默认值。 |
 | `variables` | `Variable[]` | 插入和预览变量；默认 `[]`，为空时隐藏 Personalization 入口。 |
-| `blocks` | `BlockDefinition[]` | 添加自定义区块，同名 `type` 覆盖内置定义。 |
+| `config` | `EmailEditorConfig` | 通过 `createEmailEditorConfig({ plugins })` 注册区块、资源适配器和区块库顺序。 |
 | `onChange` | `(document: EmailDocument) => void` | 文档变化时触发，包括实际改变文档值的外部 `body` 更新。 |
 | `onBodyChange` | `(body: EmailBodySettings) => void` | 编辑器内修改邮件主体配置时触发，外部 `body` 更新不触发。 |
 
@@ -110,13 +110,33 @@ const previewHtml = documentToHtml(initialDocument, undefined, {
 
 变量的 `name` 原样插入，`description` 和预览值 `value` 可选。导出时仅对与 `variables[].name` 原文精确匹配的 token 补点并保留空格，如 `{{ store_name }}` → `{{ .store_name }}`；其他 Go template 表达式保持原样。预览支持部分 Go template 语法，数据优先级为区块 `defaultData` > `templateData`（`documentToHtml` 选项）> `variables`。
 
-当前文档格式仍处于开发阶段，仅接受 `version: 3`，不自动迁移旧文档。使用 `createEmailDocument()` 和 `createBlockNode()` 创建数据。升级差异见 [CHANGELOG](./CHANGELOG.md)。
+当前文档格式仍处于开发阶段，仅接受 `version: 4`，不自动迁移旧文档。使用 `createEmailDocument()` 和 `createBlockNode()` 创建数据。升级差异见 [CHANGELOG](./CHANGELOG.md)。
 
 ## 自定义区块
 
-通过 `blocks` 传入 `BlockDefinition[]`，必填项为 `type`、`title` 和 `render(ctx)`，返回 HTML 字符串。`fields` / `styleFields` 配置检查器，`defaultFields` / `defaultStyle` / `defaultData` 设置初始值。`render` 接收 `mode: "canvas" | "email"` 和当前邮件主体配置 `body: EmailBodySettings`。
+使用 `defineBlock()` 声明控件及 `renderEmail()`，通过 `createEmailEditorConfig()` 注册：
 
-内置文字格式存于 `fields.html`，容器样式存于 `style.dimension` / `style.decorations`，按钮、图片和分割线自身样式存于 `style.element`。渲染仅使用区块启用的样式字段。完整定义见 [BlockDefinition](https://github.com/standhigher/react-email-editor/blob/main/src/types/block.ts) 和 [EmailDocument](https://github.com/standhigher/react-email-editor/blob/main/src/types/document.ts)。独立调用 `documentToHtml` 时，第二个参数需传入包含自定义区块的完整定义列表。
+```tsx
+const coupon = defineBlock({
+  type: "my-app.coupon",
+  title: "优惠券",
+  controls: {
+    code: EmailControls.text({ label: "优惠码", defaultValue: "SAVE20" }),
+  },
+  renderEmail: ({ controls, email }) => email.html`<p>${controls.code}</p>`,
+});
+const config = createEmailEditorConfig({ plugins: [coupon] });
+
+<EmailEditor config={config} />;
+const block = config.createBlock("my-app.coupon");
+const html = config.toHtml(createEmailDocument([block]));
+```
+
+从包入口导入 `defineBlock`、`EmailControls`、`createEmailEditorConfig`。控件值自动推导，默认生成检查器和画布，支持富文本、列表、图片资源适配器、自定义控件组件及 React `Inspector` / `Canvas`。`EditableRichText` 支持多区域编辑，`ControlEditor` 可在自定义检查器复用声明的控件。
+
+`config.validate(document)` 返回带区块 ID 和控件路径的 `ValidationIssue[]`，用于导出前预检；数字范围、选项、URL/图片协议、列表数量和业务校验也用于检查器及邮件导出。自定义 Canvas/Inspector 可用 `setControls(patch)` 一次更新多个关联控件值并触发一次 `onChange`。声明元数据采用隔离冻结快照，控件值解析结果在每次上下文中复用，`onChange` / `onBodyChange` 返回独立数据快照。
+
+编辑器与独立导出共用配置；`builtins` 可筛选和排序内置区块，覆盖内置区块必须显式声明 `override: true`。声明、运行时和持久化节点统一使用 `controls`；邮件文档为 v4，不兼容旧数据，不保留旧 `blocks`、`defaultFields`、`inlineEdit` 或 `render()` 接入方式。完整接入、类型、渲染工具和异常规则见[自定义区块 API 文档](./docs/custom-blocks.zh-CN.md)（[English](./docs/custom-blocks.md)），可运行示例见 `playground/plugins/`。
 
 ## 本地开发
 

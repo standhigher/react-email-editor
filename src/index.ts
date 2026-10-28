@@ -10,16 +10,15 @@ export { createEmailDocument, resolveEmailBody } from "./document/create-documen
 export { DEFAULT_EMAIL_BODY } from "./document/constants";
 export { createBlockNode } from "./document/create-block";
 export {
-  createDecorationFields,
-  createDimensionFields,
-  createTypographyFields,
-  resolveBlockStyleFields,
-} from "./blocks/style-fields";
+  createDecorationControls,
+  createDimensionControls,
+  createTypographyControls,
+} from "./blocks/style-controls";
 export type {
-  DecorationFieldName,
-  DimensionFieldName,
-  TypographyFieldName,
-} from "./blocks/style-fields";
+  DecorationControlName,
+  DimensionControlName,
+  TypographyControlName,
+} from "./blocks/style-controls";
 export { documentToHtml } from "./render/document-html";
 export type { DocumentHtmlOptions } from "./render/document-html";
 export {
@@ -65,14 +64,34 @@ export type {
   EmailBodySettings,
 } from "./types/document";
 export type {
-  BlockDefinition,
   BlockInspectorSection,
   RichTextProfile,
   BlockRenderContext,
-  FieldConfig,
-  StyleFieldConfig,
+  ControlOption,
+  StyleControlConfig,
   StyleControlType,
-  FieldType,
   StyleGroup,
   Variable,
 } from "./types/block";
+
+export { defineBlock } from "./plugins/define-block";
+export { EmailControls } from "./plugins/controls";
+export { createEmailEditorConfig } from "./plugins/config";
+export { EditableRichText } from "./plugins/components/EditableRichText";
+export type { EditableRichTextProps } from "./plugins/components/EditableRichText";
+export type {
+  BlockPlugin, BlockPluginOptions, ControlKind, ControlDefinition, ControlOptions, ControlSchema, ControlValues,
+  ControlComponentProps, PluginEditorProps, PluginRenderContext, EmailEditorConfig,
+  EmailEditorConfigOptions, ImagePickerContext, ValidationIssue,
+} from "./plugins/types";
+export type { EmailTools, EmailMarkup } from "./plugins/email-tools";
+
+export { TextInput } from "./components/TextInput";
+export { SelectControl } from "./components/SelectControl";
+export { CheckboxControl } from "./components/CheckboxControl";
+export { ColorControl } from "./components/ColorControl";
+export { RangeControl } from "./components/RangeControl";
+export { Button } from "./components/Button";
+
+export { ControlEditor } from "./plugins/components/ControlEditor";
+export type { ControlEditorProps } from "./plugins/components/ControlEditor";

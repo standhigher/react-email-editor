@@ -27,7 +27,7 @@ export interface EmailDocument {
 export interface EmailBlockNode {
   id: string;
   type: string;
-  fields: Record<string, unknown>;
+  controls: Record<string, unknown>;
   style?: EmailBlockStyle;
   defaultData?: Record<string, unknown>;
 }
@@ -65,13 +65,13 @@ export interface EmailElementStyle extends EmailDecorationStyle {
 export interface EmailSpacingStyle {
   padding?: string;
   margin?: string;
-  /** 自定义区块可通过 styleFields 启用；内置区块不支持。只使用 px。 */
+  /** 自定义区块可通过 styleControls 启用；内置区块不支持。只使用 px。 */
   height?: string;
 }
 
 export interface EmailBlockStyle {
   dimension?: EmailSpacingStyle;
-  /** 自定义区块可显式启用；内置区块的文字格式存于 fields.html。 */
+  /** 自定义区块可显式启用；内置区块的文字格式存于 controls.html。 */
   typography?: EmailTypographyStyle;
   decorations?: EmailDecorationStyle;
   element?: EmailElementStyle;

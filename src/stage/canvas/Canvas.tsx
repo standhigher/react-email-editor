@@ -16,14 +16,16 @@ import type { EditorDevice } from "../../types/editor";
 interface CanvasProps {
   blocks: EmailBlockNode[];
   body: EmailBodySettings;
-  definitions: BlockDefinition[];
+  definitions: readonly BlockDefinition[];
   selectedId: string | null;
   dropTargetId: string | null;
   dropEdge: DropEdge | null;
   variables: Variable[];
   device: EditorDevice;
   onSelect: (id: string | null) => void;
-  onCommitField: (id: string, name: string, value: unknown) => void;
+  onCommitControl: (id: string, name: string, value: unknown) => void;
+  onCommitControls: (id: string, patch: Record<string, unknown>) => void;
+  onCommitStyle: (id: string, name: string, value: string) => void;
   onDuplicate: (id: string) => void;
   onRemove: (id: string) => void;
 }
@@ -38,7 +40,9 @@ export function Canvas({
   variables,
   device,
   onSelect,
-  onCommitField,
+  onCommitControl,
+  onCommitControls,
+  onCommitStyle,
   onDuplicate,
   onRemove,
 }: CanvasProps) {
@@ -104,7 +108,8 @@ export function Canvas({
                     dropEdge={dropTargetId === block.id ? dropEdge : null}
                     variables={variables}
                     onSelect={() => onSelect(block.id)}
-                    onCommitField={onCommitField}
+                    onCommitControl={onCommitControl} onCommitControls={onCommitControls}
+                    onCommitStyle={onCommitStyle}
                     onDuplicate={() => onDuplicate(block.id)}
                     onRemove={() => onRemove(block.id)}
                   />

@@ -20,7 +20,7 @@ export interface DocumentHtmlOptions {
 
 export function documentToHtml(
   document: EmailDocument,
-  definitions: BlockDefinition[] = DEFAULT_BLOCKS,
+  definitions: readonly BlockDefinition[] = DEFAULT_BLOCKS,
   options: DocumentHtmlOptions = {},
 ): string {
   const source = ensureEmailDocument(document);

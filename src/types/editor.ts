@@ -1,3 +1,4 @@
+import type { EmailEditorConfig } from "../plugins/types";
 import type { BlockDefinition, Variable } from "./block";
 import type { EmailBlockNode, EmailDocument, EmailBodySettings } from "./document";
 
@@ -35,7 +36,7 @@ export interface EmailEditorProps {
   initialDocument?: EmailDocument;
   /** External body settings. Incoming changes are applied to the open document. */
   body?: Partial<EmailBodySettings>;
-  blocks?: BlockDefinition[];
+  config?: EmailEditorConfig;
   variables?: Variable[];
   height?: number | string;
   onChange?: (document: EmailDocument) => void;
@@ -45,14 +46,16 @@ export interface EmailEditorProps {
 export interface EditorSession {
   document: EmailDocument;
   getDocument: () => EmailDocument;
-  definitions: BlockDefinition[];
+  definitions: readonly BlockDefinition[];
+  config: EmailEditorConfig;
   variables: Variable[];
   selectedId: string | null;
   selectedBlock: EmailBlockNode | null;
   selectedDefinition: BlockDefinition | undefined;
   selectBlock: (id: string | null) => void;
   insertBlock: (type: string, index?: number) => boolean;
-  updateField: (id: string, name: string, value: unknown) => void;
+  updateControl: (id: string, name: string, value: unknown) => void;
+  updateControls: (id: string, patch: Record<string, unknown>) => void;
   updateStyle: (id: string, styleId: string, value: string) => void;
   updateBody: (patch: Partial<EmailBodySettings>) => void;
   moveBlock: (id: string, direction: -1 | 1) => void;

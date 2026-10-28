@@ -26,17 +26,27 @@ export function insertBlockNode(
   return { ...document, blocks };
 }
 
-export function updateBlockField(
+export function updateBlockControl(
   document: EmailDocument,
   id: string,
   name: string,
   value: unknown,
 ): EmailDocument {
+  return updateBlockControls(document, id, { [name]: value });
+}
+
+export function updateBlockControls(
+  document: EmailDocument,
+  id: string,
+  patch: Record<string, unknown>,
+): EmailDocument {
+  if (!Object.keys(patch).length || !document.blocks.some((block) => block.id === id)) return document;
+  const snapshot = structuredClone(patch);
   return {
     ...document,
     blocks: document.blocks.map((block) =>
       block.id === id
-        ? { ...block, fields: { ...block.fields, [name]: value } }
+        ? { ...block, controls: { ...block.controls, ...snapshot } }
         : block,
     ),
   };

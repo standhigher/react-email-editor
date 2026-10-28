@@ -58,7 +58,7 @@ export function RichText({
   }, [editor, initialHtml]);
 
   return (
-    <div className={`ree-rte ree-rte-${profile}`} ref={rootRef} onClick={onSelect}>
+    <div className={`ree-rte ree-rte-${profile}`} ref={rootRef} onClick={onSelect} onFocusCapture={onSelect}>
       {selected && !toolbarCollapsed && editor && host
         ? createPortal(
             <RichTextToolbar

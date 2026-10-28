@@ -7,7 +7,7 @@ import { esc } from "../utils/html";
 import { blockCellCss } from "../utils/style";
 import { buildRenderContext } from "./context";
 import { renderTemplatePreview } from "./template-preview";
-import type { BlockDefinition, RenderMode, Variable } from "../types/block";
+import type { BlockDefinition, BlockRenderContext, RenderMode, Variable } from "../types/block";
 import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 import type { TemplateData } from "./template-preview";
 
@@ -28,22 +28,36 @@ function normalizeBlockRenderOptions(
     : options;
 }
 
+function renderPreparedBlock(context: BlockRenderContext, definition: BlockDefinition): string {
+  try {
+    return definition.renderEmail(context);
+  } catch (error) {
+    const node = context.block;
+    throw new Error(`Block ${node.type} (${node.id}) failed to render: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
+  }
+}
+
+/** 画布复用同一份归一化上下文，避免为 HTML 和 React 编辑区域重复解析字段。 */
+export function renderBlockContentFromContext(context: BlockRenderContext, definition: BlockDefinition, options: BlockRenderOptions): string {
+  return resolveBlockContent(renderPreparedBlock(structuredClone(context), definition), context.block, options);
+}
+
 const LISTED_TOKEN = /^(\{\{-?)([\s\S]*?)(-?\}\})$/;
 
-function variableFieldName(name: string): string | null {
+function variableControlName(name: string): string | null {
   const token = /^\{\{-?\s*([\s\S]*?)\s*-?\}\}$/.exec(name.trim());
   const inner = (token ? token[1] : name).trim();
-  const field = inner.startsWith(".") ? inner.slice(1) : inner;
-  if (!field || !/^[A-Za-z_][\w.]*$/.test(field)) return null;
-  return field;
+  const control = inner.startsWith(".") ? inner.slice(1) : inner;
+  if (!control || !/^[A-Za-z_][\w.]*$/.test(control)) return null;
+  return control;
 }
 
 function dottedListedToken(name: string): string | null {
   const match = LISTED_TOKEN.exec(name);
   if (!match) return null;
   const [, open, raw, close] = match;
-  const field = variableFieldName(name);
-  if (!field || raw.trim().startsWith(".")) return null;
+  const control = variableControlName(name);
+  if (!control || raw.trim().startsWith(".")) return null;
   const start = raw.search(/\S/);
   if (start < 0) return null;
   const dotted = `${open}${raw.slice(0, start)}.${raw.slice(start)}${close}`;
@@ -62,10 +76,10 @@ function applyListedVariableDots(html: string, variables: Variable[]): string {
   );
 }
 
-function assignTemplateField(data: TemplateData, field: string, value: string) {
-  const parts = field.split(".");
+function assignTemplateControl(data: TemplateData, control: string, value: string) {
+  const parts = control.split(".");
   if (parts.length === 1) {
-    data[field] = value;
+    data[control] = value;
     return;
   }
   let current = data;
@@ -83,9 +97,9 @@ export function variablesToTemplateData(variables: Variable[]): TemplateData {
   const data: TemplateData = {};
   for (const variable of variables) {
     if (variable.value === undefined) continue;
-    const field = variableFieldName(variable.name);
-    if (!field) continue;
-    assignTemplateField(data, field, variable.value);
+    const control = variableControlName(variable.name);
+    if (!control) continue;
+    assignTemplateControl(data, control, variable.value);
   }
   return data;
 }
@@ -103,7 +117,7 @@ export function mergeTemplateData(
 
 export function renderBlockContent(
   node: EmailBlockNode,
-  definitions: BlockDefinition[] = DEFAULT_BLOCKS,
+  definitions: readonly BlockDefinition[] = DEFAULT_BLOCKS,
   mode: RenderMode = "email",
   options: BlockRenderOptionsInput = {},
 ): string {
@@ -114,6 +128,10 @@ export function renderBlockContent(
     mode,
     normalizedOptions.body ?? DEFAULT_EMAIL_BODY,
   );
+  return resolveBlockContent(rendered, node, normalizedOptions);
+}
+
+function resolveBlockContent(rendered: string, node: EmailBlockNode, normalizedOptions: BlockRenderOptions): string {
   // 预览展开作用于每个区块 render 产出的 HTML，不限于 HTML 区块。
   // 导出不替换 value，只给变量列表中的原文补点。
   if (!normalizedOptions.resolveHtmlTemplate) {
@@ -127,19 +145,22 @@ export function renderBlockContent(
 
 export function renderBlock(
   node: EmailBlockNode,
-  definitions: BlockDefinition[] = DEFAULT_BLOCKS,
+  definitions: readonly BlockDefinition[] = DEFAULT_BLOCKS,
   mode: RenderMode = "email",
   body: EmailBodySettings = DEFAULT_EMAIL_BODY,
 ): string {
   const definition = getBlockDefinition(node.type, definitions);
-  return definition
-    ? definition.render(buildRenderContext(node, mode, body, definition))
-    : `<!-- unknown block type: ${node.type} -->`;
+  if (!definition) throw new Error(`Missing block plugin: ${node.type}`);
+  try {
+    return definition.renderEmail(buildRenderContext(node, mode, body, definition));
+  } catch (error) {
+    throw new Error(`Block ${node.type} (${node.id}) failed to render: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
+  }
 }
 
 export function blockToHtml(
   node: EmailBlockNode,
-  definitions: BlockDefinition[] = DEFAULT_BLOCKS,
+  definitions: readonly BlockDefinition[] = DEFAULT_BLOCKS,
   mode: RenderMode = "email",
   options: BlockRenderOptionsInput = {},
 ): string {

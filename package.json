@@ -1,6 +1,6 @@
 {
   "name": "@standhigher/react-email-editor",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "React email template editor with drag-and-drop blocks, rich text, JSON storage, and HTML export.",
   "keywords": [
@@ -29,6 +29,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "docs",
     "README.md",
     "README.zh-CN.md",
     "CHANGELOG.md"
@@ -57,6 +58,7 @@
     "oxlint": "^1.90.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-test-renderer": "18.3.1",
     "tsup": "^8",
     "typescript": "^5",
     "vite": "^8.3.5"

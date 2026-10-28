@@ -7,7 +7,7 @@ import type { EditorDevice } from "../../types/editor";
 
 interface PreviewProps {
   document: EmailDocument;
-  definitions: BlockDefinition[];
+  definitions: readonly BlockDefinition[];
   variables: Variable[];
   device: EditorDevice;
 }

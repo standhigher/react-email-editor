@@ -1,5 +1,6 @@
-import { BodyFields } from "./BodyFields";
-import { InspectorFields } from "./InspectorFields";
+import { BlockErrorBoundary } from "../plugins/components/BlockErrorBoundary";
+import { BodyControls } from "./BodyControls";
+import { InspectorControls } from "./InspectorControls";
 import type { BlockDefinition, Variable } from "../types/block";
 import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 
@@ -13,7 +14,8 @@ interface InspectorProps {
   variables: Variable[];
   onPanelChange: (panel: InspectorPanel) => void;
   onCommitBody: (patch: Partial<EmailBodySettings>) => void;
-  onCommitField: (id: string, name: string, value: unknown) => void;
+  onCommitControl: (id: string, name: string, value: unknown) => void;
+  onCommitControls: (id: string, patch: Record<string, unknown>) => void;
   onCommitStyle: (id: string, styleId: string, value: string) => void;
 }
 
@@ -25,7 +27,8 @@ export function Inspector({
   variables,
   onPanelChange,
   onCommitBody,
-  onCommitField,
+  onCommitControl,
+  onCommitControls,
   onCommitStyle,
 }: InspectorProps) {
   const showBlock = panel === "block" && block && definition;
@@ -56,16 +59,19 @@ export function Inspector({
       </div>
       <div className="ree-inspector-scroll">
         {showBlock ? (
-          <InspectorFields
+          <BlockErrorBoundary identity={block} resetKey={definition}>
+          <InspectorControls
+            key={block.id}
             block={block}
             body={body}
             definition={definition}
             variables={variables}
-            onCommitField={onCommitField}
+            onCommitControl={onCommitControl} onCommitControls={onCommitControls}
             onCommitStyle={onCommitStyle}
           />
+          </BlockErrorBoundary>
         ) : (
-          <BodyFields body={body} onChange={onCommitBody} />
+          <BodyControls body={body} onChange={onCommitBody} />
         )}
       </div>
     </aside>

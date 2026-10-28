@@ -18,7 +18,7 @@ test("编辑保留变量原文，预览替换 value，导出只给变量列表�
   assert.deepEqual(variablesToTemplateData([userVariable]), { user: { name: "Ada" } });
 
   const document = createEmailDocument([createBlockNode(BLOCK_TYPES.text)]);
-  document.blocks[0].fields.html = [
+  document.blocks[0].controls.html = [
     "<p>{{  store_name }}</p>",
     "<p>{{  other_name }}</p>",
     "<p>{{- store_name -}}</p>",
@@ -59,7 +59,7 @@ test("编辑保留变量原文，预览替换 value，导出只给变量列表�
   );
 
   const trimmed = createEmailDocument([createBlockNode(BLOCK_TYPES.text)]);
-  trimmed.blocks[0].fields.html = "<p>{{- store_name -}}</p>";
+  trimmed.blocks[0].controls.html = "<p>{{- store_name -}}</p>";
   const trimmedHtml = documentToHtml(trimmed, undefined, { variables: [trimmedVariable] });
   assert.match(trimmedHtml, /\{\{- \.store_name -\}\}/);
 });

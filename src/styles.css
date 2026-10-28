@@ -13,3 +13,5 @@
 @import "./styles/inspector-controls.css";
 @import "./styles/link-dialog.css";
 @import "./styles/drag.css";
+
+@import "./styles/plugins.css";

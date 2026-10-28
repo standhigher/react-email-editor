@@ -15,15 +15,15 @@ const ELEMENT_BORDERS = ["element.borderWidth", "element.borderStyle", "element.
 export const HEADING_SECTIONS: BlockInspectorSection[] = [SPACING, BLOCK_APPEARANCE];
 export const TEXT_SECTIONS: BlockInspectorSection[] = [SPACING, BLOCK_APPEARANCE];
 export const HTML_SECTIONS: BlockInspectorSection[] = [
-  { title: "HTML", fieldNames: ["html"] }, SPACING, BLOCK_APPEARANCE,
+  { title: "HTML", controlNames: ["html"] }, SPACING, BLOCK_APPEARANCE,
 ];
 export const BUTTON_SECTIONS: BlockInspectorSection[] = [
-  { title: "Link", fieldNames: ["href"] },
+  { title: "Link", controlNames: ["href"] },
   { title: "Button", styleIds: ["element.align", "element.width", "element.padding", "element.backgroundColor", ...ELEMENT_BORDERS] },
   SPACING, ADVANCED_BLOCK_APPEARANCE,
 ];
 export const IMAGE_SECTIONS: BlockInspectorSection[] = [
-  { title: "Image", fieldNames: ["src", "alt", "link"] },
+  { title: "Image", controlNames: ["src", "alt", "link"] },
   { title: "Size & position", styleIds: ["element.width", "element.height", "element.align"] },
   { title: "Image appearance", styleIds: ELEMENT_BORDERS }, SPACING, ADVANCED_BLOCK_APPEARANCE,
 ];
@@ -32,5 +32,5 @@ export const DIVIDER_SECTIONS: BlockInspectorSection[] = [
   SPACING, { title: "Block appearance", styleIds: ["decorations.backgroundColor"] },
 ];
 export const SPACER_SECTIONS: BlockInspectorSection[] = [
-  { title: "Spacer", fieldNames: ["height"], styleIds: ["decorations.backgroundColor"] },
+  { title: "Spacer", controlNames: ["height"], styleIds: ["decorations.backgroundColor"] },
 ];

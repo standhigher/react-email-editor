@@ -1,7 +1,7 @@
 import { FONT_WEIGHTS, LINK_DECORATIONS, TEXT_ALIGNS } from "./style-values";
 import type { EmailTypographyStyle } from "../types/document";
 
-/** 内部基础排版。文字的显式格式由 fields.html 或自定义区块的 typography 覆盖。 */
+/** 内部基础排版。文字的显式格式由 controls.html 或自定义区块的 typography 覆盖。 */
 export const DEFAULT_TYPOGRAPHY: Readonly<Required<EmailTypographyStyle>> = Object.freeze({
   fontFamily: "Arial, Helvetica, sans-serif",
   fontSize: "16px",
