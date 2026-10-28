@@ -12,9 +12,10 @@
 
 核心行为如下：
 
-- 邮件文档是 JSON 数据，`EmailDocument` 是编辑器状态的单一事实源。
+- 邮件文档是 JSON 数据，`EmailDocument` 是编辑器状态的单一事实源。`useEmailEditor()` 持有引用稳定且相互隔离的实例，`useEmailEditorState(editor)` 按需订阅只读文档快照；`<EmailEditor>` 只接收 `editor` 和 `height`。实例独立于 UI 挂载，文档替换使用 `setDocument()`，重置恢复初始化完成时的文档；均清空旧文档交互状态。
+- 配置使用 `useEmailEditorConfig()` 创建；纯配置构建函数只用于内部，不公开旧配置工厂、组件 ref 或旧 Props，也不提供兼容层。配置/变量更新不重置文档；新增实例功能须覆盖配置更新、多实例、快照隔离和订阅行为。
 - 编辑器由区块库、画布/预览、检查器和 shell 组成。
-- 区块通过 `defineBlock()` 声明、`createEmailEditorConfig({ plugins })` 注册，`EmailControls` 创建控件，区块声明、运行时上下文和持久化节点统一使用 `controls`，控件声明是类型和默认值的唯一来源，`renderEmail(ctx)` 返回 HTML 字符串或 `EmailMarkup`。内置区块走同一注册链；不保留 `field/fields`、`Field*`、`setField/setFields` 等旧控件命名或数据兼容；旧 `blocks` Prop、`defaultFields`、`inlineEdit` 和 `render` 不保留兼容。内部 `BlockDefinition` 只用于归一化后的运行时定义，不对外导出。
+- 区块通过 `defineBlock()` 声明、`useEmailEditorConfig({ plugins })` 注册，`EmailControls` 创建控件，区块声明、运行时上下文和持久化节点统一使用 `controls`，控件声明是类型和默认值的唯一来源，`renderEmail(ctx)` 返回 HTML 字符串或 `EmailMarkup`。内置区块走同一注册链；不保留 `field/fields`、`Field*`、`setField/setFields` 等旧控件命名或数据兼容；旧 `blocks` Prop、`defaultFields`、`inlineEdit` 和 `render` 不保留兼容。内部 `BlockDefinition` 只用于归一化后的运行时定义，不对外导出。
 - `renderEmail(ctx)` 的 `mode` 为 `canvas` 或 `email`；画布展示编辑辅助界面，邮件模式生成可交付 HTML。
 - HTML 区块可以包含 Go template 风格变量，例如 `{{.customer_name}}`、`{{range .products}}`。导出保留模板，只有预览或显式请求时才解析模板值。`variables` 使用 `name`、可选的 `description` 和 `value`：`name` 是 `{{  store_name }}` 这类原文，编辑区原样显示；`value` 是预览替换文本；`description` 为空或不传时不渲染副文案。导出 HTML 只给 `variables` 里的原文补点并保留空格，例如 `{{  store_name }}` 写成 `{{  .store_name }}`；列表外的 Go template 保持原样。
 - `getData()`、`getDocument()`、`getJson()`、`getHtml()` 等公开 API 返回独立数据快照；不得让调用方修改快照时意外改变编辑器内部状态。
@@ -36,7 +37,7 @@ src/
   index.ts              包公共导出，只保留稳定 API 的显式 re-export
   types/                公共数据模型、Props、渲染上下文和配置类型
   components/           跨模块基础控件与共享展示组件
-  shell/                编辑器会话、ref handle、主题栏和个性化入口
+  shell/                编辑器实例、文档订阅、UI 会话、主题栏和个性化入口
   stage/                画布、预览、富文本编辑和工具栏
   block-library/        可拖拽区块库
   editor-dnd/           拖拽上下文和拖拽数据
@@ -54,7 +55,8 @@ scripts/
 playground/
   index.html            本地预览页面，不发布
   main.tsx              React 挂载入口
-  App.tsx               铺满视口的 EmailEditor
+  App.tsx               Hook 接入及铺满可用区域的 EmailEditor
+  EditorActions.tsx     实例导出、新建、重置与文档订阅示例
   sample.ts             示例文档和变量，不进入包导出
   styles.css            预览页铺满视口，不进入编辑器样式
   css.d.ts              让类型检查接受包样式入口
@@ -99,6 +101,7 @@ tests/
 - `blockToHtml`、`renderBlock`、`documentToHtml` 以及模板预览的职责必须保持清晰。修改渲染链时同时检查 canvas、email、preview 三种使用路径。
 - 邮件 HTML 使用表格布局和内联样式以兼容邮件客户端。不要把编辑器的拖拽边框、选中态、工具栏、空画布提示或其他 `ree-*` 编辑辅助 UI 输出到邮件。
 - 文档导出必须只生成一个完整的 `<!DOCTYPE html>`、`<html>`、`<head>` 和 `<body>`；HTML 区块输入的完整文档需要按现有逻辑合并，不能产生嵌套 `html`/`head`/`body`。
+- `blockToHtml()` 和 `renderBlockContent()` 的渲染选项仅接受 `BlockRenderOptions` 对象，不提供 boolean 参数适配。
 - 默认导出保留 Go template 原文。只有传入 `resolveHtmlTemplates` 或预览专用路径时才解析模板，解析对象是每个区块 `renderEmail` 产出的 HTML，不限于 HTML 区块；区块 `defaultData` 优先于同名全局变量，具体合并规则沿用现有实现。
 - 普通文本和属性插值使用 `src/utils/html.ts` 的现有转义工具，CSS 值先归一化再输出；URL 的协议安全与 HTML 转义是不同问题，新增 URL 入口需校验允许的协议。显式 HTML 区块和富文本按现有 HTML 内容路径处理，不能整体转义成纯文本，也不能把模板预览器当作完整 Go 引擎或安全沙箱。属性转义不等于 HTML 消毒，不得声称已有逻辑能安全执行任意不可信 HTML。
 - 新增区块必须完整考虑：定义、字段、默认字段、默认样式、注册表、画布展示、邮件输出、模板数据和测试；不得只让画布能显示而邮件导出缺失。
@@ -120,7 +123,7 @@ tests/
 区块定义通常放在 `src/blocks/<type>.ts`，公共字段配置放在 `style-controls.ts` 或同职责配置文件中。实现时遵循以下顺序：
 
 1. 使用 `defineBlock()` 声明插件，包括 `type`、`title`、字段对象及默认值、样式能力、必要的 `defaultData` 和 `renderEmail`；复杂编辑使用可选 Canvas/Inspector/字段组件。
-2. 内置区块在 `src/blocks/registry.ts` 注册；外部区块通过 `createEmailEditorConfig({ plugins })` 注册，并将同一配置用于编辑器与独立导出。覆盖内置区块必须显式声明 `override: true`。
+2. 内置区块在 `src/blocks/registry.ts` 注册；外部区块通过 `useEmailEditorConfig({ plugins })` 注册，并将同一配置用于编辑器与独立导出。覆盖内置区块必须显式声明 `override: true`。
 3. 确认 `createBlockNode()` 能产生独立的完整节点。
 4. 确认检查器能读写字段和样式，画布能编辑/选择，预览和 `documentToHtml()` 能输出正确邮件 HTML。
 5. 为默认值、样式继承、空值、模板变量和最终 HTML 写有意义的测试。
@@ -159,7 +162,7 @@ node --test tests/*.test.mjs tests/*.test.ts
 
 ## README 与公开契约
 
-涉及以下内容时同步更新 README：公开 Props/Handle、文档字段、默认值、渲染/模板行为、安装方式、构建/link 联调方式、发布内容或消费方配置。示例必须能反映当前 API；不要留下与实现不一致的旧字段或命令。
+涉及以下内容时同步更新 README：公开 Hooks/实例方法/Props、文档字段、默认值、渲染/模板行为、安装方式、构建/link 联调方式、发布内容或消费方配置。示例必须能反映当前 API；不要留下与实现不一致的旧字段或命令。
 
 ## Git 与变更边界
 

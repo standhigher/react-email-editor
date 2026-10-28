@@ -14,16 +14,16 @@ pnpm add @standhigher/react-email-editor
 
 ## Quick start
 
-Import the stylesheet once in your application and use a ref to read the document and HTML. Your application handles persistence.
+Import the stylesheet once. Create an editor instance with `useEmailEditor()` and read its document or HTML when saving. Your application handles persistence.
 
 ```tsx
-import { useRef } from "react";
 import {
   BLOCK_TYPES,
   EmailEditor,
   createBlockNode,
   createEmailDocument,
-  type EmailEditorHandle,
+  useEmailEditor,
+  useEmailEditorConfig,
   type Variable,
 } from "@standhigher/react-email-editor";
 import "@standhigher/react-email-editor/styles.css";
@@ -36,11 +36,10 @@ const variables: Variable[] = [
 ];
 
 export function EmailPage() {
-  const editorRef = useRef<EmailEditorHandle>(null);
+  const editor = useEmailEditor({ initialDocument, variables });
 
   function save() {
-    const data = editorRef.current?.getData();
-    if (!data) return;
+    const data = editor.getData();
     // Persist data.document in your app; use data.html to export the template.
     console.log(data);
   }
@@ -48,9 +47,7 @@ export function EmailPage() {
   return (
     <>
       <EmailEditor
-        ref={editorRef}
-        initialDocument={initialDocument}
-        variables={variables}
+        editor={editor}
         height={720}
       />
       <button type="button" onClick={save}>Save</button>
@@ -61,21 +58,28 @@ export function EmailPage() {
 
 Omit `initialDocument` to start empty. In Next.js App Router, add `"use client"` to the integration component and import CSS from an allowed global stylesheet entry. When using `height="100%"`, give the parent a definite height.
 
-## Props
+## Hooks and component props
 
-All props are optional.
+`<EmailEditor editor={editor} height={720} />` accepts a required `editor` instance and optional `height`. Height defaults to `"100%"`; numbers are pixels.
 
-| Prop | Type | Behavior |
+`useEmailEditor(options?)` creates a stable, isolated instance. Reading, validation, and export work without mounting `<EmailEditor>`.
+
+| Option | Type | Behavior |
 | --- | --- | --- |
-| `initialDocument` | `EmailDocument` | Read on first mount only. Remount with a new React `key` to switch documents. |
-| `height` | `number \| string` | Defaults to `"100%"`; numbers are pixels. |
-| `body` | `Partial<EmailBodySettings>` | Overrides email body layout, appearance, and default typography; later changes merge into the current document. Omitting a field does not restore its default. |
-| `variables` | `Variable[]` | Variables for insertion and preview. Defaults to `[]`; Personalization controls are hidden when empty. |
-| `config` | `EmailEditorConfig` | Registers plugins, resource adapters, and library order through `createEmailEditorConfig()`. |
-| `onChange` | `(document: EmailDocument) => void` | Called on document changes, including external `body` updates that change document values. |
-| `onBodyChange` | `(body: EmailBodySettings) => void` | Called for body style edits inside the editor, excluding external `body` updates. |
+| `initialDocument` | `EmailDocument` | Read only during initialization. Switch documents with `editor.setDocument(document)`. |
+| `body` | `Partial<EmailBodySettings>` | Overrides initial body settings; changed input values merge into the current document. Omitting a field does not restore its default. |
+| `variables` | `Variable[]` | Insertion and preview variables, default `[]`; updates apply to previews and subsequent exports. |
+| `config` | `EmailEditorConfig` | From `useEmailEditorConfig()`; defaults to all built-in blocks. Updating configuration preserves the document. |
+| `onChange` | `(document: EmailDocument) => void` | Receives an independent snapshot after editing, replacement, reset, or effective external body updates; not called on initialization. |
+| `onBodyChange` | `(body: EmailBodySettings) => void` | Receives an independent snapshot for body edits inside the editor only. |
 
-Body style example: `body={{ contentWidth: 640, contentPadding: "24px" }}`. Defaults are exported as `DEFAULT_EMAIL_BODY`; normalize a partial configuration with `resolveEmailBody()`.
+`useEmailEditorConfig({ plugins, builtins, pickImage })` registers plugins, library order, and an image picker. Multiple independent instances can share one configuration. Declare plugins at module scope, or use `useMemo` for declarations depending on business state. Keep `plugins`, `builtins`, and `pickImage` references stable to reuse the configuration. Inline options do not recreate the editor instance or reset its document.
+
+Configuration, variables, body, and callbacks synchronize during the React commit phase, before child layout effects. Interrupted concurrent renders do not change the committed instance. Subscriptions and `onChange` for external body updates run during the layout phase.
+
+Use `useEmailEditorState(editor)` in a child component for reactive document display. It returns `{ document }`, a cached read-only snapshot, and subscribes only to document changes. Edit through instance methods. Components that only call `useEmailEditor()` do not rerender on document input.
+
+Body style example: `useEmailEditor({ body: { contentWidth: 640, contentPadding: "24px" } })`. Defaults are exported as `DEFAULT_EMAIL_BODY`; normalize a partial configuration with `resolveEmailBody()`.
 
 The **BODY** panel stores its settings in `EmailDocument.body` and applies them to the canvas, preview, and HTML export:
 
@@ -88,13 +92,16 @@ Built-in blocks: `heading`, `text`, `button`, `image`, `divider`, `spacer`, and 
 
 ## Save and export
 
-| Ref method | Returns |
+| Instance method | Returns |
 | --- | --- |
 | `getData()` | `{ document, json, html, renderedHtml }` |
 | `getDocument()` | An independent `EmailDocument` snapshot to persist and pass back as `initialDocument`. |
 | `getJson()` | A formatted document JSON string. |
 | `getHtml()` | A complete email HTML document preserving template expressions. |
 | `getRenderedHtml()` | A complete email HTML document with templates resolved using preview data. |
+| `setDocument(document)` | Replaces the document, clears selection, focus, and old document control state, and calls `onChange`. |
+| `reset()` | Restores the initialized document, including initial `body` overrides, clears editing state, and calls `onChange`. |
+| `validate()` | Current document `ValidationIssue[]`, without rendering HTML. |
 
 Render a document without mounting the editor:
 
@@ -109,6 +116,8 @@ const previewHtml = documentToHtml(initialDocument, undefined, {
 ```
 
 A variable's `name` is inserted verbatim; `description` and preview `value` are optional. Export adds a missing dot only to tokens matching `variables[].name` exactly, preserving whitespace: `{{ store_name }}` → `{{ .store_name }}`. Other Go template expressions remain unchanged. Preview supports a subset of Go template syntax; data precedence is block `defaultData` > `templateData` (`documentToHtml` option) > `variables`.
+
+The fourth argument of `blockToHtml()` and `renderBlockContent()` accepts only a `BlockRenderOptions` object, such as `{ resolveHtmlTemplate: true }`. Boolean arguments are removed and throw `TypeError` in JavaScript.
 
 The document format is under development. Only `version: 4` is accepted, with no automatic migration of older documents. Create data with `createEmailDocument()` and `createBlockNode()`. See [CHANGELOG](./CHANGELOG.md) for upgrade notes.
 
@@ -125,16 +134,16 @@ const coupon = defineBlock({
   },
   renderEmail: ({ controls, email }) => email.html`<p>${controls.code}</p>`,
 });
-const config = createEmailEditorConfig({ plugins: [coupon] });
-
-<EmailEditor config={config} />;
-const block = config.createBlock("my-app.coupon");
-const html = config.toHtml(createEmailDocument([block]));
+function CouponEditor() {
+  const config = useEmailEditorConfig({ plugins: [coupon] });
+  const editor = useEmailEditor({ config });
+  return <EmailEditor editor={editor} />;
+}
 ```
 
-Import `defineBlock`, `EmailControls`, and `createEmailEditorConfig` from the package. Control values are inferred; the inspector and canvas work automatically. Plugins support rich text, editable lists, image resource adapters, custom control components, and optional React `Inspector` / `Canvas` components. `EditableRichText` supports multiple editing regions, while `ControlEditor` reuses declared controls inside custom inspectors.
+Import `defineBlock`, `EmailControls`, `useEmailEditor`, and `useEmailEditorConfig` from the package. Control values are inferred; the inspector and canvas work automatically. Plugins support rich text, editable lists, image resource adapters, custom control components, and optional React `Inspector` / `Canvas` components. `EditableRichText` supports multiple editing regions, while `ControlEditor` reuses declared controls inside custom inspectors.
 
-`config.validate(document)` returns `ValidationIssue[]` with block IDs and control paths for export preflight. Number ranges, options, URL/image protocols, list counts, and custom validation also apply to the inspector and email export. Custom Canvas/Inspector components can call `setControls(patch)` to update related controls in one document change and one `onChange` callback. Declaration metadata is copied and frozen, parsed controls are reused within each context, and `onChange` / `onBodyChange` receive independent data snapshots.
+`config.validate(document)` returns `ValidationIssue[]` with block IDs and control paths for export preflight. Number ranges, options, URL/image protocols, list counts, and custom validation also apply to the inspector and email export. Custom Canvas/Inspector components can call `setControls(patch)` to update related controls in one document change and one `onChange` callback. Declaration metadata is copied and frozen, parsed controls are reused within each context, and `useEmailEditor` callbacks `onChange` / `onBodyChange` receive independent data snapshots.
 
 The editor and standalone export share one configuration. Use `builtins` to filter and order the library; replacing a built-in requires `override: true`. Declarations, runtime contexts, and persisted nodes all use `controls`. Documents use v4, with no old-data compatibility. The old `blocks`, `defaultFields`, `inlineEdit`, and `render()` integration is removed. See the [custom block API guide](./docs/custom-blocks.md) ([简体中文](./docs/custom-blocks.zh-CN.md)) and runnable `playground/plugins/` examples.
 

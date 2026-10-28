@@ -1,13 +1,13 @@
 import { createElement } from "react";
-import { snapshotConfig } from "./config-snapshot";
+import { snapshotValue } from "../utils/snapshot";
 import { controlConstraintError } from "./control-validation";
 import type { ControlDefinition, ControlKind, ControlOptions, ControlSchema, ControlValues } from "./types";
 
 function buildControl<T>(kind: ControlKind, options: ControlOptions<T>, fallback: T, parse: (value: unknown) => T): ControlDefinition<T> {
-  const { component: Component, validate, ...config } = snapshotConfig(options);
+  const { component: Component, validate, ...config } = snapshotValue(options);
   const defaultValue = structuredClone(config.defaultValue ?? fallback);
   const read = (value: unknown): T => value === undefined ? structuredClone(defaultValue) : parse(value);
-  return snapshotConfig({
+  return snapshotValue({
     ...config, kind, defaultValue, read,
     validateValue: (value: unknown) => controlConstraintError(kind, config, value) ?? validate?.(value as T),
     renderControl: Component ? (props) => createElement(Component, { ...props, value: props.value as T }) : undefined,
@@ -38,8 +38,8 @@ export const EmailControls = {
   }),
   list<Schema extends ControlSchema>(options: ControlOptions<ControlValues<Schema>[]> & { controls: Schema }): ControlDefinition<ControlValues<Schema>[]> {
     const { controls, ...config } = options;
-    const schema = snapshotConfig(controls);
-    return snapshotConfig({ ...buildControl("list", config, [], (value) => Array.isArray(value) ? value.map((item) => readControlValues(schema, item && typeof item === "object" ? item : {})) : []), itemControls: schema });
+    const schema = snapshotValue(controls);
+    return snapshotValue({ ...buildControl("list", config, [], (value) => Array.isArray(value) ? value.map((item) => readControlValues(schema, item && typeof item === "object" ? item : {})) : []), itemControls: schema });
   },
   custom<T>(options: ControlOptions<T> & { defaultValue: T; read: (value: unknown) => T; component: NonNullable<ControlOptions<T>["component"]> }): ControlDefinition<T> {
     const { read, ...config } = options;

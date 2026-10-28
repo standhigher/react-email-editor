@@ -1,9 +1,10 @@
+import { renderConfig } from "./helpers/render-config.mjs";
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
-  buildRenderContext, createEmailDocument, createEmailEditorConfig, defineBlock,
+  buildRenderContext, createEmailDocument, defineBlock,
   EmailControls, renderBlockContent, resolveEmailBody,
 } from '../dist/index.js';
 
@@ -12,7 +13,7 @@ function configFor(controls, options = {}) {
     type: 'contract.card', title: 'Card', controls: controls,
     renderEmail: ({ email }) => email.html`<p>Card</p>`, ...options,
   });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   return { plugin, config, block: config.createBlock(plugin.type) };
 }
 
@@ -117,7 +118,7 @@ test('声明及配置元数据是隔离快照，外部修改不改变创建与�
   const plugin = defineBlock(options);
   const plugins = [plugin];
   const builtins = ['text'];
-  const config = createEmailEditorConfig({ plugins, builtins });
+  const config = renderConfig({ plugins, builtins });
   choices[0].value = 'changed'; defaults.tags.push('changed'); styles.dimension.padding = '99px'; data.name = 'Changed';
   options.renderEmail = () => '<p>Changed</p>'; options.title = 'Changed'; plugins.length = 0; builtins.length = 0;
   assert.equal(config.library.length, 2);

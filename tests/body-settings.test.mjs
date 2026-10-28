@@ -49,7 +49,11 @@ test('画布和邮件主体使用一致的相对尺寸与基础排版', (t) => {
   });
   const doc = createEmailDocument([createBlockNode('text')]);
   doc.body = resolveEmailBody({ contentPadding: '1em', borderWidth: '0.25em', fontFamily: 'Georgia, serif', fontWeight: 'bold', textColor: '#123456' });
-  const canvas = renderToStaticMarkup(createElement(editor.EmailEditor, { initialDocument: doc }));
+  function Harness() {
+    const instance = editor.useEmailEditor({ initialDocument: doc });
+    return createElement(editor.EmailEditor, { editor: instance });
+  }
+  const canvas = renderToStaticMarkup(createElement(Harness));
   const canvasStyle = canvas.match(/class="ree-email-surface" style="([^"]*)"/)?.[1];
   assert.ok(canvasStyle);
   for (const resolveHtmlTemplates of [false, true]) {

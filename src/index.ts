@@ -1,7 +1,9 @@
 export { EmailEditor } from "./EmailEditor";
 export type {
   EmailEditorData,
-  EmailEditorHandle,
+  EmailEditorInstance,
+  EmailEditorState,
+  UseEmailEditorOptions,
   EmailEditorProps,
 } from "./types/editor";
 export { RichText } from "./stage/rich-text/RichText";
@@ -76,13 +78,15 @@ export type {
 
 export { defineBlock } from "./plugins/define-block";
 export { EmailControls } from "./plugins/controls";
-export { createEmailEditorConfig } from "./plugins/config";
+export { useEmailEditorConfig } from "./plugins/useEmailEditorConfig";
+export { useEmailEditor } from "./shell/useEmailEditor";
+export { useEmailEditorState } from "./shell/useEmailEditorState";
 export { EditableRichText } from "./plugins/components/EditableRichText";
 export type { EditableRichTextProps } from "./plugins/components/EditableRichText";
 export type {
   BlockPlugin, BlockPluginOptions, ControlKind, ControlDefinition, ControlOptions, ControlSchema, ControlValues,
   ControlComponentProps, PluginEditorProps, PluginRenderContext, EmailEditorConfig,
-  EmailEditorConfigOptions, ImagePickerContext, ValidationIssue,
+  UseEmailEditorConfigOptions, ImagePickerContext, ValidationIssue,
 } from "./plugins/types";
 export type { EmailTools, EmailMarkup } from "./plugins/email-tools";
 

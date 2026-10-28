@@ -17,6 +17,7 @@ export function SubjectBar({
   onSubjectChange,
 }: SubjectBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const subjectId = useId();
   const countId = useId();
 
   const insertVariable = (token: string) => {
@@ -37,12 +38,12 @@ export function SubjectBar({
 
   return (
     <div className="ree-subject-bar">
-      <label className="ree-subject-label" htmlFor="ree-email-subject">
+      <label className="ree-subject-label" htmlFor={subjectId}>
         Email subject
       </label>
       <div className="ree-subject-field">
         <TextInput
-          id="ree-email-subject"
+          id={subjectId}
           ref={inputRef}
           className="ree-subject-input"
           value={subject}

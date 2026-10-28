@@ -8,18 +8,20 @@ This guide follows “example → parameters → return values → behavior” f
 | --- | --- |
 | `EmailControls` | Declare controls, value types, defaults, validation, and editing components. |
 | `defineBlock()` | Combine controls, styles, editing UI, and email output into a block plugin. |
-| `createEmailEditorConfig()` | Register plugins and provide block creation, document validation, and HTML export. |
+| `useEmailEditorConfig()` | Register plugins and provide block creation, document validation, and HTML export. |
 
 Built-in blocks use the same mechanism. Configuration holds no document or selection state and can be shared by multiple editors. `EmailDocument` is the source of truth for document state; the React editing session handles selection, dragging, and updates.
 
 ## Complete integration example
 
 ```tsx
+import { useState } from "react";
 import {
   EmailEditor,
   EmailControls,
   createEmailDocument,
-  createEmailEditorConfig,
+  useEmailEditorConfig,
+  useEmailEditor,
   defineBlock,
 } from "@standhigher/react-email-editor";
 import "@standhigher/react-email-editor/styles.css";
@@ -40,17 +42,12 @@ const coupon = defineBlock({
   `,
 });
 
-// Keep outside the component, or stabilize the reference with useMemo.
-const config = createEmailEditorConfig({ plugins: [coupon] });
-const initialDocument = createEmailDocument([config.createBlock(coupon.type)]);
-
 export function EmailPage() {
-  return <EmailEditor config={config} initialDocument={initialDocument} />;
+  const config = useEmailEditorConfig({ plugins: [coupon] });
+  const [initialDocument] = useState(() => createEmailDocument([config.createBlock(coupon.type)]));
+  const editor = useEmailEditor({ config, initialDocument });
+  return <EmailEditor editor={editor} />;
 }
-
-// Standalone export uses the same configuration without mounting the editor.
-const issues = config.validate(initialDocument);
-const html = config.toHtml(initialDocument);
 ```
 
 At declaration time, `controls` contains control definitions. In nodes, Canvas/Inspector props, and render contexts, it contains their values:
@@ -66,29 +63,28 @@ controls: { code: EmailControls.text({ label: "Code", defaultValue: "SAVE20" }) 
 controls.code // string
 ```
 
-## 1. createEmailEditorConfig(options?)
+## 1. useEmailEditorConfig(options?)
 
 ### Example
 
-```ts
-const config = createEmailEditorConfig({
-  plugins: [coupon],
-  builtins: ["heading", "text", "image", "button"],
-  pickImage: async ({ value, label, signal }) => {
-    // Open your application's asset picker; initialize with value,
-    // use label as its title, and cancel requests with signal.
-    // Return an image URL, or null when canceled.
-    return null;
-  },
-});
-
-const block = config.createBlock("my-app.coupon");
-const document = createEmailDocument([block]);
-const html = config.toHtml(document);
-const preview = config.toHtml(document, { resolveHtmlTemplates: true });
+```tsx
+function useCouponConfig() {
+  return useEmailEditorConfig({
+    plugins: [coupon],
+    builtins: ["heading", "text", "image", "button"],
+    pickImage: async ({ value, label, signal }) => {
+      // Open your application's asset picker; initialize with value,
+      // use label as its title, and cancel requests with signal.
+      // Return an image URL, or null when canceled.
+      return null;
+    },
+  });
+}
 ```
 
-### Parameters: EmailEditorConfigOptions
+Call this Hook at the top level of a React component or custom Hook. Stable `plugins`, `builtins`, and `pickImage` references retain configuration identity. Updates preserve instance documents. Removing a plugin used by a document preserves its data and produces a missing-plugin validation issue. Configuration methods `toHtml(document)` and `validate(document)` accept any document; instance methods `getHtml()` and `validate()` use the current document.
+
+### Parameters: UseEmailEditorConfigOptions
 
 All options are optional.
 
@@ -482,10 +478,10 @@ Missing plugins produce a canvas placeholder and preserve the node; email export
 | `ControlComponentProps<T>` | Single-control React editor props. |
 | `BlockPlugin/BlockPluginOptions` | Block definition and declaration options. |
 | `PluginEditorProps/PluginRenderContext` | Editing component props and rendering context. |
-| `EmailEditorConfig/EmailEditorConfigOptions` | Registration configuration and options. |
+| `EmailEditorConfig/UseEmailEditorConfigOptions` | Registration configuration and options. |
 | `ImagePickerContext/ValidationIssue` | Image picker context and validation results. |
 | `ControlOption/StyleControlConfig/BlockInspectorSection` | Options, style controls, and inspector sections. |
 | `ControlEditorProps/EditableRichTextProps` | Reusable control and rich-text component props. |
 | `EmailMarkup/EmailTools` | Email fragments and rendering helpers. |
 
-See [README](../README.md) for editor props, ref methods, body, and variables. Runnable examples: [coupon](../playground/plugins/coupon.ts), [product card](../playground/plugins/product.ts), and [shared configuration](../playground/plugins/config.ts).
+See [README](../README.md) for editor Hooks, instance methods, body, and variables. Runnable examples: [coupon](../playground/plugins/coupon.ts), [product card](../playground/plugins/product.ts), and [shared configuration](../playground/plugins/config.ts).

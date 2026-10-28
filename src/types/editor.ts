@@ -1,4 +1,4 @@
-import type { EmailEditorConfig } from "../plugins/types";
+import type { EmailEditorConfig, ValidationIssue } from "../plugins/types";
 import type { BlockDefinition, Variable } from "./block";
 import type { EmailBlockNode, EmailDocument, EmailBodySettings } from "./document";
 
@@ -24,26 +24,40 @@ export interface EmailEditorData {
   renderedHtml: string;
 }
 
-export interface EmailEditorHandle {
+export interface EmailEditorInstance {
   getData: () => EmailEditorData;
   getDocument: () => EmailDocument;
   getJson: () => string;
   getHtml: () => string;
   getRenderedHtml: () => string;
+  setDocument: (document: EmailDocument) => void;
+  reset: () => void;
+  validate: () => ValidationIssue[];
 }
 
 export interface EmailEditorProps {
+  editor: EmailEditorInstance;
+  height?: number | string;
+}
+
+type ReadonlyData<T> = T extends object ? { readonly [Key in keyof T]: ReadonlyData<T[Key]> } : T;
+
+export interface EmailEditorState {
+  readonly document: ReadonlyData<EmailDocument>;
+}
+
+export interface UseEmailEditorOptions {
   initialDocument?: EmailDocument;
   /** External body settings. Incoming changes are applied to the open document. */
   body?: Partial<EmailBodySettings>;
   config?: EmailEditorConfig;
   variables?: Variable[];
-  height?: number | string;
   onChange?: (document: EmailDocument) => void;
   onBodyChange?: (body: EmailBodySettings) => void;
 }
 
-export interface EditorSession {
+export interface EditorSession extends EmailEditorInstance {
+  resetKey: string;
   document: EmailDocument;
   getDocument: () => EmailDocument;
   definitions: readonly BlockDefinition[];

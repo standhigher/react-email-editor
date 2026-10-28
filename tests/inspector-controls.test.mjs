@@ -1,10 +1,11 @@
+import { renderConfig } from "./helpers/render-config.mjs";
 import "./helpers/source-modules.mjs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement, useLayoutEffect, useState } from "react";
 import { act, create } from "react-test-renderer";
 import ShallowRenderer from "react-test-renderer/shallow.js";
-import { EmailControls, createEmailEditorConfig, resolveEmailBody } from "../dist/index.js";
+import { EmailControls, resolveEmailBody } from "../dist/index.js";
 
 const { ListControl } = await import("../src/inspector/components/ListControl.tsx");
 const { ControlRenderer } = await import("../src/inspector/ControlRenderer.tsx");
@@ -16,7 +17,7 @@ function listFixture(t) {
   let signal;
   let values;
   let commits = 0;
-  const config = createEmailEditorConfig({ pickImage: (context) => {
+  const config = renderConfig({ pickImage: (context) => {
     signal = context.signal;
     return new Promise((resolve) => { resolveImage = resolve; });
   } });

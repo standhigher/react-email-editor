@@ -1,11 +1,11 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
 import { createBlockNode } from "../document/create-block";
 import { documentToHtml } from "../render/document-html";
-import { snapshotConfig } from "./config-snapshot";
+import { snapshotValue } from "../utils/snapshot";
 import { validateDocument } from "./validation";
-import type { BlockPlugin, EmailEditorConfig, EmailEditorConfigOptions } from "./types";
+import type { BlockPlugin, EmailEditorConfig, UseEmailEditorConfigOptions } from "./types";
 
-export function createEmailEditorConfig(options: EmailEditorConfigOptions = {}): EmailEditorConfig {
+export function buildEmailEditorConfig(options: UseEmailEditorConfigOptions = {}): EmailEditorConfig {
   const definitions = new Map<string, BlockPlugin>(DEFAULT_BLOCKS.map((block) => [block.type, block]));
   const customTypes = new Set<string>();
   for (const plugin of options.plugins ?? []) {
@@ -18,7 +18,7 @@ export function createEmailEditorConfig(options: EmailEditorConfigOptions = {}):
   const visibleBuiltins = options.builtins === false ? [] : options.builtins ?? [...builtinTypes];
   if (new Set(visibleBuiltins).size !== visibleBuiltins.length) throw new Error("Duplicate builtin in library order.");
   for (const type of visibleBuiltins) if (!builtinTypes.has(type)) throw new Error(`Unknown builtin block: ${type}`);
-  const all = Object.freeze([...definitions.values()].map((plugin) => snapshotConfig(plugin)));
+  const all = Object.freeze([...definitions.values()].map((plugin) => snapshotValue(plugin)));
   const registered = new Map(all.map((plugin) => [plugin.type, plugin]));
   return Object.freeze({
     definitions: all,
@@ -34,4 +34,4 @@ export function createEmailEditorConfig(options: EmailEditorConfigOptions = {}):
   } satisfies EmailEditorConfig);
 }
 
-export const DEFAULT_EDITOR_CONFIG = createEmailEditorConfig();
+export const DEFAULT_EDITOR_CONFIG = buildEmailEditorConfig();

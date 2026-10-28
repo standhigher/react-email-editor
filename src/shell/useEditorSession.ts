@@ -1,107 +1,48 @@
-import { DEFAULT_EDITOR_CONFIG } from "../plugins/config";
-import type { EmailEditorConfig } from "../plugins/types";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { EMPTY_VARIABLES } from "./constants";
+import { useCallback, useState, useSyncExternalStore } from "react";
 import { SUBJECT_MAX_LENGTH } from "../constants/editor";
-import { createBlockNode } from "../document/create-block";
 import {
-  createEmptyDocument,
-  ensureEmailDocument,
-  mergeEmailBody,
-  sameEmailBody,
-  resolveEmailBody,
-} from "../document/create-document";
-import {
-  duplicateBlockNode,
-  insertBlockNode,
-  moveBlockBy,
-  removeBlockNode,
-  reorderBlockNodes,
-  updateBlockControls,
-  updateBlockStyle,
-  updateBodySettings,
-  withSubject,
+  duplicateBlockNode, insertBlockNode, moveBlockBy, removeBlockNode, reorderBlockNodes,
+  updateBlockControls, updateBlockStyle, updateBodySettings, withSubject,
 } from "../document/mutations";
 import { getBlockDefinition } from "../document/registry";
-import type { Variable } from "../types/block";
-import type { EmailDocument, EmailBodySettings } from "../types/document";
-import type { EditorSession } from "../types/editor";
+import type { EmailEditorInstance, EditorSession } from "../types/editor";
+import type { EmailBodySettings } from "../types/document";
+import { getEditorStore } from "./editor-store";
 
-interface UseEditorSessionOptions {
-  initialDocument?: EmailDocument;
-  body?: Partial<EmailBodySettings>;
-  config?: EmailEditorConfig;
-  variables?: Variable[];
-  onChange?: (document: EmailDocument) => void;
-  onBodyChange?: (body: EmailBodySettings) => void;
-}
-
-export function useEditorSession({
-  initialDocument,
-  body,
-  config = DEFAULT_EDITOR_CONFIG,
-  variables = EMPTY_VARIABLES,
-  onChange,
-  onBodyChange,
-}: UseEditorSessionOptions): EditorSession {
+export function useEditorSession(editor: EmailEditorInstance): EditorSession {
+  const store = getEditorStore(editor);
+  const { document, config, variables, resetKey } = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const definitions = config.definitions;
-  const [document, setDocument] = useState<EmailDocument>(() => {
-    const base = ensureEmailDocument(
-      structuredClone(initialDocument ?? createEmptyDocument()),
-    );
-    if (body === undefined) return base;
-    return { ...base, body: mergeEmailBody(base.body, body) };
-  });
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const documentRef = useRef(document);
-  useLayoutEffect(() => {
-    documentRef.current = document;
-  }, [document]);
-
-  const commit = useCallback(
-    (next: EmailDocument) => {
-      documentRef.current = next;
-      setDocument(next);
-      onChange?.(structuredClone(next));
-    },
-    [onChange],
-  );
-
-  useEffect(() => {
-    if (body === undefined) return;
-    const current = documentRef.current;
-    const nextBody = mergeEmailBody(current.body, body);
-    if (sameEmailBody(resolveEmailBody(current.body), nextBody)) return;
-    commit({ ...current, body: nextBody });
-  }, [body, commit]);
-
-  const getDocument = useCallback(
-    () => ensureEmailDocument(structuredClone(documentRef.current)),
-    [],
-  );
-
+  const [previousReset, setPreviousReset] = useState({ editor, resetKey });
+  if (previousReset.editor !== editor || previousReset.resetKey !== resetKey) {
+    setPreviousReset({ editor, resetKey });
+    setSelectedId(null);
+  }
+  // 回调总是读取实例最新文档，连续操作无需等待 React 重新渲染。
+  const commit = store.commit;
   const selectBlock = useCallback((id: string | null) => {
     setSelectedId(id);
   }, []);
 
   const insertBlock = useCallback(
     (type: string, index?: number) => {
-      const node = createBlockNode(type, definitions);
+      const node = definitions.some((definition) => definition.type === type) ? config.createBlock(type) : null;
       if (!node) return false;
-      commit(insertBlockNode(documentRef.current, node, index));
+      commit(insertBlockNode(store.getSnapshot().document, node, index));
       setSelectedId(node.id);
       return true;
     },
-    [commit, definitions],
+    [commit, definitions, config, store],
   );
 
   const updateControls = useCallback(
     (id: string, patch: Record<string, unknown>) => {
-      const current = documentRef.current;
+      const current = store.getSnapshot().document;
       const next = updateBlockControls(current, id, patch);
       if (next !== current) commit(next);
     },
-    [commit],
+    [commit, store],
   );
 
   const updateControl = useCallback(
@@ -111,82 +52,63 @@ export function useEditorSession({
 
   const updateStyle = useCallback(
     (id: string, styleId: string, value: string) => {
-      commit(updateBlockStyle(documentRef.current, id, styleId, value));
+      commit(updateBlockStyle(store.getSnapshot().document, id, styleId, value));
     },
-    [commit],
+    [commit, store],
   );
 
   const updateBody = useCallback(
     (patch: Partial<EmailBodySettings>) => {
-      const next = updateBodySettings(documentRef.current, patch);
-      commit(next);
-      onBodyChange?.(structuredClone(next.body));
+      const next = updateBodySettings(store.getSnapshot().document, patch);
+      store.commit(next, true);
     },
-    [commit, onBodyChange],
+    [store],
   );
 
   const moveBlock = useCallback(
     (id: string, direction: -1 | 1) => {
-      commit(moveBlockBy(documentRef.current, id, direction));
+      commit(moveBlockBy(store.getSnapshot().document, id, direction));
     },
-    [commit],
+    [commit, store],
   );
 
   const duplicateBlock = useCallback(
     (id: string) => {
-      commit(duplicateBlockNode(documentRef.current, id));
+      commit(duplicateBlockNode(store.getSnapshot().document, id));
     },
-    [commit],
+    [commit, store],
   );
 
   const removeBlock = useCallback(
     (id: string) => {
-      commit(removeBlockNode(documentRef.current, id));
+      commit(removeBlockNode(store.getSnapshot().document, id));
       setSelectedId((current) => (current === id ? null : current));
     },
-    [commit],
+    [commit, store],
   );
 
   const reorderBlocks = useCallback(
     (activeId: string, overId: string) => {
-      commit(reorderBlockNodes(documentRef.current, activeId, overId));
+      commit(reorderBlockNodes(store.getSnapshot().document, activeId, overId));
     },
-    [commit],
+    [commit, store],
   );
 
   const setSubject = useCallback(
     (subject: string) => {
-      commit(withSubject(documentRef.current, subject.slice(0, SUBJECT_MAX_LENGTH)));
+      commit(withSubject(store.getSnapshot().document, subject.slice(0, SUBJECT_MAX_LENGTH)));
     },
-    [commit],
+    [commit, store],
   );
 
-  const resolvedDocument = useMemo(() => ensureEmailDocument(document), [document]);
-  const selectedBlock =
-    resolvedDocument.blocks.find((block) => block.id === selectedId) ?? null;
-  const selectedDefinition = selectedBlock
-    ? getBlockDefinition(selectedBlock.type, definitions)
-    : undefined;
+  const selectedBlock = document.blocks.find((block) => block.id === selectedId) ?? null;
+  const selectedDefinition = selectedBlock ? getBlockDefinition(selectedBlock.type, definitions) : undefined;
 
   return {
-    document: resolvedDocument,
-    getDocument,
-    definitions,
-    config,
-    variables,
-    selectedId,
-    selectedBlock,
-    selectedDefinition,
-    selectBlock,
-    insertBlock,
-    updateControl,
-    updateControls,
-    updateStyle,
-    updateBody,
-    moveBlock,
-    duplicateBlock,
-    removeBlock,
-    reorderBlocks,
-    setSubject,
+    ...editor,
+    document, definitions, config, variables, resetKey,
+    selectedId, selectedBlock, selectedDefinition,
+    selectBlock, insertBlock, updateControl, updateControls, updateStyle, updateBody,
+    moveBlock, duplicateBlock, removeBlock, reorderBlocks, setSubject,
   };
 }

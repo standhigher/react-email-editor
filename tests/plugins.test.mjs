@@ -1,9 +1,10 @@
+import { renderConfig } from "./helpers/render-config.mjs";
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
-  defineBlock, EmailControls, createEmailEditorConfig, createEmailDocument,
+  defineBlock, EmailControls, createEmailDocument,
   renderBlockContent, resolveEmailBody, DEFAULT_BLOCKS, buildRenderContext,
 } from '../dist/index.js';
 
@@ -17,7 +18,7 @@ function card(overrides = {}) {
 }
 
 test('同一配置用于区块注册、节点创建、JSON 恢复及独立导出', () => {
-  const config = createEmailEditorConfig({ plugins: [card()] });
+  const config = renderConfig({ plugins: [card()] });
   const document = createEmailDocument([config.createBlock('test.card')]);
   assert.equal(document.version, 4);
   assert.deepEqual(document.blocks[0].controls, { title: 'Default' });
@@ -31,7 +32,7 @@ test('同一配置用于区块注册、节点创建、JSON 恢复及独立导出
 });
 
 test('v4 拒绝使用 fields 的旧版本文档，不提供自动迁移', () => {
-  const config = createEmailEditorConfig({ plugins: [card()] });
+  const config = renderConfig({ plugins: [card()] });
   const legacy = { ...createEmailDocument(), version: 3, blocks: [{ id: 'old', type: 'test.card', fields: { title: 'Legacy' } }] };
   const before = JSON.stringify(legacy);
   assert.throws(() => config.validate(legacy), /Unsupported email document version: 3/);
@@ -39,17 +40,22 @@ test('v4 拒绝使用 fields 的旧版本文档，不提供自动迁移', () => 
   assert.equal(JSON.stringify(legacy), before);
 });
 
-test('内置区块可隐藏和排序，隐藏不妨碍旧节点渲染；覆盖必须显式声明', () => {
-  const config = createEmailEditorConfig({ builtins: ['image', 'text'], plugins: [card()] });
+test('内置区块可隐藏和排序，隐藏不妨碍已有节点渲染；覆盖必须显式声明', (t) => {
+  const reportError = console.error.bind(console);
+  t.mock.method(console, 'error', (message, ...args) => {
+    if (String(message).startsWith('The above error occurred in the <Harness> component')) return;
+    reportError(message, ...args);
+  });
+  const config = renderConfig({ builtins: ['image', 'text'], plugins: [card()] });
   assert.deepEqual(config.library.map((plugin) => plugin.type), ['image', 'text', 'test.card']);
   assert.match(config.toHtml(createEmailDocument([config.createBlock('heading')])), /Heading/);
-  assert.equal(createEmailEditorConfig({ builtins: false }).library.length, 0);
-  assert.throws(() => createEmailEditorConfig({ plugins: [card(), card()] }), /Duplicate/);
-  assert.throws(() => createEmailEditorConfig({ plugins: [card({ type: 'text' })] }), /override/);
-  const override = createEmailEditorConfig({ plugins: [card({ type: 'text', override: true })] });
+  assert.equal(renderConfig({ builtins: false }).library.length, 0);
+  assert.throws(() => renderConfig({ plugins: [card(), card()] }), /Duplicate/);
+  assert.throws(() => renderConfig({ plugins: [card({ type: 'text' })] }), /override/);
+  const override = renderConfig({ plugins: [card({ type: 'text', override: true })] });
   assert.match(override.toHtml(createEmailDocument([override.createBlock('text')])), /Default/);
-  assert.throws(() => createEmailEditorConfig({ builtins: ['oops'] }), /Unknown builtin/);
-  assert.throws(() => createEmailEditorConfig({ builtins: ['text', 'text'] }), /Duplicate/);
+  assert.throws(() => renderConfig({ builtins: ['oops'] }), /Unknown builtin/);
+  assert.throws(() => renderConfig({ builtins: ['text', 'text'] }), /Duplicate/);
 });
 
 test('嵌套字段和模板样例深拷贝，字段默认值只补缺失值', () => {
@@ -65,7 +71,7 @@ test('嵌套字段和模板样例深拷贝，字段默认值只补缺失值', ()
     defaultData: { products: [{ name: 'Cup' }] },
     renderEmail: ({ controls }) => JSON.stringify(controls),
   });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   const first = config.createBlock(plugin.type);
   const second = config.createBlock(plugin.type);
   first.controls.object.tags.push('B');
@@ -86,7 +92,7 @@ test('声明的容器能力控制创建和导出，样式控件默认值实际�
     styleControls: [{ id: 'dimension.padding', group: 'dimension', label: 'Padding', control: 'spacing', defaultValue: '12px' }],
     defaultStyle: { decorations: { backgroundColor: '#ff0000' } },
   });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   const block = config.createBlock(plugin.type);
   assert.equal(block.style.dimension.padding, '12px');
   assert.equal(block.style.decorations, undefined);
@@ -96,7 +102,7 @@ test('声明的容器能力控制创建和导出，样式控件默认值实际�
 
 test('模板在自定义画布与预览统一解析，导出保留变量及表达式', () => {
   const plugin = card({ defaultData: { name: 'Alice' }, renderEmail: ({ email }) => email.html`<p>{{ .name }}</p>` });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   const block = config.createBlock(plugin.type);
   const document = createEmailDocument([block]);
   const canvas = renderBlockContent(block, config.definitions, 'canvas', { resolveHtmlTemplate: true });
@@ -115,7 +121,7 @@ test('HTML 工具转义普通插值，显式富文本和布局工具保留 HTML'
     ${{ html: '<script>spoof</script>' }}
     {{printf "%s" .name}}
   ` });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   const html = config.toHtml(createEmailDocument([config.createBlock(plugin.type)]));
   assert.match(html, /&lt;script&gt;evil&lt;\/script&gt;/);
   assert.match(html, /<strong>Rich<\/strong>/);
@@ -127,7 +133,7 @@ test('HTML 工具转义普通插值，显式富文本和布局工具保留 HTML'
 
 test('字段校验支持嵌套路径；邮件导出失败时保留原始文档并提供区块信息', () => {
   const plugin = card({ controls: { rows: EmailControls.list({ label: 'Rows', controls: { value: EmailControls.text({ label: 'Value', validate: (value) => value ? undefined : 'Required' }) } }) }, renderEmail: () => '<p>Test</p>' });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   const block = config.createBlock(plugin.type);
   block.controls.rows = [{ value: '' }];
   const document = createEmailDocument([block]);
@@ -158,7 +164,7 @@ test('自定义控件在 React 中挂载，渲染异常包含原始区块定位�
   const spec = EmailControls.text({ label: 'Title', defaultValue: 'Default', component: ({ value, label }) => createElement('label', null, label, createElement('input', { value, readOnly: true })) });
   assert.match(renderToStaticMarkup(spec.renderControl({ value: 'Custom', label: 'Title', onChange: () => {} })), /value="Custom"/);
   const plugin = card({ renderEmail: () => { throw new Error('Broken template'); } });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   assert.throws(() => config.toHtml(createEmailDocument([config.createBlock(plugin.type)])), /test.card.*Broken template/);
 });
 
@@ -173,7 +179,7 @@ test('插件渲染收到独立快照，误修改上下文不会污染文档或�
       return '<p>Snapshot</p>';
     },
   });
-  const config = createEmailEditorConfig({ plugins: [plugin] });
+  const config = renderConfig({ plugins: [plugin] });
   const document = createEmailDocument([config.createBlock(plugin.type)]);
   const before = JSON.stringify(document);
   config.toHtml(document);

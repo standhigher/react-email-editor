@@ -8,18 +8,20 @@
 | --- | --- |
 | `EmailControls` | 声明控件、值类型、默认值、校验和编辑组件。 |
 | `defineBlock()` | 组合控件、样式、编辑界面和邮件输出，形成一个区块插件。 |
-| `createEmailEditorConfig()` | 注册插件，提供区块创建、文档校验和 HTML 导出。 |
+| `useEmailEditorConfig()` | 注册插件，提供区块创建、文档校验和 HTML 导出。 |
 
 内置区块使用相同机制。配置不持有具体文档或选中状态，可以被多个编辑器复用。`EmailDocument` 是文档状态的事实源，React 编辑会话负责选择、拖拽和更新。
 
 ## 完整接入示例
 
 ```tsx
+import { useState } from "react";
 import {
   EmailEditor,
   EmailControls,
   createEmailDocument,
-  createEmailEditorConfig,
+  useEmailEditorConfig,
+  useEmailEditor,
   defineBlock,
 } from "@standhigher/react-email-editor";
 import "@standhigher/react-email-editor/styles.css";
@@ -40,17 +42,12 @@ const coupon = defineBlock({
   `,
 });
 
-// 放在组件外，或通过 useMemo 保持引用稳定。
-const config = createEmailEditorConfig({ plugins: [coupon] });
-const initialDocument = createEmailDocument([config.createBlock(coupon.type)]);
-
 export function EmailPage() {
-  return <EmailEditor config={config} initialDocument={initialDocument} />;
+  const config = useEmailEditorConfig({ plugins: [coupon] });
+  const [initialDocument] = useState(() => createEmailDocument([config.createBlock(coupon.type)]));
+  const editor = useEmailEditor({ config, initialDocument });
+  return <EmailEditor editor={editor} />;
 }
-
-// 独立导出也使用同一配置，无需挂载编辑器。
-const issues = config.validate(initialDocument);
-const html = config.toHtml(initialDocument);
 ```
 
 `controls` 在声明阶段保存控件定义，在节点、Canvas/Inspector Props 和渲染上下文中保存对应的值：
@@ -66,28 +63,27 @@ controls: { code: EmailControls.text({ label: "优惠码", defaultValue: "SAVE20
 controls.code // string
 ```
 
-## 1. createEmailEditorConfig(options?)
+## 1. useEmailEditorConfig(options?)
 
 ### 示例
 
-```ts
-const config = createEmailEditorConfig({
-  plugins: [coupon],
-  builtins: ["heading", "text", "image", "button"],
-  pickImage: async ({ value, label, signal }) => {
-    // 调用应用自己的素材库；使用 value 初始化，label 作标题，signal 取消请求。
-    // 返回图片 URL；取消选择时返回 null。
-    return null;
-  },
-});
-
-const block = config.createBlock("my-app.coupon");
-const document = createEmailDocument([block]);
-const html = config.toHtml(document);
-const preview = config.toHtml(document, { resolveHtmlTemplates: true });
+```tsx
+function useCouponConfig() {
+  return useEmailEditorConfig({
+    plugins: [coupon],
+    builtins: ["heading", "text", "image", "button"],
+    pickImage: async ({ value, label, signal }) => {
+      // 调用应用自己的素材库；使用 value 初始化，label 作标题，signal 取消请求。
+      // 返回图片 URL；取消选择时返回 null。
+      return null;
+    },
+  });
+}
 ```
 
-### 参数：EmailEditorConfigOptions
+配置 Hook 必须在 React 组件或自定义 Hook 顶层调用。保持 `plugins`、`builtins` 和 `pickImage` 引用稳定会保留配置引用；更新配置不会重置已有实例文档。移除仍被文档使用的插件后，校验报告缺失插件，原始数据保留。配置的 `toHtml(document)` 和 `validate(document)` 面向任意文档；实例的 `getHtml()` 和 `validate()` 面向当前文档。
+
+### 参数：UseEmailEditorConfigOptions
 
 所有参数均可选。
 
@@ -481,10 +477,10 @@ renderEmail: ({ controls, email }) => email.html`
 | `ControlComponentProps<T>` | 单控件 React 编辑组件。 |
 | `BlockPlugin/BlockPluginOptions` | 区块定义及声明参数。 |
 | `PluginEditorProps/PluginRenderContext` | 编辑组件 Props / 邮件渲染上下文。 |
-| `EmailEditorConfig/EmailEditorConfigOptions` | 注册配置及参数。 |
+| `EmailEditorConfig/UseEmailEditorConfigOptions` | 注册配置及参数。 |
 | `ImagePickerContext/ValidationIssue` | 图片资源适配器 / 校验结果。 |
 | `ControlOption/StyleControlConfig/BlockInspectorSection` | 选项 / 样式控件 / 检查器分组。 |
 | `ControlEditorProps/EditableRichTextProps` | 控件复用和富文本编辑组件 Props。 |
 | `EmailMarkup/EmailTools` | 邮件片段及工具集。 |
 
-编辑器 Props、ref 方法、body 和 variables 的完整接入见 [README](../README.zh-CN.md)。可运行示例见 [优惠券](../playground/plugins/coupon.ts)、[商品卡片](../playground/plugins/product.ts)及[统一配置](../playground/plugins/config.ts)。
+编辑器 Hooks、实例方法、body 和 variables 的完整接入见 [README](../README.zh-CN.md)。可运行示例见 [优惠券](../playground/plugins/coupon.ts)、[商品卡片](../playground/plugins/product.ts)及[统一配置](../playground/plugins/config.ts)。

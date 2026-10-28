@@ -104,7 +104,7 @@ export interface ValidationIssue {
   message: string;
 }
 
-export interface EmailEditorConfigOptions {
+export interface UseEmailEditorConfigOptions {
   plugins?: BlockPlugin[];
   /** false 隐藏全部内置区块；数组声明显示顺序。隐藏不影响已有节点渲染。 */
   builtins?: false | string[];
@@ -114,7 +114,7 @@ export interface EmailEditorConfigOptions {
 export interface EmailEditorConfig {
   readonly definitions: readonly BlockPlugin[];
   readonly library: readonly BlockPlugin[];
-  readonly pickImage?: EmailEditorConfigOptions["pickImage"];
+  readonly pickImage?: UseEmailEditorConfigOptions["pickImage"];
   createBlock: (type: string) => EmailBlockNode;
   toHtml: (document: EmailDocument, options?: DocumentHtmlOptions) => string;
   validate: (document: EmailDocument) => ValidationIssue[];

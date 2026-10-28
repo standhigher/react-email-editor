@@ -13,6 +13,13 @@ body {
   background: #f1f1f1;
 }
 
+.ree-demo-app { display: flex; flex-direction: column; height: 100%; }
+.ree-demo-editor { flex: 1; min-height: 0; }
+.ree-demo-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px; background: #fff; border-bottom: 1px solid #ddd; font: 13px Arial, sans-serif; }
+.ree-demo-export { position: fixed; inset: 24px; z-index: 100; display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid #000; background: #fff; box-shadow: 0 12px 48px #0003; }
+.ree-demo-export label { display: flex; flex: 1; min-height: 0; flex-direction: column; gap: 8px; font: 13px Arial, sans-serif; }
+.ree-demo-export textarea { flex: 1; min-height: 0; resize: none; font: 12px monospace; }
+
 .ree-demo-product { display: grid; gap: 12px; }
 .ree-demo-product .ree-rte { min-height: 32px; }
 

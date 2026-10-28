@@ -18,14 +18,10 @@ export interface BlockRenderOptions {
   body?: EmailBodySettings;
 }
 
-type BlockRenderOptionsInput = BlockRenderOptions | boolean;
-
-function normalizeBlockRenderOptions(
-  options: BlockRenderOptionsInput,
-): BlockRenderOptions {
-  return typeof options === "boolean"
-    ? { resolveHtmlTemplate: options }
-    : options;
+function assertBlockRenderOptions(options: BlockRenderOptions): void {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("Block render options must be an object.");
+  }
 }
 
 function renderPreparedBlock(context: BlockRenderContext, definition: BlockDefinition): string {
@@ -119,27 +115,27 @@ export function renderBlockContent(
   node: EmailBlockNode,
   definitions: readonly BlockDefinition[] = DEFAULT_BLOCKS,
   mode: RenderMode = "email",
-  options: BlockRenderOptionsInput = {},
+  options: BlockRenderOptions = {},
 ): string {
-  const normalizedOptions = normalizeBlockRenderOptions(options);
+  assertBlockRenderOptions(options);
   const rendered = renderBlock(
     node,
     definitions,
     mode,
-    normalizedOptions.body ?? DEFAULT_EMAIL_BODY,
+    options.body ?? DEFAULT_EMAIL_BODY,
   );
-  return resolveBlockContent(rendered, node, normalizedOptions);
+  return resolveBlockContent(rendered, node, options);
 }
 
-function resolveBlockContent(rendered: string, node: EmailBlockNode, normalizedOptions: BlockRenderOptions): string {
+function resolveBlockContent(rendered: string, node: EmailBlockNode, options: BlockRenderOptions): string {
   // 预览展开作用于每个区块 render 产出的 HTML，不限于 HTML 区块。
   // 导出不替换 value，只给变量列表中的原文补点。
-  if (!normalizedOptions.resolveHtmlTemplate) {
-    return applyListedVariableDots(rendered, normalizedOptions.variables ?? []);
+  if (!options.resolveHtmlTemplate) {
+    return applyListedVariableDots(rendered, options.variables ?? []);
   }
   return renderTemplatePreview(
     rendered,
-    normalizedOptions.templateData ?? node.defaultData,
+    options.templateData ?? node.defaultData,
   );
 }
 
@@ -162,13 +158,13 @@ export function blockToHtml(
   node: EmailBlockNode,
   definitions: readonly BlockDefinition[] = DEFAULT_BLOCKS,
   mode: RenderMode = "email",
-  options: BlockRenderOptionsInput = {},
+  options: BlockRenderOptions = {},
 ): string {
-  const normalizedOptions = normalizeBlockRenderOptions(options);
-  const body = normalizedOptions.body ?? DEFAULT_EMAIL_BODY;
+  assertBlockRenderOptions(options);
+  const body = options.body ?? DEFAULT_EMAIL_BODY;
   const style = resolveBlockStyle(node.style, getBlockDefinition(node.type, definitions));
   const inner = renderBlockContent(node, definitions, mode, {
-    ...normalizedOptions,
+    ...options,
     body,
   });
   const height = cssPx(style.dimension?.height);

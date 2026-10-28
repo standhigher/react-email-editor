@@ -1,4 +1,12 @@
-import { createEmailEditorConfig, defineBlock, EmailControls } from "../src/index";
+import { useEmailEditorConfig, useEmailEditor, useEmailEditorState, defineBlock, EmailControls, blockToHtml, renderBlockContent } from "../src/index";
+
+// @ts-expect-error 旧配置工厂已移除，不提供别名。
+type RemovedConfigFactory = typeof import("../src/index").createEmailEditorConfig;
+// @ts-expect-error 旧 ref 类型已移除。
+type RemovedHandle = import("../src/index").EmailEditorHandle;
+// @ts-expect-error 配置参数只使用当前 Hook 类型。
+type RemovedConfigOptions = import("../src/index").EmailEditorConfigOptions;
+void (undefined as unknown as RemovedConfigFactory | RemovedHandle | RemovedConfigOptions);
 
 const plugin = defineBlock({
   type: "test.typed",
@@ -32,11 +40,40 @@ const plugin = defineBlock({
   },
 });
 
-const config = createEmailEditorConfig({ plugins: [plugin] });
-// @ts-expect-error 配置公开列表只读，不支持移除已注册插件。
-config.definitions.splice(0, 1);
-// @ts-expect-error 区块库只读，不支持直接追加。
-config.library.push(plugin);
-// @ts-expect-error 旧 blocks 接入方式已移除。
-const oldProps: import("../src/index").EmailEditorProps = { blocks: [plugin] };
-void oldProps;
+function useTypeContract() {
+  const config = useEmailEditorConfig({ plugins: [plugin] });
+  const editor = useEmailEditor({ config });
+  const state = useEmailEditorState(editor);
+  const props: import("../src/index").EmailEditorProps = { editor, height: 720 };
+  editor.setDocument(editor.getDocument());
+  editor.reset();
+  editor.validate();
+  // @ts-expect-error 配置公开列表只读，不支持移除已注册插件。
+  config.definitions.splice(0, 1);
+  // @ts-expect-error 区块库只读，不支持直接追加。
+  config.library.push(plugin);
+  // @ts-expect-error 订阅文档及其嵌套数据为只读。
+  // oxlint-disable-next-line react/immutability -- 负向类型契约刻意验证 Hook 快照不能写入。
+  state.document.body.contentWidth = 700;
+  // @ts-expect-error 订阅区块列表为只读。
+  state.document.blocks.push(config.createBlock(plugin.type));
+  // @ts-expect-error 组件只接收实例，不接受旧状态 Props。
+  const oldProps: import("../src/index").EmailEditorProps = { editor, initialDocument: editor.getDocument() };
+  // @ts-expect-error 必须明确传入编辑器实例。
+  const missingEditor: import("../src/index").EmailEditorProps = { height: 720 };
+  // @ts-expect-error 组件不接受 ref。
+  const refProps: import("../src/index").EmailEditorProps = { editor, ref: { current: editor } };
+  // @ts-expect-error 配置只能传给 useEmailEditor，不能传给组件。
+  const configProps: import("../src/index").EmailEditorProps = { editor, config };
+  // @ts-expect-error 组件不再接收旧 blocks Prop。
+  const blocksProps: import("../src/index").EmailEditorProps = { editor, blocks: [plugin] };
+  const block = config.createBlock(plugin.type);
+  blockToHtml(block, config.definitions, "email", { resolveHtmlTemplate: true });
+  renderBlockContent(block, config.definitions, "canvas", { resolveHtmlTemplate: true });
+  // @ts-expect-error 渲染参数只接受配置对象，拒绝旧 boolean 参数。
+  blockToHtml(block, config.definitions, "email", true);
+  // @ts-expect-error 内容渲染同样拒绝旧 boolean 参数。
+  renderBlockContent(block, config.definitions, "email", false);
+  void props; void oldProps; void missingEditor; void refProps; void configProps; void blocksProps;
+}
+void useTypeContract;

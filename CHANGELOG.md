@@ -1,5 +1,26 @@
 # 更新日志
 
+## 0.4.0 — 2026-10-28
+
+### 新增与改进
+
+- React 接入统一使用 `useEmailEditorConfig()`、`useEmailEditor()` 和 `<EmailEditor editor={editor}>`；新增 `useEmailEditorState(editor)` 按需订阅缓存的只读文档快照。
+- 编辑器实例引用稳定且互相隔离，无需挂载界面即可读取、校验及导出；提供 `setDocument()` 和 `reset()`，替换或重置时清空旧文档的选择、焦点与控件状态。
+- 配置与变量更新保留当前文档；外部主体输入按值变化合并，初始化不触发回调，文档读取及回调参数保持独立快照。
+- playground 增加导出、新建、重置与订阅示例，中英文接入文档同步更新。
+
+### 修复与验证
+
+- 配置、变量、主体及回调在提交阶段同步，子组件的 layout effect 可读取新值；订阅通知及主体回调延后到 layout 阶段，被中断的并发 render 不改变现有实例。
+- 主题输入框使用实例级 ID，多个编辑器的标签、输入框和字数提示独立关联。
+- 补齐配置更新时序、并发中断、多实例主题关联、旧 API 负向类型契约和源码兼容入口检查。
+
+### 不兼容变更
+
+- 移除公开 `createEmailEditorConfig`、`EmailEditorConfigOptions`、`EmailEditorHandle`、组件 ref 和旧状态 Props，不提供别名或兼容层。配置与状态改为传给 `useEmailEditor()`，组件只接收 `editor` 和 `height`。
+- `blockToHtml()` 和 `renderBlockContent()` 的第四个参数仅接受 `BlockRenderOptions` 对象；移除 boolean 参数适配，JavaScript 传入 boolean 时明确报错。模板预览改用 `{ resolveHtmlTemplate: true }`。
+- 持久化文档继续使用 `version: 4`，不迁移旧版本；本次版本号变化仅涉及包 API 与行为。
+
 ## 0.3.0 — 2026-10-28
 
 ### 新增与改进
