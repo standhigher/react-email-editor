@@ -139,7 +139,7 @@ tests/
 
 ## 测试与验证
 
-默认使用 pnpm，并在项目根目录执行。仓库使用 `pnpm-lock.yaml`，不混用 npm/yarn 锁文件。依赖未安装时优先运行 `pnpm install --frozen-lockfile`；仅在任务确实改变依赖时更新清单和锁文件。当前仓库未声明 `engines` 或 `packageManager`，不得假定团队成员拥有某个个人路径下的 Node/pnpm；首次使用应检查 `node --version` 和 `pnpm --version`，采用依赖支持的 Node LTS。
+默认使用 pnpm，并在项目根目录执行。仓库使用 `pnpm-lock.yaml`，不混用 npm/yarn 锁文件。依赖未安装时优先运行 `pnpm install --frozen-lockfile`；仅在任务确实改变依赖时更新清单和锁文件。`packageManager` 固定 pnpm 10.16.1，`.nvmrc` 推荐 Node 24 LTS，完整校验最低需要 Node 22.18。未声明消费方 `engines`；不要将开发测试的 Node 要求当作消费方安装门槛。不得假定团队成员拥有某个个人路径下的 Node/pnpm；首次使用应检查 `node --version` 和 `pnpm --version`。
 
 ```bash
 pnpm typecheck
@@ -147,6 +147,8 @@ pnpm lint
 pnpm build
 node --test tests/*.test.mjs tests/*.test.ts
 ```
+
+`pnpm check` 按上述顺序执行完整校验；`pnpm test` 只执行 Node 测试，运行前需要已有构建产物。`prepack` 构建发布产物，`prepublishOnly` 执行完整校验。npm 发布及 Trusted Publishing 配置见 `docs/release.zh-CN.md`；GitHub 发布工作流只接受与包版本匹配的版本标签，并由手动触发执行。
 
 验证要求：
 

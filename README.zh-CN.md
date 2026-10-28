@@ -6,9 +6,9 @@
 
 ## 模块架构图
 
-![项目模块架构图：8 个模块及对应功能](./docs/assets/architecture.zh-CN.png)
+![项目模块架构图：8 个模块及对应功能](https://cdn.jsdelivr.net/npm/@standhigher/react-email-editor@0.4.1/docs/assets/architecture.zh-CN.png)
 
-[查看高清架构图](./docs/assets/architecture.zh-CN.png) · [可编辑 SVG](./docs/assets/architecture.zh-CN.svg)
+[查看高清架构图](https://cdn.jsdelivr.net/npm/@standhigher/react-email-editor@0.4.1/docs/assets/architecture.zh-CN.png) · [可编辑 SVG](https://cdn.jsdelivr.net/npm/@standhigher/react-email-editor@0.4.1/docs/assets/architecture.zh-CN.svg)
 
 ## 安装与最小接入
 
@@ -32,7 +32,7 @@ Next.js App Router 的接入组件需声明 `"use client"`；样式在应用允�
 
 ## 本地启动
 
-使用依赖支持的 Node.js LTS（运行全部测试至少需要 22.18）和 pnpm：
+推荐 Node.js 24 LTS（`.nvmrc`；完整测试最低需要 22.18）和 pnpm 10.16.1（`packageManager`）：
 
 ```bash
 pnpm install --frozen-lockfile
@@ -47,6 +47,7 @@ pnpm dev
 - [基础场景](./docs/basic-examples.zh-CN.md)：初始内容、保存恢复、主体样式、变量及预览。
 - [复杂场景](./docs/advanced-examples.zh-CN.md)：校验后保存、多实例、自定义区块、多区域编辑、资源适配与独立导出。
 - [自定义区块指南](./docs/custom-blocks.zh-CN.md)：控件、插件和渲染工具的完整说明。
+- [发布指南](./docs/release.zh-CN.md)：发布包校验与 npm Trusted Publishing 配置。
 - [更新记录](./CHANGELOG.md)。
 
 文档格式仍处于开发阶段，当前只支持 `version: 4`，不自动迁移旧版文档。

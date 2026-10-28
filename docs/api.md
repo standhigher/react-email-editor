@@ -270,6 +270,8 @@ pnpm build
 node --test tests/*.test.mjs tests/*.test.ts
 ```
 
+Use `pnpm check` to run all four checks in order, or `pnpm test` after building to run only the Node tests. Node 24 LTS and pnpm 10.16.1 are the repository defaults. See the [release guide](./release.md) for package verification and publishing.
+
 Build before tests that depend on dist. Internal TypeScript tests require Node 22.18+. The package ships ESM, declarations and flattened CSS. React/React DOM are peer dependencies; TipTap, dnd-kit, CodeMirror and Lezer are dependencies, externalized during builds rather than bundled.
 
 Local consumers can use link:../react-email-editor. Run pnpm build first and pnpm build:watch to update dist. Both projects must share one React instance: Vite can use resolve.dedupe: ["react", "react-dom"]; Next.js can use transpilePackages: ["@standhigher/react-email-editor"], with Turbopack root covering the linked directory.

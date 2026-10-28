@@ -6,9 +6,9 @@ Drag content onto a canvas, style your email, preview it, then save editable JSO
 
 ## Modules and features
 
-![Project modules and features](./docs/assets/architecture.png)
+![Project modules and features](https://cdn.jsdelivr.net/npm/@standhigher/react-email-editor@0.4.1/docs/assets/architecture.png)
 
-[Open full-size architecture diagram](./docs/assets/architecture.png) · [Editable SVG](./docs/assets/architecture.svg)
+[Open full-size architecture diagram](https://cdn.jsdelivr.net/npm/@standhigher/react-email-editor@0.4.1/docs/assets/architecture.png) · [Editable SVG](https://cdn.jsdelivr.net/npm/@standhigher/react-email-editor@0.4.1/docs/assets/architecture.svg)
 
 ## Install and integrate
 
@@ -32,7 +32,7 @@ With Next.js App Router, add `"use client"` to the integration component and imp
 
 ## Run locally
 
-Use a supported Node.js LTS release (at least 22.18 for the complete test suite) and pnpm:
+Use Node.js 24 LTS (`.nvmrc`; at least 22.18 for the complete test suite) and pnpm 10.16.1 (`packageManager`):
 
 ```bash
 pnpm install --frozen-lockfile
@@ -47,6 +47,7 @@ Open [http://localhost:5173](http://localhost:5173); reuse an existing server wh
 - [Basic examples](./docs/basic-examples.md): initial content, saving/loading, body styles, variables and preview.
 - [Advanced examples](./docs/advanced-examples.md): validated saving, multiple instances, custom blocks, multiple editing regions, resource adapters and standalone export.
 - [Custom block guide](./docs/custom-blocks.md): detailed controls, plugins and rendering helpers.
+- [Release guide](./docs/release.md): package checks and npm Trusted Publishing setup.
 - [Changelog](./CHANGELOG.md).
 
 The document format is under development. Only `version: 4` is supported, without automatic migration of older documents.

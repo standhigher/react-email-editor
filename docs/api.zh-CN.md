@@ -270,6 +270,8 @@ pnpm build
 node --test tests/*.test.mjs tests/*.test.ts
 ```
 
+`pnpm check` 按上述顺序执行全部检查；只运行 Node 测试时，构建后执行 `pnpm test`。本仓库默认使用 Node 24 LTS 和 pnpm 10.16.1。打包检查与发布流程见[发布指南](./release.zh-CN.md)。
+
 先构建再运行依赖 dist 的测试；TypeScript 内部测试需要 Node 22.18+。包提供 ESM、类型与展开后的 CSS。React/React DOM 为 peer dependencies；TipTap、dnd-kit、CodeMirror、Lezer 等为 dependencies，构建时 external，不内联到发布包。
 
 消费方可使用 `link:../react-email-editor`；先 `pnpm build`，再 `pnpm build:watch` 保持 dist 更新。两项目需共用一个 React 实例：Vite 可设置 `resolve.dedupe: ["react", "react-dom"]`；Next.js 可设置 `transpilePackages: ["@standhigher/react-email-editor"]`，Turbopack 的 root 需覆盖链接目录。

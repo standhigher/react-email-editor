@@ -1,6 +1,6 @@
 {
   "name": "@standhigher/react-email-editor",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "type": "module",
   "description": "React email template editor with drag-and-drop blocks, rich text, JSON storage, and HTML export.",
   "keywords": [
@@ -17,6 +17,16 @@
     "go-template"
   ],
   "author": "Nono",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/standhigher/react-email-editor.git"
+  },
+  "homepage": "https://github.com/standhigher/react-email-editor#readme",
+  "bugs": {
+    "url": "https://github.com/standhigher/react-email-editor/issues"
+  },
+  "packageManager": "pnpm@10.16.1",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -27,21 +37,27 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": ["**/*.css"],
   "files": [
     "dist",
-    "docs",
+    "docs/**/*.md",
+    "docs/**/*.svg",
     "README.md",
     "README.zh-CN.md",
     "CHANGELOG.md"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "dev": "vite --config playground/vite.config.ts",
     "build": "tsup",
     "build:watch": "tsup --watch src",
+    "test": "node --test tests/*.test.mjs tests/*.test.ts",
+    "check": "pnpm typecheck && pnpm lint && pnpm build && pnpm test",
     "prepack": "pnpm build",
+    "prepublishOnly": "pnpm check",
     "typecheck": "tsc --noEmit && tsc --noEmit -p playground",
     "lint": "oxlint . --deny-warnings --report-unused-disable-directives",
     "lint:fix": "pnpm lint --fix"
