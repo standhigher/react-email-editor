@@ -42,6 +42,25 @@ test("中英文 README 图片与查看链接使用已发布资源的固定绝对
   }
 });
 
+test("README 文档导航使用 GitHub 绝对地址且目标文件与章节存在", () => {
+  const base = "https://github.com/standhigher/react-email-editor/blob/main/";
+  for (const file of ["README.md", "README.zh-CN.md"]) {
+    const markdown = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+    for (const [, target] of markdown.matchAll(/\[[^\]]*\]\(([^)]+)\)/g)) {
+      const url = new URL(target);
+      if (url.href === "http://localhost:5173/") continue;
+      assert.equal(url.protocol, "https:", target);
+      if (url.hostname === "cdn.jsdelivr.net") continue;
+      assert.ok(target.startsWith(base), target);
+      const document = readFileSync(new URL(`../${url.pathname.split("/blob/main/")[1]}`, import.meta.url), "utf8");
+      if (!url.hash) continue;
+      const headings = [...document.matchAll(/^#{1,6}\s+(.+)$/gm)].map(([, title]) =>
+        title.toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, "").trim().replace(/\s/g, "-"));
+      assert.ok(headings.includes(decodeURIComponent(url.hash.slice(1))), target);
+    }
+  }
+});
+
 test("消费方可移除未使用的包导入，同时保留显式导入的编辑器 CSS", async () => {
   const result = await build({
     root,

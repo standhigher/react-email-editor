@@ -1,6 +1,6 @@
 # @standhigher/react-email-editor
 
-[English](./README.md) | 简体中文
+[English](https://github.com/standhigher/react-email-editor/blob/main/README.md) | 简体中文
 
 把内容拖进画布，调整邮件外观，预览后保存为可继续编辑的 JSON 或导出邮件 HTML。
 
@@ -39,15 +39,15 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-打开 [http://localhost:5173](http://localhost:5173)，已有服务时优先复用。构建与校验命令见 [API 文档的开发说明](./docs/api.zh-CN.md#开发与本地联调)。
+打开 [http://localhost:5173](http://localhost:5173)，已有服务时优先复用。构建与校验命令见 [API 文档的开发说明](https://github.com/standhigher/react-email-editor/blob/main/docs/api.zh-CN.md#开发与本地联调)。
 
 ## 文档
 
-- [API 参考](./docs/api.zh-CN.md)：所有公共导出、参数、默认值与类型。
-- [基础场景](./docs/basic-examples.zh-CN.md)：初始内容、保存恢复、主体样式、变量及预览。
-- [复杂场景](./docs/advanced-examples.zh-CN.md)：校验后保存、多实例、自定义区块、多区域编辑、资源适配与独立导出。
-- [自定义区块指南](./docs/custom-blocks.zh-CN.md)：控件、插件和渲染工具的完整说明。
-- [发布指南](./docs/release.zh-CN.md)：发布包校验与 npm Trusted Publishing 配置。
-- [更新记录](./CHANGELOG.md)。
+- [API 参考](https://github.com/standhigher/react-email-editor/blob/main/docs/api.zh-CN.md)：所有公共导出、参数、默认值与类型。
+- [基础场景](https://github.com/standhigher/react-email-editor/blob/main/docs/basic-examples.zh-CN.md)：初始内容、保存恢复、主体样式、变量及预览。
+- [复杂场景](https://github.com/standhigher/react-email-editor/blob/main/docs/advanced-examples.zh-CN.md)：校验后保存、多实例、自定义区块、多区域编辑、资源适配与独立导出。
+- [自定义区块指南](https://github.com/standhigher/react-email-editor/blob/main/docs/custom-blocks.zh-CN.md)：控件、插件和渲染工具的完整说明。
+- [发布指南](https://github.com/standhigher/react-email-editor/blob/main/docs/release.zh-CN.md)：发布包校验与 npm Trusted Publishing 配置。
+- [更新记录](https://github.com/standhigher/react-email-editor/blob/main/CHANGELOG.md)。
 
 文档格式仍处于开发阶段，当前只支持 `version: 4`，不自动迁移旧版文档。

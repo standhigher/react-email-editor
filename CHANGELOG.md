@@ -8,6 +8,7 @@
 - 新增 `pnpm test`、`pnpm check` 和发布前完整校验；通过 `sideEffects` 保留 CSS，并验证消费方可以移除未使用的 JavaScript 导入。
 - 新增 Node 22 / 24 CI，以及手动选择已有稳定版本标签的 GitHub Actions npm Trusted Publishing 工作流；发布前校验版本，使用 OIDC 和 provenance。
 - 修复 npm README 图片失效：中英文图片与查看链接改用已发布 0.4.1 资源的固定绝对 CDN 地址；新版包不重复携带 PNG 原图，保留 Markdown 和 SVG 文档。
+- 中英文 README 的语言切换、API、示例、发布指南、更新日志及章节导航统一使用 GitHub 绝对地址，并验证目标文档和锚点存在；远端文档需随提交一并推送。
 - 补充中英文发布指南、发布文件范围与 CSS 消费验证；保持 React 18 peer 范围及现有公开 API、文档格式不变。
 
 ## 0.4.1 — 2026-10-28

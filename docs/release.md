@@ -16,6 +16,8 @@ Both READMEs use absolute CDN URLs pinned to the publicly published `0.4.1` pack
 
 When updating a diagram, host the new image at a stable public URL before changing either README. Do not reference an unpublished version or a `latest` URL that may no longer contain PNGs. Verify an unauthenticated `200` response and the correct image Content-Type.
 
+README language switches, documentation, changelog and section links use absolute GitHub `blob/main` URLs. Push the corresponding commit before publishing so the linked READMEs, `docs/` and changelog exist on GitHub; local-only files still return 404. Relative links inside documentation pages are resolved by GitHub against their directories.
+
 ## Local checks and publishing
 
 ```bash

@@ -1,6 +1,6 @@
 # @standhigher/react-email-editor
 
-English | [简体中文](./README.zh-CN.md)
+English | [简体中文](https://github.com/standhigher/react-email-editor/blob/main/README.zh-CN.md)
 
 Drag content onto a canvas, style your email, preview it, then save editable JSON or export email HTML.
 
@@ -39,15 +39,15 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173); reuse an existing server when available. See [development and local linking](./docs/api.md#development-and-local-linking) for build and validation commands.
+Open [http://localhost:5173](http://localhost:5173); reuse an existing server when available. See [development and local linking](https://github.com/standhigher/react-email-editor/blob/main/docs/api.md#development-and-local-linking) for build and validation commands.
 
 ## Documentation
 
-- [API reference](./docs/api.md): every public export, parameter, default and type.
-- [Basic examples](./docs/basic-examples.md): initial content, saving/loading, body styles, variables and preview.
-- [Advanced examples](./docs/advanced-examples.md): validated saving, multiple instances, custom blocks, multiple editing regions, resource adapters and standalone export.
-- [Custom block guide](./docs/custom-blocks.md): detailed controls, plugins and rendering helpers.
-- [Release guide](./docs/release.md): package checks and npm Trusted Publishing setup.
-- [Changelog](./CHANGELOG.md).
+- [API reference](https://github.com/standhigher/react-email-editor/blob/main/docs/api.md): every public export, parameter, default and type.
+- [Basic examples](https://github.com/standhigher/react-email-editor/blob/main/docs/basic-examples.md): initial content, saving/loading, body styles, variables and preview.
+- [Advanced examples](https://github.com/standhigher/react-email-editor/blob/main/docs/advanced-examples.md): validated saving, multiple instances, custom blocks, multiple editing regions, resource adapters and standalone export.
+- [Custom block guide](https://github.com/standhigher/react-email-editor/blob/main/docs/custom-blocks.md): detailed controls, plugins and rendering helpers.
+- [Release guide](https://github.com/standhigher/react-email-editor/blob/main/docs/release.md): package checks and npm Trusted Publishing setup.
+- [Changelog](https://github.com/standhigher/react-email-editor/blob/main/CHANGELOG.md).
 
 The document format is under development. Only `version: 4` is supported, without automatic migration of older documents.
