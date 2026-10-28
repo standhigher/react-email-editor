@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
-import { Button } from "../components/Button";
 import type { BlockDefinition } from "../types/block";
 import { BlockLibraryItem } from "./BlockLibraryItem";
+import { BlockLibraryToggle } from "./BlockLibraryToggle";
 
 interface BlockLibraryProps {
   definitions: BlockDefinition[];
@@ -9,29 +9,17 @@ interface BlockLibraryProps {
 }
 
 export function BlockLibrary({ definitions, onAdd }: BlockLibraryProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean | null>(null);
   const libraryId = useId();
 
   return (
-    <aside className={`ree-col ree-col-left${collapsed ? " is-collapsed" : ""}`}>
+    <aside className={`ree-col ree-col-left${collapsed === null ? "" : collapsed ? " is-collapsed" : " is-expanded"}`}>
       <div className="ree-col-head ree-library-head">
-        {!collapsed && <span>Blocks</span>}
-        <Button
-          variant="icon"
-          aria-label={collapsed ? "Expand blocks sidebar" : "Collapse blocks sidebar"}
-          aria-expanded={!collapsed}
-          aria-controls={libraryId}
-          tooltip={collapsed ? "Expand blocks sidebar" : "Collapse blocks sidebar"}
-          onClick={() => setCollapsed((value) => !value)}
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M9 3v18" />
-            {collapsed ? <path d="m14 9 3 3-3 3" /> : <path d="m16 9-3 3 3 3" />}
-          </svg>
-        </Button>
+        <span className="ree-library-label">Blocks</span>
+        <BlockLibraryToggle collapsed={false} libraryId={libraryId} onToggle={() => setCollapsed(true)} />
+        <BlockLibraryToggle collapsed libraryId={libraryId} onToggle={() => setCollapsed(false)} />
       </div>
-      <div id={libraryId} className="ree-lib" hidden={collapsed}>
+      <div id={libraryId} className="ree-lib">
         {definitions.map((definition) => (
           <BlockLibraryItem
             key={definition.type}

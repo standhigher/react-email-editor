@@ -22,7 +22,8 @@ export function BlockLibraryItem({ definition, onAdd }: BlockLibraryItemProps) {
       {...attributes}
       className={`ree-lib-item${isDragging ? " is-dragging" : ""}`}
       onClick={onAdd}
-      title={definition.description}
+      aria-label={definition.title}
+      title={definition.description ? `${definition.title}: ${definition.description}` : definition.title}
     >
       <BlockIcon icon={definition.icon} className="ree-lib-icon" />
       <span className="ree-lib-title">{definition.title}</span>

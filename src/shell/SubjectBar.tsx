@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { TextInput } from "../components/TextInput";
 import { SUBJECT_MAX_LENGTH } from "../constants/editor";
 import { PERSONALIZATION_HINT } from "./constants";
@@ -17,6 +17,7 @@ export function SubjectBar({
   onSubjectChange,
 }: SubjectBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const countId = useId();
 
   const insertVariable = (token: string) => {
     const input = inputRef.current;
@@ -39,17 +40,20 @@ export function SubjectBar({
       <label className="ree-subject-label" htmlFor="ree-email-subject">
         Email subject
       </label>
-      <TextInput
-        id="ree-email-subject"
-        ref={inputRef}
-        className="ree-subject-input"
-        value={subject}
-        maxLength={SUBJECT_MAX_LENGTH}
-        onChange={(event) => onSubjectChange(event.target.value)}
-      />
-      <span className="ree-subject-count">
-        {subject.length}/{SUBJECT_MAX_LENGTH}
-      </span>
+      <div className="ree-subject-field">
+        <TextInput
+          id="ree-email-subject"
+          ref={inputRef}
+          className="ree-subject-input"
+          value={subject}
+          maxLength={SUBJECT_MAX_LENGTH}
+          aria-describedby={countId}
+          onChange={(event) => onSubjectChange(event.target.value)}
+        />
+        <span id={countId} className="ree-subject-count">
+          {subject.length}/{SUBJECT_MAX_LENGTH}
+        </span>
+      </div>
       {variables.length > 0 ? (
         <>
           <PersonalizationMenu variables={variables} onInsert={insertVariable} />
