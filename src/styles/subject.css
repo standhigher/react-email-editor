@@ -68,11 +68,6 @@
   background: var(--ree-panel-secondary);
 }
 
-.ree-personalization-menu {
-  left: 0;
-  min-width: 240px;
-}
-
 .ree-subject-hint {
   flex: 0 1 auto;
   margin: 0;

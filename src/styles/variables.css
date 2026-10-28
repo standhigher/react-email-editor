@@ -1,15 +1,29 @@
 /* ---------- 变量 ---------- */
 
-.ree-var-wrap {
+.ree-input-with-variable {
   position: relative;
 }
 
-.ree-var-btn {
+.ree-input-with-variable > .ree-input {
+  --ree-control-padding-end: 48px;
+}
+
+.ree-input-with-variable > .ree-textarea {
+  display: block;
+}
+
+.ree-personalization-suffix {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+.ree-personalization-suffix-btn {
   appearance: none;
   border: none;
   background: transparent;
   min-width: 30px;
-  height: 24px;
+  height: 26px;
   padding: 0 6px;
   border-radius: var(--ree-radius-sm);
   cursor: pointer;
@@ -17,8 +31,14 @@
   font-size: 12px;
 }
 
-.ree-var-btn:hover {
+.ree-personalization-suffix-btn:hover {
   background: var(--ree-panel-secondary);
+}
+
+.ree-personalization-suffix-btn:focus-visible,
+.ree-personalization-btn:focus-visible {
+  outline: 2px solid var(--ree-text);
+  outline-offset: -2px;
 }
 
 .ree-var-menu {
@@ -35,6 +55,16 @@
   max-height: 240px;
   overflow-y: auto;
   color: var(--ree-text, #202223);
+}
+
+.ree-var-menu.ree-personalization-menu {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  z-index: 1000;
+  width: 240px;
+  min-width: 0;
+  max-width: calc(100vw - 16px);
 }
 
 .ree-var-item {
@@ -58,6 +88,13 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
   color: var(--ree-primary);
+}
+
+.ree-var-name,
+.ree-var-label {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .ree-var-label {

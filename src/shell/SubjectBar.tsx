@@ -2,7 +2,7 @@ import { useId, useRef } from "react";
 import { TextInput } from "../components/TextInput";
 import { SUBJECT_MAX_LENGTH } from "../constants/editor";
 import { PERSONALIZATION_HINT } from "./constants";
-import { PersonalizationMenu } from "./PersonalizationMenu";
+import { PersonalizationMenu } from "../components/PersonalizationMenu";
 import type { Variable } from "../types/block";
 
 interface SubjectBarProps {
