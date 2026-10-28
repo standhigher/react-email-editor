@@ -1,5 +1,5 @@
 import { DEFAULT_BLOCKS } from "../blocks/registry";
-import { DEFAULT_EMAIL_GLOBAL } from "../document/constants";
+import { DEFAULT_EMAIL_BODY } from "../document/constants";
 import { getBlockDefinition } from "../document/registry";
 import { resolveBlockStyle } from "../document/block-style";
 import { cssPx, cssSpacing } from "../utils/css-values";
@@ -8,14 +8,14 @@ import { blockCellCss } from "../utils/style";
 import { buildRenderContext } from "./context";
 import { renderTemplatePreview } from "./template-preview";
 import type { BlockDefinition, RenderMode, Variable } from "../types/block";
-import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
+import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 import type { TemplateData } from "./template-preview";
 
 export interface BlockRenderOptions {
   resolveHtmlTemplate?: boolean;
   templateData?: TemplateData;
   variables?: Variable[];
-  global?: EmailGlobalSettings;
+  body?: EmailBodySettings;
 }
 
 type BlockRenderOptionsInput = BlockRenderOptions | boolean;
@@ -112,7 +112,7 @@ export function renderBlockContent(
     node,
     definitions,
     mode,
-    normalizedOptions.global ?? DEFAULT_EMAIL_GLOBAL,
+    normalizedOptions.body ?? DEFAULT_EMAIL_BODY,
   );
   // 预览展开作用于每个区块 render 产出的 HTML，不限于 HTML 区块。
   // 导出不替换 value，只给变量列表中的原文补点。
@@ -129,11 +129,11 @@ export function renderBlock(
   node: EmailBlockNode,
   definitions: BlockDefinition[] = DEFAULT_BLOCKS,
   mode: RenderMode = "email",
-  global: EmailGlobalSettings = DEFAULT_EMAIL_GLOBAL,
+  body: EmailBodySettings = DEFAULT_EMAIL_BODY,
 ): string {
   const definition = getBlockDefinition(node.type, definitions);
   return definition
-    ? definition.render(buildRenderContext(node, mode, global, definition))
+    ? definition.render(buildRenderContext(node, mode, body, definition))
     : `<!-- unknown block type: ${node.type} -->`;
 }
 
@@ -144,13 +144,13 @@ export function blockToHtml(
   options: BlockRenderOptionsInput = {},
 ): string {
   const normalizedOptions = normalizeBlockRenderOptions(options);
-  const global = normalizedOptions.global ?? DEFAULT_EMAIL_GLOBAL;
+  const body = normalizedOptions.body ?? DEFAULT_EMAIL_BODY;
   const style = resolveBlockStyle(node.style, getBlockDefinition(node.type, definitions));
   const inner = renderBlockContent(node, definitions, mode, {
     ...normalizedOptions,
-    global,
+    body,
   });
   const height = cssPx(style.dimension?.height);
   const cellAttrs = height ? ` height="${esc(height)}" valign="top"` : "";
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td style="padding:${esc(cssSpacing(style.dimension?.margin))};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td${cellAttrs} style="${blockCellCss(style, global)}">${inner}</td></tr></table></td></tr></table>`;
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td style="padding:${esc(cssSpacing(style.dimension?.margin))};"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout:fixed;"><tr><td${cellAttrs} style="${blockCellCss(style, body)}">${inner}</td></tr></table></td></tr></table>`;
 }

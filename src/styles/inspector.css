@@ -77,13 +77,13 @@
   padding-bottom: var(--ree-inspector-section-space);
 }
 
-/* Global 没有标题区，容器顶部留白会叠到第一个类目上。 */
-.ree-inspector-global {
+/* Body 没有标题区，容器顶部留白会叠到第一个类目上。 */
+.ree-inspector-body {
   padding-top: 0;
   padding-bottom: 0;
 }
 
-.ree-inspector-global > .ree-inspector-section:first-child {
+.ree-inspector-body > .ree-inspector-section:first-child {
   border-top: 0;
 }
 

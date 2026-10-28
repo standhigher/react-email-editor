@@ -1,9 +1,9 @@
 import { CANVAS_DEVICE_WIDTH } from "../constants/editor";
-import { BORDER_STYLES, FONT_WEIGHTS, HORIZONTAL_ALIGNS, LINK_DECORATIONS, TEXT_ALIGNS } from "../constants/style-values";
+import { BORDER_STYLES, FONT_WEIGHTS, LINK_DECORATIONS } from "../constants/style-values";
 import type { FieldOption } from "../types/block";
-import type { EmailGlobalSettings } from "../types/document";
+import type { EmailBodySettings } from "../types/document";
 
-export const DOCUMENT_VERSION = 2 as const;
+export const DOCUMENT_VERSION = 3 as const;
 
 function fontOption(label: string, value: string): FieldOption {
   return Object.freeze({ label, value });
@@ -37,27 +37,17 @@ export function fontFamilyOptions(value: string): FieldOption[] {
   return [{ label: fontFamilyLabel(value), value }, ...fonts];
 }
 
-export const DEFAULT_EMAIL_GLOBAL: EmailGlobalSettings = {
+export const DEFAULT_EMAIL_BODY: EmailBodySettings = {
   textColor: "#000000",
-  textAlign: TEXT_ALIGNS.left,
   backgroundColor: "#ffffff",
-  contentBackgroundColor: "#ffffff",
   contentWidth: CANVAS_DEVICE_WIDTH.desktop,
-  contentAlign: HORIZONTAL_ALIGNS.center,
+  fontFamily: "Arial, Helvetica, sans-serif",
+  fontWeight: FONT_WEIGHTS.normal,
+  linkColor: "#005bd3",
+  linkDecoration: LINK_DECORATIONS.underline,
   contentPadding: "0px",
-  outerPadding: "0px",
   blockGap: "4px",
-  paragraphSpacing: "6px",
-  listSpacing: "4px",
-  listIndent: "22px",
   borderWidth: "0px",
   borderStyle: BORDER_STYLES.solid,
   borderColor: "transparent",
-  borderRadius: "0px",
-  fontFamily: "Arial, Helvetica, sans-serif",
-  fontWeight: FONT_WEIGHTS.normal,
-  defaultFontSize: "16px",
-  defaultLineHeight: "1.5",
-  linkColor: "#005bd3",
-  linkDecoration: LINK_DECORATIONS.underline,
 };

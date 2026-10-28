@@ -69,13 +69,20 @@ All props are optional.
 | --- | --- | --- |
 | `initialDocument` | `EmailDocument` | Read on first mount only. Remount with a new React `key` to switch documents. |
 | `height` | `number \| string` | Defaults to `"100%"`; numbers are pixels. |
-| `global` | `Partial<EmailGlobalSettings>` | Overrides global styles; later changes merge into the current document. Omitting a field does not restore its default. |
+| `body` | `Partial<EmailBodySettings>` | Overrides email body layout, appearance, and default typography; later changes merge into the current document. Omitting a field does not restore its default. |
 | `variables` | `Variable[]` | Variables for insertion and preview. Defaults to `[]`; Personalization controls are hidden when empty. |
 | `blocks` | `BlockDefinition[]` | Adds custom blocks; matching types replace built-in definitions. |
-| `onChange` | `(document: EmailDocument) => void` | Called on document changes, including external `global` updates that change document values. |
-| `onGlobalChange` | `(global: EmailGlobalSettings) => void` | Called for global style edits inside the editor, excluding external `global` updates. |
+| `onChange` | `(document: EmailDocument) => void` | Called on document changes, including external `body` updates that change document values. |
+| `onBodyChange` | `(body: EmailBodySettings) => void` | Called for body style edits inside the editor, excluding external `body` updates. |
 
-Global style example: `global={{ contentWidth: 640, outerPadding: "24px" }}`. Defaults are exported as `DEFAULT_EMAIL_GLOBAL`.
+Body style example: `body={{ contentWidth: 640, contentPadding: "24px" }}`. Defaults are exported as `DEFAULT_EMAIL_BODY`; normalize a partial configuration with `resolveEmailBody()`.
+
+The **BODY** panel stores its settings in `EmailDocument.body` and applies them to the canvas, preview, and HTML export:
+
+- **General**: text color, link color, font family, font weight, and a link underline switch.
+- **Content**: Background, content width, Padding (`contentPadding`), and block gap. **Advanced: Border** is collapsed by default and contains border color, width, and style. Background is the single background color of the email content container; the surrounding area is white. The container is always centered. Padding applies inside the content border and is the only body padding setting; `outerPadding` has been removed.
+
+Text and links inherit BODY defaults unless explicitly formatted in the rich-text toolbar. Editing only a link URL or target preserves explicit link styles; resetting a link style restores BODY inheritance. Base font size (16px), line height (1.5), and paragraph/list spacing use internal defaults. HTML blocks preserve their source formatting; their wrapper inherits body typography without rewriting links or lists. BODY does not expose alignment or corner radius.
 
 Built-in blocks: `heading`, `text`, `button`, `image`, `divider`, `spacer`, and `html`, available through `BLOCK_TYPES`.
 
@@ -103,11 +110,11 @@ const previewHtml = documentToHtml(initialDocument, undefined, {
 
 A variable's `name` is inserted verbatim; `description` and preview `value` are optional. Export adds a missing dot only to tokens matching `variables[].name` exactly, preserving whitespace: `{{ store_name }}` → `{{ .store_name }}`. Other Go template expressions remain unchanged. Preview supports a subset of Go template syntax; data precedence is block `defaultData` > `templateData` (`documentToHtml` option) > `variables`.
 
-The document format is under development. Only `version: 2` is accepted, with no automatic migration of older documents. Create data with `createEmailDocument()` and `createBlockNode()`. See [CHANGELOG](./CHANGELOG.md) for upgrade notes.
+The document format is under development. Only `version: 3` is accepted, with no automatic migration of older documents. Create data with `createEmailDocument()` and `createBlockNode()`. See [CHANGELOG](./CHANGELOG.md) for upgrade notes.
 
 ## Custom blocks
 
-Pass `BlockDefinition[]` through `blocks`. Required fields are `type`, `title`, and `render(ctx)`, which returns HTML. Use `fields` / `styleFields` for inspector controls and `defaultFields` / `defaultStyle` / `defaultData` for initial values. The render context includes `mode: "canvas" | "email"`.
+Pass `BlockDefinition[]` through `blocks`. Required fields are `type`, `title`, and `render(ctx)`, which returns HTML. Use `fields` / `styleFields` for inspector controls and `defaultFields` / `defaultStyle` / `defaultData` for initial values. The render context includes `mode: "canvas" | "email"` and `body: EmailBodySettings` for the current email body settings.
 
 Built-in text formatting lives in `fields.html`, container styles in `style.dimension` / `style.decorations`, and button, image, and divider element styles in `style.element`. Rendering uses only enabled style fields. See [BlockDefinition](https://github.com/standhigher/react-email-editor/blob/main/src/types/block.ts) and [EmailDocument](https://github.com/standhigher/react-email-editor/blob/main/src/types/document.ts) for full types. When calling `documentToHtml` directly, pass the complete definition list including custom blocks as its second argument.
 

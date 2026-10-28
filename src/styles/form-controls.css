@@ -185,6 +185,46 @@
   cursor: default;
 }
 
+.ree-switch-control {
+  width: 100%;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  font-size: 13px;
+  color: var(--ree-muted, #6d7175);
+}
+
+.ree-switch-control input {
+  display: flex;
+  align-items: center;
+  width: 32px;
+  height: 20px;
+  padding: 2px;
+  border: 0;
+  border-radius: 999px;
+  background: #b5b5b5;
+}
+
+.ree-switch-control input::before,
+.ree-switch-control input:checked::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  transform: none;
+}
+
+.ree-switch-control input:checked::before {
+  transform: translateX(12px);
+}
+
+.ree-switch-control input:focus-visible {
+  border: 2px solid #202223;
+  padding: 0;
+}
+
 .ree-range {
   -webkit-appearance: none;
   appearance: none;

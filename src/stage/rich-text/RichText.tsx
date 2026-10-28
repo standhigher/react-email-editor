@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { DEFAULT_EMAIL_GLOBAL } from "../../document/constants";
+import { DEFAULT_TYPOGRAPHY } from "../../constants/typography";
 import type { RichTextProfile, Variable } from "../../types/block";
 import { RichTextToolbar } from "./components/RichTextToolbar";
 import { createRichTextExtensions } from "./extensions";
@@ -23,14 +23,7 @@ export interface RichTextProps {
   onSelect: () => void;
 }
 
-const DEFAULT_INHERITED: RichTextInheritedStyle = {
-  fontFamily: DEFAULT_EMAIL_GLOBAL.fontFamily,
-  fontSize: "15px",
-  color: DEFAULT_EMAIL_GLOBAL.textColor,
-  fontWeight: DEFAULT_EMAIL_GLOBAL.fontWeight,
-  lineHeight: DEFAULT_EMAIL_GLOBAL.defaultLineHeight,
-  paragraphSpacing: DEFAULT_EMAIL_GLOBAL.paragraphSpacing,
-};
+const DEFAULT_INHERITED: RichTextInheritedStyle = DEFAULT_TYPOGRAPHY;
 
 export function RichText({
   initialHtml,

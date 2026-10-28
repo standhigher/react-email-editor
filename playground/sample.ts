@@ -27,7 +27,7 @@ function sampleBlock(type: string, patch: SampleBlockPatch): EmailBlockNode {
 }
 
 export const sampleVariables: Variable[] = [
-  { name: "{{  store_name }}", description: "", value: "店铺名称" },
+  { name: "{{  store_name }}", description: "店铺名称", value: "店铺名称" },
 ];
 
 export const sampleDocument: EmailDocument = {

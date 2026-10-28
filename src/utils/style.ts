@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
 import { FONT_WEIGHTS, isStyleValue, type FontWeight } from "../constants/style-values";
-import type { EmailBlockStyle, EmailDecorationStyle, EmailGlobalSettings } from "../types/document";
-import { resolveEmailGlobal } from "../document/create-document";
+import type { EmailBlockStyle, EmailBodySettings, EmailDecorationStyle } from "../types/document";
+import { DEFAULT_TYPOGRAPHY } from "../constants/typography";
+import { typographyWithBody } from "./typography";
 import { cornerRadii, cssBorderStyle, cssColor, cssFont, cssLength, cssLineHeight, cssPx, cssSpacing } from "./css-values";
 import { esc } from "./html";
 
@@ -23,19 +24,19 @@ export function writeStyleValue(style: EmailBlockStyle | undefined, id: string, 
   return next;
 }
 
-export function resolvedFontWeight(blockWeight: string | undefined, globalWeight: EmailGlobalSettings["fontWeight"]): FontWeight {
-  return isStyleValue(FONT_WEIGHTS, blockWeight) ? blockWeight : globalWeight;
+export function resolvedFontWeight(blockWeight: string | undefined, fallback: FontWeight = DEFAULT_TYPOGRAPHY.fontWeight): FontWeight {
+  return isStyleValue(FONT_WEIGHTS, blockWeight) ? blockWeight : fallback;
 }
 
-export function typographyStyle(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): CSSProperties {
-  const settings = resolveEmailGlobal(global);
+export function typographyStyle(style: EmailBlockStyle | undefined, body?: EmailBodySettings): CSSProperties {
+  const settings = typographyWithBody(body);
   const typography = style?.typography ?? {};
   return {
     fontFamily: cssFont(typography.fontFamily, settings.fontFamily),
-    fontSize: cssLength(typography.fontSize, settings.defaultFontSize),
+    fontSize: cssLength(typography.fontSize, settings.fontSize),
     fontWeight: resolvedFontWeight(typography.fontWeight, settings.fontWeight),
-    lineHeight: cssLineHeight(typography.lineHeight, settings.defaultLineHeight),
-    color: cssColor(typography.color, settings.textColor),
+    lineHeight: cssLineHeight(typography.lineHeight, settings.lineHeight),
+    color: cssColor(typography.color, settings.color),
     textAlign: typography.textAlign ?? settings.textAlign,
   };
 }
@@ -68,25 +69,25 @@ export function styleToCss(style: CSSProperties): string {
     .join(";");
 }
 
-export function typographyCss(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): string {
-  return styleToCss(typographyStyle(style, global));
+export function typographyCss(style: EmailBlockStyle | undefined, body?: EmailBodySettings): string {
+  return styleToCss(typographyStyle(style, body));
 }
 
-export function emailBaseCss(global: EmailGlobalSettings): string {
-  return typographyCss(undefined, global);
+export function emailBaseCss(body?: EmailBodySettings): string {
+  return typographyCss(undefined, body);
 }
 
-export function blockContentStyle(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): CSSProperties {
+export function blockContentStyle(style: EmailBlockStyle | undefined, body?: EmailBodySettings): CSSProperties {
   return {
-    ...typographyStyle(style, global),
+    ...typographyStyle(style, body),
     ...decorationStyle(style?.decorations),
     padding: cssSpacing(style?.dimension?.padding),
     overflowWrap: "anywhere",
   };
 }
 
-export function blockCellCss(style: EmailBlockStyle | undefined, global?: EmailGlobalSettings): string {
-  const css: CSSProperties = { ...blockContentStyle(style, global) };
+export function blockCellCss(style: EmailBlockStyle | undefined, body?: EmailBodySettings): string {
+  const css: CSSProperties = { ...blockContentStyle(style, body) };
   const height = cssPx(style?.dimension?.height);
   if (height) {
     css.boxSizing = "border-box";

@@ -1,35 +1,26 @@
 import type { BorderStyle, FontWeight, HorizontalAlign, LinkDecoration, TextAlign } from "../constants/style-values";
 import { DOCUMENT_VERSION } from "../document/constants";
 
-export interface EmailGlobalSettings {
+/** 邮件主体布局、外观和可继承的基础文字与链接样式。 */
+export interface EmailBodySettings {
   textColor: string;
-  textAlign: TextAlign;
   backgroundColor: string;
   contentWidth: number;
-  contentAlign: HorizontalAlign;
   fontFamily: string;
   fontWeight: FontWeight;
-  contentBackgroundColor: string;
-  contentPadding: string;
-  outerPadding: string;
-  blockGap: string;
-  defaultFontSize: string;
-  defaultLineHeight: string;
-  paragraphSpacing: string;
-  listSpacing: string;
-  listIndent: string;
   linkColor: string;
   linkDecoration: LinkDecoration;
+  contentPadding: string;
+  blockGap: string;
   borderWidth: string;
   borderStyle: BorderStyle;
   borderColor: string;
-  borderRadius: string;
 }
 
 export interface EmailDocument {
   version: typeof DOCUMENT_VERSION;
   subject?: string;
-  global: EmailGlobalSettings;
+  body: EmailBodySettings;
   blocks: EmailBlockNode[];
 }
 

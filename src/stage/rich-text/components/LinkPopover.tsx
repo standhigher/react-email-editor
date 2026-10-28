@@ -5,13 +5,15 @@ import { Button } from "../../../components/Button";
 import { CheckboxControl } from "../../../components/CheckboxControl";
 import { SelectControl } from "../../../components/SelectControl";
 import { TextInput } from "../../../components/TextInput";
+import { ResetButton } from "../../../components/ResetButton";
 import { LINK_TARGETS } from "../constants";
-import { DEFAULT_EMAIL_GLOBAL } from "../../../document/constants";
 
 interface LinkPopoverProps {
   url: string;
   color: string;
+  defaultColor: string;
   decoration: string;
+  defaultDecoration: string;
   target: string;
   onColorChange: (value: string) => void;
   onDecorationChange: (value: string) => void;
@@ -25,7 +27,9 @@ interface LinkPopoverProps {
 export function LinkPopover({
   url,
   color,
+  defaultColor,
   decoration,
+  defaultDecoration,
   target,
   onColorChange,
   onDecorationChange,
@@ -92,8 +96,11 @@ export function LinkPopover({
           />
         </label>
         {submitted && invalidUrl ? <p id={errorId} className="ree-rte-link-error" role="alert">Enter a valid link using an allowed protocol, such as https://.</p> : null}
-        <ColorControl value={color} label="Link color" resetTo={DEFAULT_EMAIL_GLOBAL.linkColor} onChange={onColorChange} />
-        <CheckboxControl label="Underline" checked={decoration === "underline"} onChange={(checked) => onDecorationChange(checked ? "underline" : "none")} />
+        <ColorControl value={color} fallback={defaultColor} label="Link color" resetTo="" onChange={onColorChange} />
+        <div className="ree-field-label">
+          <CheckboxControl label="Underline" checked={(decoration || defaultDecoration) === "underline"} onChange={(checked) => onDecorationChange(checked ? "underline" : "none")} />
+          <ResetButton label="Reset link underline" disabled={!decoration} onClick={() => onDecorationChange("")} />
+        </div>
         <label className="ree-field">
           <span className="ree-field-label">Target</span>
           <SelectControl label="Target" value={target} options={LINK_TARGETS} onChange={onTargetChange} />

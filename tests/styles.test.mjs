@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
-import { BLOCK_TYPES, BORDER_STYLES, createDecorationFields, createDimensionFields, createEmailDocument, createBlockNode, createTypographyFields, DEFAULT_BLOCKS, DOCUMENT_VERSION, documentToHtml, FONT_FAMILIES, FONT_WEIGHTS, getBlockDefinition, HORIZONTAL_ALIGNS, LINK_DECORATIONS, renderBlock, resolveBlockStyleFields, resolveEmailGlobal, blockToHtml, TEXT_ALIGNS } from '../dist/index.js';
+import { BLOCK_TYPES, BORDER_STYLES, createDecorationFields, createDimensionFields, createEmailDocument, createBlockNode, createTypographyFields, DEFAULT_BLOCKS, DOCUMENT_VERSION, documentToHtml, FONT_FAMILIES, FONT_WEIGHTS, getBlockDefinition, HORIZONTAL_ALIGNS, LINK_DECORATIONS, renderBlock, resolveBlockStyleFields, resolveEmailBody, blockToHtml, TEXT_ALIGNS } from '../dist/index.js';
 
 test('内置区块类型和样式取值可从包入口引用', () => {
   assert.deepEqual(DEFAULT_BLOCKS.map((block) => block.type), Object.values(BLOCK_TYPES));
@@ -20,11 +20,11 @@ test('内置区块类型和样式取值可从包入口引用', () => {
 
 test('新文档宽度默认 600，所有留白都允许清零', () => {
   const doc = createEmailDocument([createBlockNode('text'), createBlockNode('text')]);
-  assert.equal(doc.global.contentWidth, 600);
-  assert.equal(doc.global.contentPadding, '0px');
-  assert.equal(doc.global.blockGap, '4px');
-  doc.global = resolveEmailGlobal({ ...doc.global, contentPadding: '0', outerPadding: '0', blockGap: '0', paragraphSpacing: '0', listSpacing: '0', listIndent: '0' });
-  for (const key of ['contentPadding', 'outerPadding', 'blockGap', 'paragraphSpacing', 'listSpacing', 'listIndent']) assert.equal(doc.global[key], '0px');
+  assert.equal(doc.body.contentWidth, 600);
+  assert.equal(doc.body.contentPadding, '0px');
+  assert.equal(doc.body.blockGap, '4px');
+  doc.body = resolveEmailBody({ ...doc.body, contentPadding: '0', blockGap: '0' });
+  for (const key of ['contentPadding', 'blockGap']) assert.equal(doc.body[key], '0px');
   const html = documentToHtml(doc);
   assert.match(html, /max-width:600px/);
   assert.match(html, /width="600"/);
@@ -57,18 +57,18 @@ test('容器只渲染区块支持的样式，Spacer 和 Divider 不读取隐藏�
   }
 });
 
-test('Text 继承全局排版，覆盖与显式富文本样式保持优先级', () => {
+test('Text 使用默认主体排版，显式富文本样式优先，布局配置不影响文字', () => {
   const block = createBlockNode('text');
   block.fields.html = '<p style="text-align:right">A <a href="https://example.com">link</a></p><ul><li><p>B</p></li></ul>';
-  const global = resolveEmailGlobal({ defaultFontSize: '22px', defaultLineHeight: '1.8', textAlign: 'center', paragraphSpacing: '0px', listSpacing: '12px', listIndent: '28px', linkColor: '#123456', linkDecoration: 'none' });
-  const html = renderBlock(block, DEFAULT_BLOCKS, 'email', global);
-  for (const css of ['font-size:22px', 'line-height:1.8', 'text-align:center', 'text-align:right', 'margin:0;text-align:right', 'margin:12px 0;padding-left:28px', 'color:#123456;text-decoration:none', '<p style="margin:0;">B</p>']) assert.ok(html.includes(css), css);
-  assert.doesNotMatch(html, /margin:0 0 0px/);
+  const body = resolveEmailBody({ contentWidth: 720, backgroundColor: '#eeeeee' });
+  const html = renderBlock(block, DEFAULT_BLOCKS, 'email', body);
+  for (const css of ['font-size:16px', 'line-height:1.5', 'text-align:left', 'text-align:right', 'margin:0;text-align:right', 'margin:4px 0;padding-left:22px', 'color:#005bd3;text-decoration:underline', '<p style="margin:0;">B</p>']) assert.ok(html.includes(css), css);
   block.fields.html = '<p>A</p><p>B</p>';
-  block.style.typography = { paragraphSpacing: '8px' };
-  assert.match(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /<p style="margin:0;">A<\/p><p style="margin:0;">B<\/p>/);
   block.style.typography = { fontSize: '30px', paragraphSpacing: '5px' };
-  assert.doesNotMatch(renderBlock(block, DEFAULT_BLOCKS, 'email', global), /font-size:30px|margin:5px/);
+  const updated = renderBlock(block, DEFAULT_BLOCKS, 'email', body);
+  assert.match(updated, /<p style="margin:0;">A<\/p><p style="margin:6px 0 0 0;">B<\/p>/);
+  assert.doesNotMatch(updated, /font-size:30px|margin:5px/);
+  assert.equal(updated, renderBlock(block));
 });
 
 test('按钮、图片、分割线的元素样式与容器样式分离', () => {
@@ -184,9 +184,6 @@ test('自定义区块按容器槽位合并样式，并返回独立副本', () =>
 });
 
 test('圆角可分四角，内置区块忽略容器高度，段落支持间距和行高', () => {
-  assert.equal(resolveEmailGlobal({ borderRadius: '8px' }).borderRadius, '8px');
-  assert.equal(resolveEmailGlobal({ borderRadius: '8px 8px 0 0' }).borderRadius, '8px 8px 0px 0px');
-  assert.equal(resolveEmailGlobal({ borderRadius: '8px 0' }).borderRadius, '0px');
   assert.equal(createDecorationFields().borderRadius.control, 'corners');
   assert.equal(createDimensionFields().height.id, 'dimension.height');
   assert.equal(createDimensionFields().height.max, 480);
@@ -205,19 +202,16 @@ test('圆角可分四角，内置区块忽略容器高度，段落支持间距�
   assert.doesNotMatch(uniform, /valign="top"|height="0"|box-sizing:border-box/);
   assert.match(uniform, /border-radius:8px/);
   assert.doesNotMatch(uniform, /border-top-left-radius/);
-  const global = resolveEmailGlobal({ borderRadius: '8px 8px 0 0', paragraphSpacing: '6px' });
-  const shaped = documentToHtml({ ...createEmailDocument([createBlockNode('text')]), global });
-  assert.match(shaped, /border-top-left-radius:8px/);
-  assert.doesNotMatch(shaped, /border-radius:8px 8px 0 0/);
+  const body = resolveEmailBody();
   block.fields.html = '<p style="margin:10px">A</p><p data-spacing="0">B</p><p data-spacing="16px" data-line-height="1.5" style="line-height:2;--ree-paragraph-gap: 16px">C</p>';
   block.style = { typography: { paragraphSpacing: '8px' } };
-  const text = renderBlock(block, DEFAULT_BLOCKS, 'email', global);
+  const text = renderBlock(block, DEFAULT_BLOCKS, 'email', body);
   assert.match(text, /<p style="margin:0;margin:10px">A<\/p>/);
   assert.match(text, /<p style="margin:0;">B<\/p>/);
   assert.match(text, /<p style="margin:16px 0 0 0;line-height:1.5;">C<\/p>/);
   assert.doesNotMatch(text, /data-spacing|data-line-height|--ree-paragraph-gap/);
   block.fields.html = '<p data-spacing="12px" style="margin:10px">A</p><ul><li><p data-spacing="16px" style="margin:4px">B</p></li></ul><p style="margin:8px">C</p>';
-  const placed = renderBlock(block, DEFAULT_BLOCKS, 'email', global);
+  const placed = renderBlock(block, DEFAULT_BLOCKS, 'email', body);
   assert.match(placed, /<p style="margin:12px 0 0 0;">A<\/p>/);
   assert.match(placed, /<p style="margin:0;margin:4px">B<\/p>/);
   assert.match(placed, /<p style="margin:0;margin:8px">C<\/p>/);
@@ -239,7 +233,7 @@ test('自定义区块的邮件模板在预览时展开，导出保留变量', ()
   assert.doesNotMatch(preview, /\{\{\.title\}\}/);
 });
 
-test('Heading 默认格式存入富文本，画布段落继承全局值而保留行内粗体', async () => {
+test('Heading 默认格式存入富文本，画布段落继承内部基础排版而保留行内粗体', async () => {
   const block = createBlockNode('heading');
   assert.match(renderBlock(block), /<strong>Heading<\/strong>/);
   assert.match(renderBlock(block), /font-size:26px/);
@@ -266,7 +260,7 @@ test('Text 和 Heading 只从富文本内容读取文字格式', () => {
     const block = createBlockNode(type);
     block.fields.html = '<p>Legacy</p>';
     block.style.typography = { fontFamily: 'Georgia, serif', fontSize: '10px', fontWeight: 'bold', color: '#123456', textAlign: 'right', lineHeight: '1.8' };
-    const html = renderBlock(block, DEFAULT_BLOCKS, 'email', resolveEmailGlobal());
+    const html = renderBlock(block, DEFAULT_BLOCKS, 'email', resolveEmailBody());
     for (const css of ['font-family:Georgia, serif', 'font-size:10px', 'font-weight:bold', 'color:#123456', 'text-align:right', 'line-height:1.8']) assert.equal(html.includes(css), false, css);
   }
 });

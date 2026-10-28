@@ -1,10 +1,10 @@
 import type { CSSProperties } from "react";
-import { resolveEmailGlobal } from "../document/create-document";
-import type { EmailBlockStyle, EmailGlobalSettings } from "../types/document";
+import { typographyWithBody } from "../utils/typography";
+import type { EmailBlockStyle, EmailBodySettings } from "../types/document";
 import { cssColor, cssLength, cssLineHeight } from "../utils/css-values";
 
-export function contentDefaults(style: EmailBlockStyle | undefined, global: EmailGlobalSettings) {
-  const settings = resolveEmailGlobal(global);
+export function contentDefaults(style: EmailBlockStyle | undefined, body?: EmailBodySettings) {
+  const settings = typographyWithBody(body);
   const typography = style?.typography;
   return {
     paragraph: cssLength(typography?.paragraphSpacing, settings.paragraphSpacing),
@@ -15,8 +15,8 @@ export function contentDefaults(style: EmailBlockStyle | undefined, global: Emai
   };
 }
 
-export function contentVariables(style: EmailBlockStyle | undefined, global: EmailGlobalSettings): CSSProperties {
-  const values = contentDefaults(style, global);
+export function contentVariables(style: EmailBlockStyle | undefined, body?: EmailBodySettings): CSSProperties {
+  const values = contentDefaults(style, body);
   return {
     "--ree-paragraph-spacing": values.paragraph,
     "--ree-list-spacing": values.listSpacing,
@@ -87,8 +87,8 @@ function paragraphMargin(gap: string): string {
 }
 
 /** 内联默认排版，使邮件客户端不依赖编辑器样式表。没有段落属性时，作者已有 style 仍优先。 */
-export function styleRichText(html: string, style: EmailBlockStyle | undefined, global: EmailGlobalSettings): string {
-  const values = contentDefaults(style, global);
+export function styleRichText(html: string, style: EmailBlockStyle | undefined, body?: EmailBodySettings): string {
+  const values = contentDefaults(style, body);
   const placements = paragraphPlacements(html);
   let paragraph = 0;
   return html.replace(/<!--[\s\S]*?-->|<(p|ul|ol|a)\b([^>]*)>/gi, (tag, name?: string, attributes?: string) => {

@@ -40,7 +40,7 @@ src/
   stage/                画布、预览、富文本编辑和工具栏
   block-library/        可拖拽区块库
   editor-dnd/           拖拽上下文和拖拽数据
-  inspector/            全局/区块字段、样式控制器及检查器组件
+  inspector/            主体/区块字段、样式控制器及检查器组件
   blocks/               内置区块定义、字段配置、图标和注册表
   document/             文档/区块创建、默认值、注册表和 mutations
   render/               画布/邮件渲染、模板预览和文档 HTML 输出
@@ -85,16 +85,16 @@ tests/
 
 ## 文档与数据模型
 
-- 文档创建和归一化统一经过 `src/document/create-document.ts` 的 `createEmailDocument`、`resolveEmailGlobal`、`ensureEmailDocument` 等函数；不要在组件中复制默认值或自行拼装不完整文档。
+- 文档创建和归一化统一经过 `src/document/create-document.ts` 的 `createEmailDocument`、`resolveEmailBody`、`ensureEmailDocument` 等函数；不要在组件中复制默认值或自行拼装不完整文档。
 - 区块创建统一优先使用 `createBlockNode()`，默认字段、默认样式和 `defaultData` 必须从 `BlockDefinition` 派生，并在需要时使用深拷贝，避免共享可变对象。
 - `EmailDocument.version` 是持久化版本字段。变更数据结构时必须检查默认值、导出兼容性和版本语义，并补充测试。当前 README 明确处于开发阶段、不迁移旧版区块字段；不要无需求增加迁移框架。若任务涉及存量文档兼容，先明确支持范围，再实现归一化或迁移。
 - mutations 应保持状态更新边界清晰，避免直接修改不属于当前操作的对象。对外快照和重置逻辑必须保持独立引用。
-- 全局样式与区块样式分层：内置区块容器使用 `dimension`、`decorations`，按钮/图片/分割线等元素自身样式使用 `element`；文字格式只存于 `fields.html`，不读取旧 `label` 或区块文字样式。自定义区块可以显式声明 `typography` 字段。新建默认样式、画布和邮件渲染只读取该区块启用的 `styleFields`。文档当前版本为 `2`，不迁移旧版文档。
+- 邮件主体与区块样式分层：`EmailDocument.body` / `EmailBodySettings` 保存主体布局、外观及文字颜色、字体、字重、链接颜色和下划线默认值；其余基础排版使用内部 `DEFAULT_TYPOGRAPHY`，富文本显式格式优先。主体只有一个 `backgroundColor`，固定居中，不支持主体圆角。内置区块容器使用 `dimension`、`decorations`，按钮/图片/分割线等元素自身样式使用 `element`；文字格式只存于 `fields.html`，不读取旧 `label` 或区块文字样式。自定义区块可以显式声明 `typography` 字段。新建默认样式、画布和邮件渲染只读取该区块启用的 `styleFields`。文档当前版本为 `3`，不迁移旧版文档。
 - CSS 值应使用现有 `src/utils/css-values.ts` 的归一化和校验函数；不要在多个模块重复实现长度、颜色、边框或间距解析。
 
 ## 渲染与邮件 HTML
 
-- `src/render/` 中的函数应尽量保持纯函数：相同文档、定义、全局配置和模板数据应得到相同结果，不读取浏览器全局状态，也不依赖编辑器 React 状态。
+- `src/render/` 中的函数应尽量保持纯函数：相同文档、定义、主体配置和模板数据应得到相同结果，不读取浏览器全局状态，也不依赖编辑器 React 状态。
 - `blockToHtml`、`renderBlock`、`documentToHtml` 以及模板预览的职责必须保持清晰。修改渲染链时同时检查 canvas、email、preview 三种使用路径。
 - 邮件 HTML 使用表格布局和内联样式以兼容邮件客户端。不要把编辑器的拖拽边框、选中态、工具栏、空画布提示或其他 `ree-*` 编辑辅助 UI 输出到邮件。
 - 文档导出必须只生成一个完整的 `<!DOCTYPE html>`、`<html>`、`<head>` 和 `<body>`；HTML 区块输入的完整文档需要按现有逻辑合并，不能产生嵌套 `html`/`head`/`body`。

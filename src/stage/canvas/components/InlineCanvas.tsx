@@ -2,20 +2,20 @@ import { buttonContent, buttonStyles } from "../../../render/button";
 import { contentDefaults } from "../../../render/content-style";
 import { readAlign } from "../../../render/align";
 import { resolvedFontWeight, typographyStyle } from "../../../utils/style";
-import type { EmailBlockNode, EmailGlobalSettings } from "../../../types/document";
+import type { EmailBlockNode, EmailBodySettings } from "../../../types/document";
 import { RichText, type RichTextProps } from "../../rich-text/RichText";
 
 interface InlineCanvasProps extends Omit<RichTextProps, "initialHtml" | "inherited" | "onCommit"> {
   block: EmailBlockNode;
-  global: EmailGlobalSettings;
+  body: EmailBodySettings;
   onCommit: (html: string) => void;
 }
 
-export function InlineCanvas({ block, global, ...props }: InlineCanvasProps) {
+export function InlineCanvas({ block, body, ...props }: InlineCanvasProps) {
   const button = props.profile === "button";
-  const styles = buttonStyles(block, global);
-  const typography = button ? styles.text : typographyStyle(block.style, global);
-  const defaults = contentDefaults(block.style, global);
+  const styles = buttonStyles(block, body);
+  const typography = button ? styles.text : typographyStyle(block.style, body);
+  const defaults = contentDefaults(block.style, body);
   const editor = (
     <RichText
       {...props}
@@ -24,7 +24,7 @@ export function InlineCanvas({ block, global, ...props }: InlineCanvasProps) {
         fontFamily: String(typography.fontFamily),
         fontSize: String(typography.fontSize),
         color: String(typography.color),
-        fontWeight: resolvedFontWeight(button ? undefined : block.style?.typography?.fontWeight, global.fontWeight),
+        fontWeight: resolvedFontWeight(button ? undefined : block.style?.typography?.fontWeight, body.fontWeight),
         lineHeight: String(typography.lineHeight ?? ""),
         paragraphSpacing: defaults.paragraph,
         listSpacing: defaults.listSpacing,

@@ -11,12 +11,12 @@ import { BlockActions } from "./components/BlockActions";
 import { canvasBlockStyle } from "./block-style";
 import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
-import type { EmailBlockNode, EmailGlobalSettings } from "../../types/document";
+import type { EmailBlockNode, EmailBodySettings } from "../../types/document";
 import type { CanvasDragData } from "../../types/editor";
 
 interface CanvasBlockProps {
   block: EmailBlockNode;
-  global: EmailGlobalSettings;
+  body: EmailBodySettings;
   definition: BlockDefinition | undefined;
   selected: boolean;
   dropEdge: DropEdge | null;
@@ -29,7 +29,7 @@ interface CanvasBlockProps {
 
 export function CanvasBlock({
   block: sourceBlock,
-  global,
+  body,
   definition,
   selected,
   dropEdge,
@@ -54,7 +54,7 @@ export function CanvasBlock({
     ? renderBlockContent(block, [definition], "canvas", {
         resolveHtmlTemplate: block.type === "html",
         templateData: mergeTemplateData(variables, block.defaultData),
-        global,
+        body,
       })
     : "";
   const usesTemplatePreview = block.type === "html";
@@ -110,12 +110,12 @@ export function CanvasBlock({
 
       <div
         className={`ree-block-content${definition?.inlineEdit ? " is-inline" : ""}`}
-        style={canvasBlockStyle(block, global)}
+        style={canvasBlockStyle(block, body)}
       >
         {definition?.inlineEdit ? (
           <InlineCanvas
             block={block}
-            global={global}
+            body={body}
             profile={definition.inlineEditProfile}
             variables={variables}
             selected={selected}
@@ -134,7 +134,7 @@ export function CanvasBlock({
             className="ree-block-static"
             dangerouslySetInnerHTML={{
               __html: definition
-                ? definition.render(buildRenderContext(block, "canvas", global, definition))
+                ? definition.render(buildRenderContext(block, "canvas", body, definition))
                 : `<!-- ${block.type} -->`,
             }}
           />

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { DEFAULT_BLOCKS, buildRenderContext, createBlockNode, getBlockDefinition, renderBlock, blockToHtml, documentToHtml, createEmailDocument, resolveEmailGlobal } from '../dist/index.js';
+import { DEFAULT_BLOCKS, buildRenderContext, createBlockNode, getBlockDefinition, renderBlock, blockToHtml, documentToHtml, createEmailDocument, resolveEmailBody } from '../dist/index.js';
 
 test('内置区块按各自能力声明分组，所有配置恰好出现一次', () => {
   const sections = {
@@ -54,7 +54,7 @@ test('HTML 保留源码内部样式，不再注入正文、链接或列表排版
   const source = '<p class="a">A</p><p style="margin:3px">B</p><ul><li>C</li></ul><a href="https://example.com">Link</a>';
   block.fields.html = source;
   block.style.typography = { fontSize: '21px', paragraphSpacing: '32px', listSpacing: '22px', listIndent: '50px', linkColor: '#123456' };
-  const html = renderBlock(block, DEFAULT_BLOCKS, 'email', resolveEmailGlobal());
+  const html = renderBlock(block, DEFAULT_BLOCKS, 'email', resolveEmailBody());
   assert.ok(html.includes(source));
   assert.doesNotMatch(html, /font-size:21px|margin:32px|margin:22px|padding-left:50px|color:#123456/);
 });
@@ -73,7 +73,7 @@ test('按钮导出原样保留带引号、比较符、注释及空格的模板�
   assert.ok(documentToHtml(createEmailDocument([block])).includes('{{printf "}}" .customer_name}}'));
 });
 
-test('正文行内列表与链接格式覆盖全局值，邮件输出保留模板', () => {
+test('正文行内列表与链接格式覆盖内部基础排版，邮件输出保留模板', () => {
   const block = createBlockNode('text');
   block.fields.html = '<ul style="margin:12px 0;padding-left:36px"><li><p><a href="https://example.com" style="color:#ff0000;text-decoration:none">{{.name}}</a></p></li></ul>';
   const doc = createEmailDocument([block]);
@@ -120,8 +120,8 @@ test('自定义区块仅渲染启用的样式，默认对象独立，旧文档�
   assert.equal(second.style.dimension.height, '72px');
   assert.match(blockToHtml(second, [definition]), /height="72"/);
   const doc = createEmailDocument([second]);
-  assert.equal(doc.version, 2);
-  assert.throws(() => documentToHtml({ ...doc, version: 1 }, [definition]), /Unsupported email document version/);
+  assert.equal(doc.version, 3);
+  for (const version of [1, 2]) assert.throws(() => documentToHtml({ ...doc, version }, [definition]), /Unsupported email document version/);
 });
 
 
@@ -145,7 +145,7 @@ test('按钮和图片的链接默认留空，空白链接在画布、邮件及�
 });
 
 test('低频边框颜色默认为透明，显式颜色仍正常导出', () => {
-  assert.equal(resolveEmailGlobal().borderColor, 'transparent');
+  assert.equal(resolveEmailBody().borderColor, 'transparent');
   for (const type of ['button', 'image', 'text']) {
     const definition = getBlockDefinition(type);
     assert.equal(definition.styleFields.find((field) => field.id === 'decorations.borderColor').defaultValue, 'transparent');

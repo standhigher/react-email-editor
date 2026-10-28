@@ -5,9 +5,9 @@ import { createBlockNode } from "../document/create-block";
 import {
   createEmptyDocument,
   ensureEmailDocument,
-  mergeEmailGlobal,
-  sameEmailGlobal,
-  resolveEmailGlobal,
+  mergeEmailBody,
+  sameEmailBody,
+  resolveEmailBody,
 } from "../document/create-document";
 import {
   duplicateBlockNode,
@@ -17,38 +17,38 @@ import {
   reorderBlockNodes,
   updateBlockField,
   updateBlockStyle,
-  updateGlobalSettings,
+  updateBodySettings,
   withSubject,
 } from "../document/mutations";
 import { getBlockDefinition, mergeBlockDefinitions } from "../document/registry";
 import type { BlockDefinition, Variable } from "../types/block";
-import type { EmailDocument, EmailGlobalSettings } from "../types/document";
+import type { EmailDocument, EmailBodySettings } from "../types/document";
 import type { EditorSession } from "../types/editor";
 
 interface UseEditorSessionOptions {
   initialDocument?: EmailDocument;
-  global?: Partial<EmailGlobalSettings>;
+  body?: Partial<EmailBodySettings>;
   blocks?: BlockDefinition[];
   variables?: Variable[];
   onChange?: (document: EmailDocument) => void;
-  onGlobalChange?: (global: EmailGlobalSettings) => void;
+  onBodyChange?: (body: EmailBodySettings) => void;
 }
 
 export function useEditorSession({
   initialDocument,
-  global,
+  body,
   blocks = EMPTY_BLOCK_DEFINITIONS,
   variables = EMPTY_VARIABLES,
   onChange,
-  onGlobalChange,
+  onBodyChange,
 }: UseEditorSessionOptions): EditorSession {
   const definitions = useMemo(() => mergeBlockDefinitions(blocks), [blocks]);
   const [document, setDocument] = useState<EmailDocument>(() => {
     const base = ensureEmailDocument(
       structuredClone(initialDocument ?? createEmptyDocument()),
     );
-    if (global === undefined) return base;
-    return { ...base, global: mergeEmailGlobal(base.global, global) };
+    if (body === undefined) return base;
+    return { ...base, body: mergeEmailBody(base.body, body) };
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const documentRef = useRef(document);
@@ -66,12 +66,12 @@ export function useEditorSession({
   );
 
   useEffect(() => {
-    if (global === undefined) return;
+    if (body === undefined) return;
     const current = documentRef.current;
-    const nextGlobal = mergeEmailGlobal(current.global, global);
-    if (sameEmailGlobal(resolveEmailGlobal(current.global), nextGlobal)) return;
-    commit({ ...current, global: nextGlobal });
-  }, [global, commit]);
+    const nextBody = mergeEmailBody(current.body, body);
+    if (sameEmailBody(resolveEmailBody(current.body), nextBody)) return;
+    commit({ ...current, body: nextBody });
+  }, [body, commit]);
 
   const getDocument = useCallback(
     () => ensureEmailDocument(structuredClone(documentRef.current)),
@@ -107,13 +107,13 @@ export function useEditorSession({
     [commit],
   );
 
-  const updateGlobal = useCallback(
-    (patch: Partial<EmailGlobalSettings>) => {
-      const next = updateGlobalSettings(documentRef.current, patch);
+  const updateBody = useCallback(
+    (patch: Partial<EmailBodySettings>) => {
+      const next = updateBodySettings(documentRef.current, patch);
       commit(next);
-      onGlobalChange?.(next.global);
+      onBodyChange?.(next.body);
     },
-    [commit, onGlobalChange],
+    [commit, onBodyChange],
   );
 
   const moveBlock = useCallback(
@@ -171,7 +171,7 @@ export function useEditorSession({
     insertBlock,
     updateField,
     updateStyle,
-    updateGlobal,
+    updateBody,
     moveBlock,
     duplicateBlock,
     removeBlock,

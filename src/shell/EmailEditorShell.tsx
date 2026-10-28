@@ -19,37 +19,37 @@ import type {
 export const EmailEditorShell = forwardRef<EmailEditorHandle, EmailEditorProps>(
   function EmailEditorShell({
     initialDocument,
-    global,
+    body,
     blocks,
     variables = EMPTY_VARIABLES,
     height = "100%",
     onChange,
-    onGlobalChange,
+    onBodyChange,
   }, ref) {
     const session = useEditorSession({
       initialDocument,
-      global,
+      body,
       blocks,
       variables,
       onChange,
-      onGlobalChange,
+      onBodyChange,
     });
     useEditorHandle(ref, session);
     const [viewMode, setViewMode] = useState<EditorViewMode>("edit");
     const [device, setDevice] = useState<EditorDevice>("desktop");
-    const [inspectorPanel, setInspectorPanel] = useState<InspectorPanel>("global");
+    const [inspectorPanel, setInspectorPanel] = useState<InspectorPanel>("body");
 
     const [previousSelectedId, setPreviousSelectedId] = useState(session.selectedId);
     if (previousSelectedId !== session.selectedId) {
       setPreviousSelectedId(session.selectedId);
-      if (!session.selectedId) setInspectorPanel("global");
+      if (!session.selectedId) setInspectorPanel("body");
     }
 
     const selectBlock = (id: string | null) => {
       const hadSelection = session.selectedId !== null;
       session.selectBlock(id);
       if (!id) {
-        setInspectorPanel("global");
+        setInspectorPanel("body");
         return;
       }
       if (!hadSelection) setInspectorPanel("block");
@@ -108,12 +108,12 @@ export const EmailEditorShell = forwardRef<EmailEditorHandle, EmailEditorProps>(
           </EditorDnd>
           <Inspector
             panel={inspectorPanel}
-            global={session.document.global}
+            body={session.document.body}
             block={session.selectedBlock}
             definition={session.selectedDefinition}
             variables={session.variables}
             onPanelChange={setInspectorPanel}
-            onCommitGlobal={session.updateGlobal}
+            onCommitBody={session.updateBody}
             onCommitField={session.updateField}
             onCommitStyle={session.updateStyle}
           />

@@ -20,6 +20,6 @@ export const textBlock: BlockDefinition = {
     dimension: { padding: "16px" },
   },
   styleFields: WRAPPER_STYLE_FIELDS,
-  render: ({ fields, global }) =>
-    `<div style="display:flow-root;${typographyCss(undefined, global)}">${styleRichText(String(fields.html ?? ""), undefined, global)}</div>`,
+  render: ({ fields, body }) =>
+    `<div style="display:flow-root;${typographyCss(undefined, body)}">${styleRichText(String(fields.html ?? ""), undefined, body)}</div>`,
 };

@@ -1,30 +1,30 @@
-import { GlobalFields } from "./GlobalFields";
+import { BodyFields } from "./BodyFields";
 import { InspectorFields } from "./InspectorFields";
 import type { BlockDefinition, Variable } from "../types/block";
-import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
+import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 
-export type InspectorPanel = "global" | "block";
+export type InspectorPanel = "body" | "block";
 
 interface InspectorProps {
   panel: InspectorPanel;
-  global: EmailGlobalSettings;
+  body: EmailBodySettings;
   block: EmailBlockNode | null;
   definition: BlockDefinition | undefined;
   variables: Variable[];
   onPanelChange: (panel: InspectorPanel) => void;
-  onCommitGlobal: (patch: Partial<EmailGlobalSettings>) => void;
+  onCommitBody: (patch: Partial<EmailBodySettings>) => void;
   onCommitField: (id: string, name: string, value: unknown) => void;
   onCommitStyle: (id: string, styleId: string, value: string) => void;
 }
 
 export function Inspector({
   panel,
-  global,
+  body,
   block,
   definition,
   variables,
   onPanelChange,
-  onCommitGlobal,
+  onCommitBody,
   onCommitField,
   onCommitStyle,
 }: InspectorProps) {
@@ -36,11 +36,11 @@ export function Inspector({
         <div className="ree-inspector-tabs" role="group" aria-label="Inspector panel">
           <button
             type="button"
-            className={`ree-inspector-tab${panel === "global" ? " is-active" : ""}`}
-            aria-pressed={panel === "global"}
-            onClick={() => onPanelChange("global")}
+            className={`ree-inspector-tab${panel === "body" ? " is-active" : ""}`}
+            aria-pressed={panel === "body"}
+            onClick={() => onPanelChange("body")}
           >
-            GLOBAL
+            BODY
           </button>
           {block && definition ? (
             <button
@@ -58,14 +58,14 @@ export function Inspector({
         {showBlock ? (
           <InspectorFields
             block={block}
+            body={body}
             definition={definition}
             variables={variables}
-            global={global}
             onCommitField={onCommitField}
             onCommitStyle={onCommitStyle}
           />
         ) : (
-          <GlobalFields global={global} onChange={onCommitGlobal} />
+          <BodyFields body={body} onChange={onCommitBody} />
         )}
       </div>
     </aside>

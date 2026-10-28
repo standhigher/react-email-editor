@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { BUTTON_BOX_DEFAULTS } from "../blocks/element-fields";
-import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
+import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 import { cssLength, cssSpacing } from "../utils/css-values";
 import { decorationStyle, typographyStyle } from "../utils/style";
 
@@ -9,9 +9,9 @@ export function buttonContent(block: EmailBlockNode): string {
   return String(block.fields.html ?? "");
 }
 
-export function buttonStyles(block: EmailBlockNode, global: EmailGlobalSettings) {
+export function buttonStyles(block: EmailBlockNode, body?: EmailBodySettings) {
   const element = { ...BUTTON_BOX_DEFAULTS, ...block.style?.element };
-  const text: CSSProperties = { ...typographyStyle(undefined, global), textAlign: "center" };
+  const text: CSSProperties = { ...typographyStyle(undefined, body), textAlign: "center" };
   const box: CSSProperties = {
     ...decorationStyle(element), padding: cssSpacing(element.padding, BUTTON_BOX_DEFAULTS.padding), textAlign: "center",
   };

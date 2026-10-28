@@ -10,12 +10,12 @@ import { getBlockDefinition } from "../../document/registry";
 import { CanvasBlock } from "./CanvasBlock";
 import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
-import type { EmailBlockNode, EmailGlobalSettings } from "../../types/document";
+import type { EmailBlockNode, EmailBodySettings } from "../../types/document";
 import type { EditorDevice } from "../../types/editor";
 
 interface CanvasProps {
   blocks: EmailBlockNode[];
-  global: EmailGlobalSettings;
+  body: EmailBodySettings;
   definitions: BlockDefinition[];
   selectedId: string | null;
   dropTargetId: string | null;
@@ -30,7 +30,7 @@ interface CanvasProps {
 
 export function Canvas({
   blocks,
-  global,
+  body,
   definitions,
   selectedId,
   dropTargetId,
@@ -67,57 +67,50 @@ export function Canvas({
       <div
         className="ree-email-viewport"
         style={{
-          width: viewportWidth(device, global),
-          fontSize: global.defaultFontSize,
-          fontFamily: global.fontFamily,
-          marginLeft: global.contentAlign === "left" ? 0 : "auto",
-          marginRight: global.contentAlign === "right" ? 0 : "auto",
+          width: viewportWidth(device, body),
+          marginLeft: "auto",
+          marginRight: "auto",
         }}
       >
         <div
-          className="ree-email-outer"
-          style={{ padding: global.outerPadding, backgroundColor: global.backgroundColor }}
+          className="ree-email-surface"
+          style={{
+            ...surfaceStyle(body),
+            maxWidth: body.contentWidth,
+            marginLeft: "auto",
+            marginRight: "auto",
+          }}
         >
           <div
-            className="ree-email-surface"
-            style={{
-              ...surfaceStyle(global),
-              maxWidth: global.contentWidth,
-              marginLeft: global.contentAlign === "left" ? 0 : "auto",
-              marginRight: global.contentAlign === "right" ? 0 : "auto",
-            }}
+            className="ree-canvas-inner"
+            style={{ "--ree-block-gap": body.blockGap } as CSSProperties}
           >
-            <div
-              className="ree-canvas-inner"
-              style={{ "--ree-block-gap": global.blockGap } as CSSProperties}
-            >
-              {blocks.length === 0 ? (
-                <div className="ree-canvas-empty">
-                  Drag a block here or click one to get started
-                </div>
-              ) : (
-                <SortableContext
-                  items={blocks.map((block) => block.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {blocks.map((block) => (
-                    <CanvasBlock
-                      key={block.id}
-                      block={block}
-                      global={global}
-                      definition={getBlockDefinition(block.type, definitions)}
-                      selected={block.id === selectedId}
-                      dropEdge={dropTargetId === block.id ? dropEdge : null}
-                      variables={variables}
-                      onSelect={() => onSelect(block.id)}
-                      onCommitField={onCommitField}
-                      onDuplicate={() => onDuplicate(block.id)}
-                      onRemove={() => onRemove(block.id)}
-                    />
-                  ))}
-                </SortableContext>
-              )}
-            </div>
+            {blocks.length === 0 ? (
+              <div className="ree-canvas-empty">
+                Drag a block here or click one to get started
+              </div>
+            ) : (
+              <SortableContext
+                items={blocks.map((block) => block.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {blocks.map((block) => (
+                  <CanvasBlock
+                    key={block.id}
+                    block={block}
+                    body={body}
+                    definition={getBlockDefinition(block.type, definitions)}
+                    selected={block.id === selectedId}
+                    dropEdge={dropTargetId === block.id ? dropEdge : null}
+                    variables={variables}
+                    onSelect={() => onSelect(block.id)}
+                    onCommitField={onCommitField}
+                    onDuplicate={() => onDuplicate(block.id)}
+                    onRemove={() => onRemove(block.id)}
+                  />
+                ))}
+              </SortableContext>
+            )}
           </div>
         </div>
       </div>

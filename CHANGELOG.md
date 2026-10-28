@@ -1,5 +1,17 @@
 # 更新日志
 
+## 未发布
+
+### 修复
+
+- 修改链接 URL 或打开方式时保留已有的显式颜色和下划线，重置后恢复继承 BODY。
+- 画布主体使用与预览及邮件导出一致的基础排版，修复 `em` 内边距、边框等尺寸的计算差异。
+
+### 不兼容变更
+
+- 邮件主体设置统一改为 `body`：文档使用 `EmailDocument.body`，组件使用 `body` / `onBodyChange`，类型及工具改为 `EmailBodySettings`、`DEFAULT_EMAIL_BODY`、`resolveEmailBody`；区块渲染上下文和 `BlockRenderOptions` 同步使用 `body`。移除旧 Global API，不保留别名或迁移代码。
+- 文档版本升为 `3`，不支持旧版本。BODY 的 General 提供文字颜色、链接颜色、字体、字重和链接下划线开关；Content 提供唯一主体 Background、内容宽度、Padding 和区块间距，边框颜色、宽度及样式收进默认折叠的 Advanced: Border。配置同步用于画布、预览和导出，内容显式格式保持优先。仅保留 `contentPadding` 内边距，移除 `outerPadding`、主体对齐、外侧背景和圆角配置；主体固定居中，外侧固定白色。
+
 ## 0.2.0 — 2026-10-27
 
 ### 不兼容变更

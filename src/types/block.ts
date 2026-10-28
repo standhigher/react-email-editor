@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { EmailBlockNode, EmailBlockStyle, EmailGlobalSettings } from "./document";
+import type { EmailBlockNode, EmailBlockStyle, EmailBodySettings } from "./document";
 
 export type FieldType =
   | "text"
@@ -66,7 +66,7 @@ export interface BlockRenderContext {
   style: EmailBlockStyle;
   /** canvas/email identify the consumer; HTML template resolution is applied by the shared renderer. */
   mode: RenderMode;
-  global: EmailGlobalSettings;
+  body: EmailBodySettings;
 }
 
 export type RichTextProfile = "text" | "heading" | "button";

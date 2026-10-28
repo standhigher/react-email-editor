@@ -7,22 +7,22 @@ import { InspectorSection } from "./components/InspectorSection";
 import { StyleFieldStack } from "./components/StyleFieldStack";
 import { StyleControl } from "./StyleControl";
 import type { BlockDefinition, BlockInspectorSection, StyleFieldConfig, Variable } from "../types/block";
-import type { EmailBlockNode, EmailGlobalSettings } from "../types/document";
+import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 
 interface InspectorFieldsProps {
   block: EmailBlockNode;
+  body: EmailBodySettings;
   definition: BlockDefinition;
   variables: Variable[];
-  global: EmailGlobalSettings;
   onCommitField: (id: string, name: string, value: unknown) => void;
   onCommitStyle: (id: string, styleId: string, value: string) => void;
 }
 
 export function InspectorFields({
   block,
+  body,
   definition,
   variables,
-  global,
   onCommitField,
   onCommitStyle,
 }: InspectorFieldsProps) {
@@ -30,7 +30,7 @@ export function InspectorFields({
   const styleFields = definition.styleFields ?? [];
   const renderStyle = (field: StyleFieldConfig) => {
     const stored = readStyleValue(block.style, field.id);
-    const inherited = inheritedStyleValue(field.id, global);
+    const inherited = inheritedStyleValue(field.id, body);
     const restore = readStyleValue(definition.defaultStyle, field.id) || field.defaultValue || "";
     const reset = styleReset(stored, restore, inherited !== undefined);
     return (
@@ -41,7 +41,7 @@ export function InspectorFields({
         fallback={inherited}
         resetTo={reset.resetTo}
         showReset={reset.show}
-        resetLabel={inherited !== undefined ? "Inherit global" : "Reset"}
+        resetLabel={inherited !== undefined ? "Use default" : "Reset"}
         onChange={(value) => onCommitStyle(block.id, field.id, value)}
       />
     );

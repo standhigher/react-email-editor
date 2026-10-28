@@ -24,8 +24,8 @@ export const buttonBlock: BlockDefinition = {
     element: { ...BUTTON_BOX_DEFAULTS },
   },
   styleFields: [...WRAPPER_STYLE_FIELDS, ...BUTTON_STYLE_FIELDS],
-  render: ({ block, global }) => {
-    const { element, width, text, box } = buttonStyles(block, global);
+  render: ({ block, body }) => {
+    const { element, width, text, box } = buttonStyles(block, body);
     const px = pixelLength(width);
     const href = String(block.fields.href ?? "").trim();
     const tag = href ? "a" : "span";

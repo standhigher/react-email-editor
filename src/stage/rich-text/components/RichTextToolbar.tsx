@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { isAllowedUri } from "@tiptap/extension-link";
-import { DEFAULT_EMAIL_GLOBAL } from "../../../document/constants";
+import { DEFAULT_TYPOGRAPHY } from "../../../constants/typography";
 import { useEditorState, type Editor } from "@tiptap/react";
 import type { RichTextProfile, Variable } from "../../../types/block";
 import { DEFAULT_LINK_TARGET, TEXT_ALIGNS } from "../constants";
@@ -78,8 +78,9 @@ export function RichTextToolbar({
       const range = currentSelection(editor);
       if (next === "link") {
         setLinkUrl(state.linkHref);
-        setLinkColor(state.linkColor || (state.linkHref ? inherited.linkColor : "") || DEFAULT_EMAIL_GLOBAL.linkColor);
-        setLinkDecoration(state.linkDecoration || (state.linkHref ? inherited.linkDecoration : "") || "underline");
+        // 空值保留继承语义，弹窗只负责展示主体默认值。
+        setLinkColor(state.linkColor);
+        setLinkDecoration(state.linkDecoration);
         setLinkTarget(state.linkTarget === "_self" ? "_self" : DEFAULT_LINK_TARGET);
         linkRange.current = range;
       }
@@ -95,7 +96,12 @@ export function RichTextToolbar({
       return;
     }
     if (!isAllowedUri(href)) return;
-    const attrs = { href, color: linkColor, decoration: linkDecoration, target: linkTarget };
+    const attrs = {
+      href,
+      color: linkColor || null,
+      decoration: linkDecoration || null,
+      target: linkTarget,
+    };
     const range = linkRange.current;
     const chain = focusSelection(editor, range);
     if (range && range.anchor === range.head && !state.linkHref) {
@@ -225,7 +231,9 @@ export function RichTextToolbar({
             <LinkPopover
               url={linkUrl}
               color={linkColor}
+              defaultColor={inherited.linkColor || DEFAULT_TYPOGRAPHY.linkColor}
               decoration={linkDecoration}
+              defaultDecoration={inherited.linkDecoration || DEFAULT_TYPOGRAPHY.linkDecoration}
               target={linkTarget}
               onColorChange={setLinkColor}
               onDecorationChange={setLinkDecoration}

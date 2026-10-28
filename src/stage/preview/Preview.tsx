@@ -58,9 +58,9 @@ export function Preview({ document, definitions, variables, device }: PreviewPro
       <div
         className="ree-email-viewport"
         style={{
-          width: viewportWidth(device, document.global),
-          marginLeft: document.global.contentAlign === "left" ? 0 : "auto",
-          marginRight: document.global.contentAlign === "right" ? 0 : "auto",
+          width: viewportWidth(device, document.body),
+          marginLeft: "auto",
+          marginRight: "auto",
         }}
       >
         <iframe
@@ -70,8 +70,7 @@ export function Preview({ document, definitions, variables, device }: PreviewPro
           srcDoc={html}
           onLoad={observeContent}
           style={{
-            fontSize: document.global.defaultFontSize,
-            backgroundColor: document.global.backgroundColor || "#ffffff",
+            backgroundColor: "#ffffff",
           }}
         />
       </div>

@@ -1,10 +1,10 @@
 import { generateId } from "../utils/id";
 import { writeStyleValue } from "../utils/style";
-import { mergeEmailGlobal } from "./create-document";
+import { mergeEmailBody } from "./create-document";
 import type {
   EmailBlockNode,
   EmailDocument,
-  EmailGlobalSettings,
+  EmailBodySettings,
 } from "../types/document";
 
 function moveItem<T>(items: T[], from: number, to: number): T[] {
@@ -114,12 +114,12 @@ export function withSubject(
   return { ...document, subject };
 }
 
-export function updateGlobalSettings(
+export function updateBodySettings(
   document: EmailDocument,
-  patch: Partial<EmailGlobalSettings>,
+  patch: Partial<EmailBodySettings>,
 ): EmailDocument {
   return {
     ...document,
-    global: mergeEmailGlobal(document.global, patch),
+    body: mergeEmailBody(document.body, patch),
   };
 }

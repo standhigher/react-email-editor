@@ -24,5 +24,5 @@ export const htmlBlock: BlockDefinition = {
   ],
   defaultStyle: { dimension: { padding: "8px" } },
   styleFields: WRAPPER_STYLE_FIELDS,
-  render: ({ fields, global, block }) => htmlContent(String(fields.html ?? ""), global, block.id),
+  render: ({ fields, body, block }) => htmlContent(String(fields.html ?? ""), body, block.id),
 };

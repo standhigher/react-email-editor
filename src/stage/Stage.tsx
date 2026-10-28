@@ -35,7 +35,7 @@ export function Stage({
         <div className="ree-stage-view">
           <Canvas
             blocks={session.document.blocks}
-            global={session.document.global}
+            body={session.document.body}
             definitions={session.definitions}
             selectedId={session.selectedId}
             dropTargetId={targetId}
