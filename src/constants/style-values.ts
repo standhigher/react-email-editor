@@ -5,6 +5,7 @@ export const TEXT_ALIGNS = {
   justify: "justify",
 } as const;
 
+/** Text alignment: left, center, right, justify. */
 export type TextAlign = (typeof TEXT_ALIGNS)[keyof typeof TEXT_ALIGNS];
 
 export const HORIZONTAL_ALIGNS = {
@@ -13,6 +14,7 @@ export const HORIZONTAL_ALIGNS = {
   right: "right",
 } as const;
 
+/** Element alignment: left, center, right. */
 export type HorizontalAlign = (typeof HORIZONTAL_ALIGNS)[keyof typeof HORIZONTAL_ALIGNS];
 
 export const FONT_WEIGHTS = {
@@ -20,6 +22,7 @@ export const FONT_WEIGHTS = {
   bold: "bold",
 } as const;
 
+/** Font weight: normal or bold. */
 export type FontWeight = (typeof FONT_WEIGHTS)[keyof typeof FONT_WEIGHTS];
 
 export const BORDER_STYLES = {
@@ -29,6 +32,7 @@ export const BORDER_STYLES = {
   dotted: "dotted",
 } as const;
 
+/** Border style: none, solid, dashed, dotted. */
 export type BorderStyle = (typeof BORDER_STYLES)[keyof typeof BORDER_STYLES];
 
 export const LINK_DECORATIONS = {
@@ -36,6 +40,7 @@ export const LINK_DECORATIONS = {
   none: "none",
 } as const;
 
+/** Link decoration: underline or none. */
 export type LinkDecoration = (typeof LINK_DECORATIONS)[keyof typeof LINK_DECORATIONS];
 
 export function isStyleValue<const T extends Record<string, string>>(

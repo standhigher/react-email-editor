@@ -483,4 +483,4 @@ renderEmail: ({ controls, email }) => email.html`
 | `ControlEditorProps/EditableRichTextProps` | 控件复用和富文本编辑组件 Props。 |
 | `EmailMarkup/EmailTools` | 邮件片段及工具集。 |
 
-编辑器 Hooks、实例方法、body 和 variables 的完整接入见 [README](../README.zh-CN.md)。可运行示例见 [优惠券](../playground/plugins/coupon.ts)、[商品卡片](../playground/plugins/product.ts)及[统一配置](../playground/plugins/config.ts)。
+编辑器 Hooks、实例方法、body 和 variables 的完整接入见 [API 参考](./api.zh-CN.md)，业务集成见[复杂场景](./advanced-examples.zh-CN.md)。可运行示例见 [优惠券](../playground/plugins/coupon.ts)、[商品卡片](../playground/plugins/product.ts)及[统一配置](../playground/plugins/config.ts)。

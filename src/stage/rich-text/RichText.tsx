@@ -10,16 +10,27 @@ import { createRichTextExtensions } from "./extensions";
 import { preserveTemplateSpaces, restoreTemplateSpaces } from "./template-spaces";
 import type { RichTextInheritedStyle } from "./types";
 
+/** Low-level rich-text props; prefer EditableRichText in plugins. */
 export interface RichTextProps {
+  /** Initial and externally synchronized HTML. */
   initialHtml: string;
+  /** Feature profile, default text. */
   profile?: RichTextProfile;
+  /** Empty hint, default Type something…. */
   placeholder?: string;
+  /** Variables available in the toolbar. */
   variables: Variable[];
+  /** Whether selected and eligible to show the toolbar. */
   selected: boolean;
+  /** Toolbar DOM ID; caller ensures uniqueness. */
   toolbarId: string;
+  /** Whether the toolbar is hidden. */
   toolbarCollapsed: boolean;
+  /** Inherited typography; defaults to internal typography. */
   inherited?: RichTextInheritedStyle;
+  /** Receive complete rich-text HTML after each edit. */
   onCommit: (html: string) => void;
+  /** Request selection on click or focus. */
   onSelect: () => void;
 }
 

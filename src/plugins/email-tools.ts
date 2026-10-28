@@ -6,29 +6,46 @@ import type { EmailBodySettings } from "../types/document";
 
 const EMAIL_MARKUP = Symbol("email-markup");
 
+/** Branded email HTML fragment created by email tools. */
 export interface EmailMarkup {
   readonly [EMAIL_MARKUP]: true;
+  /** Fragment HTML content. */
   readonly html: string;
 }
 
+/** email.image options. */
 export interface EmailImageOptions {
+  /** Image URL allowing http, https, cid or a template. */
   src: string;
+  /** Alternative text, default empty. */
   alt?: string;
+  /** CSS width, default 100%; invalid values use the default. */
   width?: string;
 }
 
+/** email.button options. */
 export interface EmailButtonOptions {
+  /** Link URL; empty or invalid values render non-link text. */
   href: string;
+  /** Button text, automatically escaped. */
   label: string;
 }
 
+/** Email HTML helpers available in plugin renderEmail. */
 export interface EmailTools {
+  /** Tagged template strings and values; ordinary values are escaped, markup and arrays compose. */
   html: (strings: TemplateStringsArray, ...values: unknown[]) => EmailMarkup;
+  /** Insert raw HTML without sanitization. */
   raw: (html: string) => EmailMarkup;
+  /** Preserve rich-text formatting and apply body defaults. */
   richText: (html: string) => EmailMarkup;
+  /** Build a presentation table from rows of EmailMarkup cells. */
   table: (rows: EmailMarkup[][]) => EmailMarkup;
+  /** Render an image from URL, alt and width, validating protocols and escaping. */
   image: (options: EmailImageOptions) => EmailMarkup;
+  /** Render an email table button from URL and label. */
   button: (options: EmailButtonOptions) => EmailMarkup;
+  /** Validate a URL; image selects image protocols, default false; invalid URLs return empty. */
   url: (value: string, image?: boolean) => string;
 }
 

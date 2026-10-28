@@ -11,16 +11,27 @@ export type RichTextMenu = "font" | "size" | "emoji" | "link" | "variable" | "sp
 
 export type TextAlignment = TextAlign;
 
+/** Inherited styles for the low-level rich-text toolbar. */
 export interface RichTextInheritedStyle {
+  /** Inherited font stack. */
   fontFamily: string;
+  /** Inherited font size. */
   fontSize: string;
+  /** Inherited text color. */
   color: string;
+  /** Inherited font weight. */
   fontWeight: FontWeight;
+  /** Inherited line height. */
   lineHeight: string;
+  /** Inherited paragraph spacing. */
   paragraphSpacing: string;
+  /** Inherited list item spacing. */
   listSpacing?: string;
+  /** Inherited list indentation. */
   listIndent?: string;
+  /** Inherited link color. */
   linkColor?: string;
+  /** Inherited link decoration. */
   linkDecoration?: string;
 }
 

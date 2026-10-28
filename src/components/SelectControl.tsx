@@ -1,13 +1,22 @@
 import type { ControlOption } from "../types/block";
 
+/** String select props. */
 interface SelectControlProps {
+  /** Native select DOM ID. */
   id?: string;
+  /** Accessible name. */
   label?: string;
+  /** Current option value. */
   value: string;
+  /** Options in display order. */
   options: readonly ControlOption[];
+  /** Optional empty-option label; no duplicate empty option. */
   emptyLabel?: string;
+  /** Compact size, default false. */
   compact?: boolean;
+  /** Whether disabled. */
   disabled?: boolean;
+  /** Receive the new option value. */
   onChange: (value: string) => void;
 }
 

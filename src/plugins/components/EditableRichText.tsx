@@ -5,9 +5,13 @@ import { contentDefaults } from "../../render/content-style";
 import { usePluginEditor, RichTextFocusContext } from "../editor-context";
 import type { RichTextProfile } from "../../types/block";
 
+/** Rich-text region within plugin context. */
 export interface EditableRichTextProps {
+  /** Name of a declared richText control. */
   control: string;
+  /** Override the control rich-text feature profile. */
   profile?: RichTextProfile;
+  /** Override the empty editor hint. */
   placeholder?: string;
 }
 

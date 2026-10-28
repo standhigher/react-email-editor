@@ -1,12 +1,20 @@
 import type { CSSProperties } from "react";
 
+/** Numeric range props. */
 interface RangeControlProps {
+  /** Native input DOM ID. */
   id?: string;
+  /** Accessible name. */
   label?: string;
+  /** Current numeric value. */
   value: number;
+  /** Minimum, default 0. */
   min?: number;
+  /** Maximum, default 100. */
   max?: number;
+  /** Increment, default 1. */
   step?: number;
+  /** Receive the updated number. */
   onChange: (value: number) => void;
 }
 

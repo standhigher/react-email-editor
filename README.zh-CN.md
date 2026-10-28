@@ -2,167 +2,51 @@
 
 [English](./README.md) | 简体中文
 
-React 邮件模板编辑器，支持拖拽区块、画布富文本编辑、桌面/移动预览、JSON 保存和 HTML 导出。
+把内容拖进画布，调整邮件外观，预览后保存为可继续编辑的 JSON 或导出邮件 HTML。
 
-## 安装
+## 模块架构图
 
-需要 React 18 和 React DOM 18。提供 ESM 和 TypeScript 类型。
+![项目模块架构图：8 个模块及对应功能](./docs/assets/architecture.zh-CN.png)
+
+[查看高清架构图](./docs/assets/architecture.zh-CN.png) · [可编辑 SVG](./docs/assets/architecture.zh-CN.svg)
+
+## 安装与最小接入
+
+需要 React 18 和 React DOM 18；包提供 ESM 和 TypeScript 类型。
 
 ```bash
 pnpm add @standhigher/react-email-editor
 ```
 
-## 基本接入
-
-在应用入口引入一次样式，通过 `useEmailEditor()` 创建实例，在保存时读取文档和 HTML；保存逻辑由应用实现。
-
 ```tsx
-import {
-  BLOCK_TYPES,
-  EmailEditor,
-  createBlockNode,
-  createEmailDocument,
-  useEmailEditor,
-  useEmailEditorConfig,
-  type Variable,
-} from "@standhigher/react-email-editor";
+import { EmailEditor, useEmailEditor } from "@standhigher/react-email-editor";
 import "@standhigher/react-email-editor/styles.css";
 
-const text = createBlockNode(BLOCK_TYPES.text);
-if (text) text.controls.html = "<p>你好，{{ store_name }}</p>";
-const initialDocument = createEmailDocument(text ? [text] : []);
-const variables: Variable[] = [
-  { name: "{{ store_name }}", description: "店铺名称", value: "示例店铺" },
-];
-
 export function EmailPage() {
-  const editor = useEmailEditor({ initialDocument, variables });
-
-  function save() {
-    const data = editor.getData();
-    // 将 data.document 保存到应用，data.html 用于邮件模板导出。
-    console.log(data);
-  }
-
-  return (
-    <>
-      <EmailEditor
-        editor={editor}
-        height={720}
-      />
-      <button type="button" onClick={save}>保存</button>
-    </>
-  );
+  const editor = useEmailEditor();
+  return <EmailEditor editor={editor} height={720} />;
 }
 ```
 
-省略 `initialDocument` 即为空编辑器。Next.js App Router 中，接入组件需声明 `"use client"`，CSS 在应用允许的全局样式入口引入。使用 `height="100%"` 时，父容器需要有明确高度。
+Next.js App Router 的接入组件需声明 `"use client"`；样式在应用允许的全局样式入口引入。保存、上传资源与发送邮件由你的应用实现。
 
-## Hooks 与组件参数
+## 本地启动
 
-`<EmailEditor editor={editor} height={720} />` 只接收必填的 `editor` 和可选的 `height`。`height` 默认 `"100%"`，数字单位为像素。
-
-`useEmailEditor(options?)` 创建引用稳定、互相隔离的实例；不挂载 `<EmailEditor>` 也可以读取、校验和导出文档。
-
-| 参数 | 类型 | 行为 |
-| --- | --- | --- |
-| `initialDocument` | `EmailDocument` | 仅初始化读取；后续切换文档调用 `editor.setDocument(document)`。 |
-| `body` | `Partial<EmailBodySettings>` | 初始化时覆盖主体设置；后续传入值变化时合并到当前文档。省略字段不恢复默认值。 |
-| `variables` | `Variable[]` | 插入及预览变量，默认 `[]`；更新后预览与后续导出使用新值。 |
-| `config` | `EmailEditorConfig` | 来自 `useEmailEditorConfig()`；省略时使用全部内置区块。更新配置不重置文档。 |
-| `onChange` | `(document: EmailDocument) => void` | 编辑、替换、重置和有效的外部主体更新后回调；首次初始化不触发。接收独立快照。 |
-| `onBodyChange` | `(body: EmailBodySettings) => void` | 仅编辑器内主体编辑触发，接收独立快照。 |
-
-`useEmailEditorConfig({ plugins, builtins, pickImage })` 注册插件、区块库及图片资源适配器；同一配置可以供多个独立实例使用。插件应在模块级声明，依赖业务状态时使用 `useMemo`；保持 `plugins`、`builtins` 和 `pickImage` 引用稳定可以复用配置；内联传入不会重建编辑器实例或重置文档。更新声明时传入新的插件。
-
-配置、变量、主体及回调在 React 提交阶段同步，子组件的 layout effect 可读取更新后的实例；被中断的并发 render 不改变已提交的实例。订阅通知和外部主体更新的 `onChange` 在 layout 阶段执行。
-
-需要响应式展示文档时，在对应子组件中调用 `useEmailEditorState(editor)`，返回 `{ document }`。它只订阅文档变化，返回缓存的只读快照；编辑请调用实例方法。仅调用 `useEmailEditor()` 的组件不会因为输入而重新渲染。
-
-邮件主体示例：`useEmailEditor({ body: { contentWidth: 640, contentPadding: "24px" } })`。默认值通过 `DEFAULT_EMAIL_BODY` 导出；可使用 `resolveEmailBody()` 归一化部分配置。
-
-**BODY** 面板的配置存于 `EmailDocument.body`，同步用于画布、预览和最终邮件 HTML：
-
-- **General**：文字颜色、链接颜色、字体、字重和链接下划线开关。
-- **Content**：Background、内容宽度、Padding（`contentPadding`）和区块间距。默认折叠的 **Advanced: Border** 包含边框颜色、宽度和样式。Background 是唯一的邮件主体内容容器背景色，外侧区域为白色，主体固定居中。Padding 作用于内容边框内部，是唯一的主体内边距配置；已移除 `outerPadding`。
-
-文字和链接默认继承 BODY 配置，富文本工具栏中单独设置的格式优先。仅修改链接 URL 或打开方式会保留显式链接样式；重置链接样式后恢复继承 BODY。基础字号（16px）、行高（1.5）以及段落、列表间距使用内部默认值。HTML 区块保留源码格式，外层继承主体排版，不改写内部链接和列表。BODY 不提供对齐和圆角配置。
-
-内置区块：`heading`、`text`、`button`、`image`、`divider`、`spacer`、`html`，均可通过 `BLOCK_TYPES` 引用。
-
-## 保存与导出
-
-| 实例方法 | 返回值 |
-| --- | --- |
-| `getData()` | `{ document, json, html, renderedHtml }` |
-| `getDocument()` | 独立的 `EmailDocument` 快照，可存储后传回 `initialDocument`。 |
-| `getJson()` | 格式化的文档 JSON 字符串。 |
-| `getHtml()` | 保留模板表达式的完整邮件 HTML。 |
-| `getRenderedHtml()` | 使用预览数据解析模板后的完整邮件 HTML。 |
-| `setDocument(document)` | 替换文档，清空选择、焦点和旧文档控件状态，触发 `onChange`。 |
-| `reset()` | 恢复初始化完成时的文档（含初始 `body` 覆盖），清空编辑状态并触发 `onChange`。 |
-| `validate()` | 当前文档的 `ValidationIssue[]`，不执行 HTML 渲染。 |
-
-不挂载编辑器时，也可直接渲染文档：
-
-```ts
-import { documentToHtml } from "@standhigher/react-email-editor";
-
-const html = documentToHtml(initialDocument, undefined, { variables });
-const previewHtml = documentToHtml(initialDocument, undefined, {
-  variables,
-  resolveHtmlTemplates: true,
-});
-```
-
-变量的 `name` 原样插入，`description` 和预览值 `value` 可选。导出时仅对与 `variables[].name` 原文精确匹配的 token 补点并保留空格，如 `{{ store_name }}` → `{{ .store_name }}`；其他 Go template 表达式保持原样。预览支持部分 Go template 语法，数据优先级为区块 `defaultData` > `templateData`（`documentToHtml` 选项）> `variables`。
-
-`blockToHtml()` 和 `renderBlockContent()` 的第四个参数仅接受 `BlockRenderOptions` 对象，例如 `{ resolveHtmlTemplate: true }`；不再接受 boolean，JavaScript 传入 boolean 会抛出 `TypeError`。
-
-当前文档格式仍处于开发阶段，仅接受 `version: 4`，不自动迁移旧文档。使用 `createEmailDocument()` 和 `createBlockNode()` 创建数据。升级差异见 [CHANGELOG](./CHANGELOG.md)。
-
-## 自定义区块
-
-使用 `defineBlock()` 声明控件及 `renderEmail()`，通过 `useEmailEditorConfig()` 注册：
-
-```tsx
-const coupon = defineBlock({
-  type: "my-app.coupon",
-  title: "优惠券",
-  controls: {
-    code: EmailControls.text({ label: "优惠码", defaultValue: "SAVE20" }),
-  },
-  renderEmail: ({ controls, email }) => email.html`<p>${controls.code}</p>`,
-});
-function CouponEditor() {
-  const config = useEmailEditorConfig({ plugins: [coupon] });
-  const editor = useEmailEditor({ config });
-  return <EmailEditor editor={editor} />;
-}
-```
-
-从包入口导入 `defineBlock`、`EmailControls`、`useEmailEditor`、`useEmailEditorConfig`。控件值自动推导，默认生成检查器和画布，支持富文本、列表、图片资源适配器、自定义控件组件及 React `Inspector` / `Canvas`。`EditableRichText` 支持多区域编辑，`ControlEditor` 可在自定义检查器复用声明的控件。
-
-`config.validate(document)` 返回带区块 ID 和控件路径的 `ValidationIssue[]`，用于导出前预检；数字范围、选项、URL/图片协议、列表数量和业务校验也用于检查器及邮件导出。自定义 Canvas/Inspector 可用 `setControls(patch)` 一次更新多个关联控件值并触发一次 `onChange`。声明元数据采用隔离冻结快照，控件值解析结果在每次上下文中复用，`onChange` / `onBodyChange` 返回独立数据快照。
-
-编辑器与独立导出共用配置；`builtins` 可筛选和排序内置区块，覆盖内置区块必须显式声明 `override: true`。声明、运行时和持久化节点统一使用 `controls`；邮件文档为 v4，不兼容旧数据，不保留旧 `blocks`、`defaultFields`、`inlineEdit` 或 `render()` 接入方式。完整接入、类型、渲染工具和异常规则见[自定义区块 API 文档](./docs/custom-blocks.zh-CN.md)（[English](./docs/custom-blocks.md)），可运行示例见 `playground/plugins/`。
-
-## 本地开发
-
-建议 Node.js 22.18+，使用 pnpm：
+使用依赖支持的 Node.js LTS（运行全部测试至少需要 22.18）和 pnpm：
 
 ```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-打开 [http://localhost:5173](http://localhost:5173)。playground 直接加载 `src/`，已有服务时复用。验证命令：
+打开 [http://localhost:5173](http://localhost:5173)，已有服务时优先复用。构建与校验命令见 [API 文档的开发说明](./docs/api.zh-CN.md#开发与本地联调)。
 
-```bash
-pnpm typecheck
-pnpm lint
-pnpm build
-node --test tests/*.test.mjs tests/*.test.ts
-```
+## 文档
 
-本地消费方可使用 `link:../react-email-editor`；先运行 `pnpm build`，再运行 `pnpm build:watch` 持续生成 `dist/`。两个项目需共用一个 React 实例；Vite 可按需设置 `resolve.dedupe: ["react", "react-dom"]`，Next.js 可设置 `transpilePackages: ["@standhigher/react-email-editor"]`，Turbopack 的 `root` 需覆盖链接目录。
+- [API 参考](./docs/api.zh-CN.md)：所有公共导出、参数、默认值与类型。
+- [基础场景](./docs/basic-examples.zh-CN.md)：初始内容、保存恢复、主体样式、变量及预览。
+- [复杂场景](./docs/advanced-examples.zh-CN.md)：校验后保存、多实例、自定义区块、多区域编辑、资源适配与独立导出。
+- [自定义区块指南](./docs/custom-blocks.zh-CN.md)：控件、插件和渲染工具的完整说明。
+- [更新记录](./CHANGELOG.md)。
+
+文档格式仍处于开发阶段，当前只支持 `version: 4`，不自动迁移旧版文档。

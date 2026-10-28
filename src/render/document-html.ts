@@ -12,9 +12,13 @@ import type { BlockDefinition, Variable } from "../types/block";
 import type { EmailDocument } from "../types/document";
 import type { TemplateData } from "./template-preview";
 
+/** Complete document HTML export options. */
 export interface DocumentHtmlOptions {
+  /** Resolve templates for preview; default false. */
   resolveHtmlTemplates?: boolean;
+  /** Exact inserted tokens and optional preview values, default []. */
   variables?: Variable[];
+  /** Global template data; shallow precedence below block defaultData and above variables. */
   templateData?: TemplateData;
 }
 

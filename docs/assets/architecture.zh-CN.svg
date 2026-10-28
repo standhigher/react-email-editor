@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1300" viewBox="0 0 1440 1300" role="img" aria-labelledby="title description" xml:lang="zh-CN"><title id="title">项目模块架构图</title><desc id="description">8 个模块协同：选内容 → 编邮件 → 看预览 → 保存或导出. 内容区块库, 拖拽编辑画布, 属性与主体设置, 主题与个性化, 桌面 / 移动预览, 自定义区块与资源, 文档与编辑状态, 邮件渲染与校验.</desc><defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M1 1 L7 4.5 L1 8" fill="none" stroke="#91a2b8" stroke-width="1.6"/></marker></defs><g font-family="'PingFang SC','Helvetica Neue',Arial,sans-serif">
+<rect x="0" y="0" width="1440" height="1300" rx="0" fill="#ffffff" stroke="#ffffff"/>
+<text x="48" y="59" font-size="38" font-weight="700" fill="#152033">项目模块架构图</text>
+<text x="48" y="101" font-size="23" font-weight="400" fill="#64748b">8 个模块协同：选内容 → 编邮件 → 看预览 → 保存或导出</text>
+<rect x="48" y="135" width="1344" height="88" rx="16" fill="#eff4fb" stroke="#d8e1ed"/>
+<text x="72" y="173" font-size="26" font-weight="650" fill="#152033">接入你的应用</text>
+<text x="72" y="205" font-size="22" font-weight="400" fill="#475569">网站、运营后台或业务系统，把邮件编辑能力嵌入现有页面</text>
+<path d="M720 223 V250" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="48" y="262" width="1344" height="514" rx="20" fill="#f8fafc" stroke="#ccd7e5"/>
+<text x="72" y="305" font-size="27" font-weight="700" fill="#152033">用户直接操作的模块</text>
+<text x="560" y="304" font-size="21" font-weight="400" fill="#64748b">制作一封邮件时使用的 6 项核心能力</text>
+<rect x="72" y="332" width="416" height="188" rx="16" fill="#ffffff" stroke="#d8e1ed"/>
+<rect x="90" y="350" width="38" height="34" rx="9" fill="#efeaff" stroke="#efeaff"/>
+<text x="97" y="375" font-size="18" font-weight="700" fill="#6653c1">01</text>
+<text x="142" y="376" font-size="25" font-weight="650" fill="#152033">内容区块库</text>
+<text x="92" y="420" font-size="23" font-weight="400" fill="#475569">标题、正文、按钮、图片</text>
+<text x="92" y="453" font-size="23" font-weight="400" fill="#475569">分割线、留白、自定义 HTML</text>
+<text x="92" y="486" font-size="23" font-weight="400" fill="#475569">把需要的内容拖入邮件</text>
+<rect x="512" y="332" width="416" height="188" rx="16" fill="#ffffff" stroke="#d8e1ed"/>
+<rect x="530" y="350" width="38" height="34" rx="9" fill="#e7f1ff" stroke="#e7f1ff"/>
+<text x="537" y="375" font-size="18" font-weight="700" fill="#266ab5">02</text>
+<text x="582" y="376" font-size="25" font-weight="650" fill="#152033">拖拽编辑画布</text>
+<text x="532" y="420" font-size="23" font-weight="400" fill="#475569">排列、复制、删除内容区块</text>
+<text x="532" y="453" font-size="23" font-weight="400" fill="#475569">直接编辑文字与富文本</text>
+<text x="532" y="486" font-size="23" font-weight="400" fill="#475569">边编辑边查看邮件布局</text>
+<rect x="952" y="332" width="416" height="188" rx="16" fill="#ffffff" stroke="#d8e1ed"/>
+<rect x="970" y="350" width="38" height="34" rx="9" fill="#fff1e1" stroke="#fff1e1"/>
+<text x="977" y="375" font-size="18" font-weight="700" fill="#a3652d">03</text>
+<text x="1022" y="376" font-size="25" font-weight="650" fill="#152033">属性与主体设置</text>
+<text x="972" y="420" font-size="23" font-weight="400" fill="#475569">修改区块内容、颜色与边框</text>
+<text x="972" y="453" font-size="23" font-weight="400" fill="#475569">调整宽度、内边距与间距</text>
+<text x="972" y="486" font-size="23" font-weight="400" fill="#475569">统一设置邮件字体与背景</text>
+<rect x="72" y="545" width="416" height="188" rx="16" fill="#ffffff" stroke="#d8e1ed"/>
+<rect x="90" y="563" width="38" height="34" rx="9" fill="#e7f6ef" stroke="#e7f6ef"/>
+<text x="97" y="588" font-size="18" font-weight="700" fill="#268163">04</text>
+<text x="142" y="589" font-size="25" font-weight="650" fill="#152033">主题与个性化</text>
+<text x="92" y="633" font-size="23" font-weight="400" fill="#475569">设置邮件主题</text>
+<text x="92" y="666" font-size="23" font-weight="400" fill="#475569">插入姓名、店铺等模板变量</text>
+<text x="92" y="699" font-size="23" font-weight="400" fill="#475569">使用示例数据查看替换结果</text>
+<rect x="512" y="545" width="416" height="188" rx="16" fill="#ffffff" stroke="#d8e1ed"/>
+<rect x="530" y="563" width="38" height="34" rx="9" fill="#e7f1ff" stroke="#e7f1ff"/>
+<text x="537" y="588" font-size="18" font-weight="700" fill="#266ab5">05</text>
+<text x="582" y="589" font-size="25" font-weight="650" fill="#152033">桌面 / 移动预览</text>
+<text x="532" y="633" font-size="23" font-weight="400" fill="#475569">切换桌面与手机显示效果</text>
+<text x="532" y="666" font-size="23" font-weight="400" fill="#475569">预览模板变量替换后的内容</text>
+<text x="532" y="699" font-size="23" font-weight="400" fill="#475569">发送前检查邮件内容与版式</text>
+<rect x="952" y="545" width="416" height="188" rx="16" fill="#ffffff" stroke="#d8e1ed"/>
+<rect x="970" y="563" width="38" height="34" rx="9" fill="#efeaff" stroke="#efeaff"/>
+<text x="977" y="588" font-size="18" font-weight="700" fill="#6653c1">06</text>
+<text x="1022" y="589" font-size="25" font-weight="650" fill="#152033">自定义区块与资源</text>
+<text x="972" y="633" font-size="23" font-weight="400" fill="#475569">增加商品卡片等业务区块</text>
+<text x="972" y="666" font-size="23" font-weight="400" fill="#475569">定制编辑画布和属性控件</text>
+<text x="972" y="699" font-size="23" font-weight="400" fill="#475569">接入已有图片资源选择器</text>
+<path d="M494 426 H504" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M944 426 H934" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M720 776 V812" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" />
+<text x="48" y="826" font-size="24" font-weight="650" fill="#475569">支撑所有编辑模块的共享能力</text>
+<path d="M720 845 V856 H386 V876" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M720 856 H1054 V876" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="48" y="889" width="642" height="153" rx="16" fill="#f3efff" stroke="#dcd1f5"/>
+<rect x="70" y="909" width="38" height="34" rx="9" fill="#e7defb" stroke="#e7defb"/>
+<text x="77" y="934" font-size="18" font-weight="700" fill="#6653c1">07</text>
+<text x="122" y="936" font-size="26" font-weight="650" fill="#40347a">文档与编辑状态</text>
+<text x="72" y="976" font-size="23" font-weight="400" fill="#475569">统一记录邮件内容、顺序、样式与主题</text>
+<text x="72" y="1010" font-size="23" font-weight="400" fill="#475569">支持载入、替换、重置；多个编辑器互不干扰</text>
+<rect x="750" y="889" width="642" height="153" rx="16" fill="#eef5ff" stroke="#cddff7"/>
+<rect x="772" y="909" width="38" height="34" rx="9" fill="#dfeaff" stroke="#dfeaff"/>
+<text x="779" y="934" font-size="18" font-weight="700" fill="#266ab5">08</text>
+<text x="824" y="936" font-size="26" font-weight="650" fill="#225897">邮件渲染与校验</text>
+<text x="774" y="976" font-size="23" font-weight="400" fill="#475569">检查控件值与区块配置，生成邮件 HTML</text>
+<text x="774" y="1010" font-size="23" font-weight="400" fill="#475569">保留模板供发送使用，或解析示例数据用于预览</text>
+<path d="M690 965 H738" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M369 1042 V1081" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M1071 1042 V1081" fill="none" stroke="#91a2b8" stroke-width="2.5" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="48" y="1094" width="642" height="137" rx="16" fill="#edf8f1" stroke="#cce4d5"/>
+<text x="72" y="1134" font-size="27" font-weight="700" fill="#286844">JSON 文档</text>
+<text x="72" y="1170" font-size="23" font-weight="400" fill="#475569">交给应用保存草稿</text>
+<text x="72" y="1202" font-size="23" font-weight="400" fill="#475569">下次载入，继续编辑</text>
+<rect x="750" y="1094" width="642" height="137" rx="16" fill="#edf5ff" stroke="#cddff7"/>
+<text x="774" y="1134" font-size="27" font-weight="700" fill="#225897">邮件 HTML</text>
+<text x="774" y="1170" font-size="23" font-weight="400" fill="#475569">导出邮件模板或预览结果</text>
+<text x="774" y="1202" font-size="23" font-weight="400" fill="#475569">交给应用的邮件发送系统</text>
+<text x="48" y="1272" font-size="22" font-weight="400" fill="#64748b">本项目负责邮件制作、预览与导出；数据存储、文件上传、实际发信由接入应用完成。</text>
+</g></svg>

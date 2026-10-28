@@ -1,9 +1,16 @@
+/** Checkbox or switch props. */
 interface CheckboxControlProps {
+  /** Visible and accessible label. */
   label: string;
+  /** Current checked state. */
   checked: boolean;
+  /** Whether disabled. */
   disabled?: boolean;
+  /** Additional root CSS class. */
   className?: string;
+  /** Appearance: checkbox by default, or switch. */
   variant?: "checkbox" | "switch";
+  /** Receive the new checked state. */
   onChange: (checked: boolean) => void;
 }
 

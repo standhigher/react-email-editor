@@ -61,8 +61,11 @@ const TYPOGRAPHY_CONTROL_MAP = {
   linkDecoration: LINK_DECORATION,
 } satisfies Record<string, StyleControlConfig>;
 
+/** Dimension names: padding, margin, height. */
 export type DimensionControlName = keyof typeof DIMENSION_CONTROLS;
+/** Appearance control names. */
 export type DecorationControlName = keyof typeof DECORATION_CONTROLS;
+/** Typography control names. */
 export type TypographyControlName = keyof typeof TYPOGRAPHY_CONTROL_MAP;
 
 export const TYPOGRAPHY_CONTROLS: StyleControlConfig[] = [

@@ -2,17 +2,24 @@ import type { ComponentType, ReactNode } from "react";
 import type { ControlDefinition, PluginEditorProps } from "../plugins/types";
 import type { EmailBlockNode, EmailBlockStyle, EmailBodySettings } from "./document";
 
+/** Select or alignment control option. */
 export interface ControlOption {
+  /** Display label. */
   label: string;
+  /** Persisted option value. */
   value: string;
 }
 
+/** Named runtime control definition. */
 export interface ControlConfig extends ControlDefinition {
+  /** Key in the controls object. */
   name: string;
 }
 
+/** Inspector group identifier. */
 export type StyleGroup = "general" | "dimension" | "typography" | "decorations";
 
+/** Union of style input kinds. */
 export type StyleControlType =
   | "text"
   | "color"
@@ -23,72 +30,106 @@ export type StyleControlType =
   | "spacing"
   | "corners";
 
+/** Inspector style control declaration. */
 export interface StyleControlConfig {
-  /** e.g. "typography.fontSize" — which style slot this reads and writes */
+  /** Style path, e.g. dimension.padding. */
   id: string;
+  /** Default inspector group. */
   group: StyleGroup;
+  /** Display label. */
   label: string;
+  /** Style input kind. */
   control: StyleControlType;
+  /** Options for select or alignment. */
   options?: ControlOption[];
-  /** Unit suffix for a single-unit slider, e.g. "px". Omit for unitless values. */
+  /** Single unit suffix; omit for unitless values. */
   unit?: string;
-  /** Email-safe units. A select appears only when more than one is listed. */
+  /** Allowed email CSS units; multiple units show a selector. */
   units?: string[];
+  /** Minimum numeric or range value. */
   min?: number;
+  /** Maximum numeric or range value. */
   max?: number;
+  /** Numeric increment. */
   step?: number;
+  /** Default style string; overridden by defaultStyle. */
   defaultValue?: string;
+  /** Empty input hint. */
   placeholder?: string;
 }
 
+/** Canvas or email consumer mode; independent of template resolution. */
 export type RenderMode = "canvas" | "email";
 
+/** Normalized snapshots used by block renderers. */
 export interface BlockRenderContext {
+  /** Block copy with normalized controls and styles. */
   block: EmailBlockNode;
+  /** Values parsed by the plugin readControls. */
   controls: Record<string, unknown>;
+  /** Normalized enabled styles. */
   style: EmailBlockStyle;
-  /** canvas/email identify the consumer; HTML template resolution is applied by the shared renderer. */
+  /** Canvas or email consumer; templates are processed by the shared renderer. */
   mode: RenderMode;
+  /** Copy of email body settings. */
   body: EmailBodySettings;
 }
 
+/** Rich-text features for text, heading or button. */
 export type RichTextProfile = "text" | "heading" | "button";
 
-/** 显式控制检查器的分组及字段归属，分组按声明顺序展示。 */
+/** Inspector section displayed in declaration order. */
 export interface BlockInspectorSection {
+  /** Section title. */
   title: string;
+  /** Content control names in display order. */
   controlNames?: string[];
+  /** Style control IDs in display order. */
   styleIds?: string[];
+  /** Style IDs inside the collapsed advanced section. */
   advancedStyleIds?: string[];
 }
 
+/** Normalized block definition available through plugin values and registry lookups. */
 export interface BlockDefinition {
+  /** Unique block type. */
   type: string;
+  /** Library title. */
   title: string;
+  /** Library React icon or string. */
   icon?: ReactNode | string;
+  /** Library description. */
   description?: string;
+  /** Named controls in declaration order. */
   controls?: ControlConfig[];
+  /** Enabled style controls. */
   styleControls?: StyleControlConfig[];
+  /** Custom inspector sections. */
   inspectorSections?: BlockInspectorSection[];
+  /** Parse a raw control object into normalized values. */
   readControls: (value: Record<string, unknown>) => Record<string, unknown>;
+  /** Allow replacing a builtin with the same type. */
   override?: boolean;
+  /** Default styles for new nodes. */
   defaultStyle?: EmailBlockStyle;
-  /** Sample data used to render template HTML in the editor and preview. */
+  /** Template preview data for new nodes. */
   defaultData?: Record<string, unknown>;
-  /** 默认画布直接编辑的 richText 字段；由字段声明解析生成。 */
+  /** Rich-text control edited by the default canvas. */
   inlineControl?: string;
-  /** Optional React inspector for controls that need domain-specific editing UI. */
+  /** Inspector component bound to the editor context. */
   inspector?: ComponentType<PluginEditorProps>;
-  /** Optional React canvas for multi-region or interactive editing. */
+  /** Canvas component bound to the editor context. */
   canvas?: ComponentType<PluginEditorProps>;
+  /** Render inner HTML from normalized context; email mode validates controls. */
   renderEmail: (ctx: BlockRenderContext) => string;
 }
 
+/** Insertable template variable and preview value. */
 export interface Variable {
-  /** 下拉展示并插入的变量，例如 `{{  store_name }}`。 */
+  /** Exact inserted token, e.g. {{ store_name }}; exact matches receive export dot normalization. */
   name: string;
-  /** 下拉选项副文案。空字符串或不传时不渲染。 */
+  /** Secondary option text; hidden when absent or empty. */
   description?: string;
-  /** 预览时替换该变量的文本。 */
+  /** Preview replacement text; omitted values add no preview data. */
   value?: string;
 }

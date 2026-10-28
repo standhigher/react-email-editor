@@ -1,7 +1,10 @@
 import { useId, type ButtonHTMLAttributes } from "react";
 
+/** Button props; other attributes follow React button; type defaults to button. */
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Appearance: default, primary, solid or icon; default is default. */
   variant?: "default" | "primary" | "solid" | "icon";
+  /** Optional tooltip linked through aria-describedby. */
   tooltip?: string;
 }
 

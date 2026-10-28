@@ -1,11 +1,13 @@
 import { ControlRenderer } from "../../inspector/ControlRenderer";
 import { usePluginEditor } from "../editor-context";
 
+/** Declared-control component props within plugin context. */
 export interface ControlEditorProps {
+  /** Declared control name; unknown names throw. */
   control: string;
 }
 
-/** 自定义 Inspector 复用字段声明、资源选择器、校验和标准控件。 */
+/** Reuse declared controls, image pickers and validation inside a plugin inspector. */
 export function ControlEditor({ control }: ControlEditorProps) {
   const context = usePluginEditor();
   const definition = context.controlDefinitions.find((item) => item.name === control);

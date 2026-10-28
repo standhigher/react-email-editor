@@ -484,4 +484,4 @@ Missing plugins produce a canvas placeholder and preserve the node; email export
 | `ControlEditorProps/EditableRichTextProps` | Reusable control and rich-text component props. |
 | `EmailMarkup/EmailTools` | Email fragments and rendering helpers. |
 
-See [README](../README.md) for editor Hooks, instance methods, body, and variables. Runnable examples: [coupon](../playground/plugins/coupon.ts), [product card](../playground/plugins/product.ts), and [shared configuration](../playground/plugins/config.ts).
+See the [API reference](./api.md) for editor Hooks, instance methods, body, and variables, and [advanced examples](./advanced-examples.md) for business integration. Runnable examples: [coupon](../playground/plugins/coupon.ts), [product card](../playground/plugins/product.ts), and [shared configuration](../playground/plugins/config.ts).

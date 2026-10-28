@@ -36,12 +36,22 @@ export const EmailControls = {
   number: (options: ControlOptions<number>) => buildControl("number", options, 0, (value) => {
     return typeof value === "number" || (typeof value === "string" && value.trim()) ? Number(value) : Number.NaN;
   }),
-  list<Schema extends ControlSchema>(options: ControlOptions<ControlValues<Schema>[]> & { controls: Schema }): ControlDefinition<ControlValues<Schema>[]> {
+  list<Schema extends ControlSchema>(options: ControlOptions<ControlValues<Schema>[]> & {
+    /** Controls for each list row; Schema infers row values. */
+    controls: Schema;
+  }): ControlDefinition<ControlValues<Schema>[]> {
     const { controls, ...config } = options;
     const schema = snapshotValue(controls);
     return snapshotValue({ ...buildControl("list", config, [], (value) => Array.isArray(value) ? value.map((item) => readControlValues(schema, item && typeof item === "object" ? item : {})) : []), itemControls: schema });
   },
-  custom<T>(options: ControlOptions<T> & { defaultValue: T; read: (value: unknown) => T; component: NonNullable<ControlOptions<T>["component"]> }): ControlDefinition<T> {
+  custom<T>(options: ControlOptions<T> & {
+    /** Required default value; must be JSON-persistable. */
+    defaultValue: T;
+    /** Purely parse an unknown persisted value into T. */
+    read: (value: unknown) => T;
+    /** Required editing component receiving ControlComponentProps<T>. */
+    component: NonNullable<ControlOptions<T>["component"]>;
+  }): ControlDefinition<T> {
     const { read, ...config } = options;
     return buildControl("custom", config, options.defaultValue, read);
   },

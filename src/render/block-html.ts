@@ -11,10 +11,15 @@ import type { BlockDefinition, BlockRenderContext, RenderMode, Variable } from "
 import type { EmailBlockNode, EmailBodySettings } from "../types/document";
 import type { TemplateData } from "./template-preview";
 
+/** Single-block rendering options; must be an object. */
 export interface BlockRenderOptions {
+  /** Resolve templates, default false; single-block rendering does not auto-merge variables. */
   resolveHtmlTemplate?: boolean;
+  /** Explicit preview data; defaults to node defaultData. */
   templateData?: TemplateData;
+  /** Exact token dot normalization on export; merge preview data explicitly. */
   variables?: Variable[];
+  /** Body defaults; defaults to DEFAULT_EMAIL_BODY. */
   body?: EmailBodySettings;
 }
 
@@ -88,7 +93,7 @@ function assignTemplateControl(data: TemplateData, control: string, value: strin
   current[parts[parts.length - 1]] = value;
 }
 
-/** 用变量 name 里的字段名作为键，value 作为预览替换值。 */
+/** Convert variable name paths and preview values into template data. */
 export function variablesToTemplateData(variables: Variable[]): TemplateData {
   const data: TemplateData = {};
   for (const variable of variables) {

@@ -1,4 +1,6 @@
+/** Template keys mapped to preview values; nested objects and arrays support paths and loops. */
 export interface TemplateData {
+  /** Template key mapped to a scalar, object or array. */
   [key: string]: unknown;
 }
 

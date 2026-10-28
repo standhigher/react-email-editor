@@ -2,11 +2,17 @@ import { ColorPicker } from "./ColorPicker";
 import { colorToHex } from "./color-picker/colors";
 import { useColorPicker } from "./color-picker/useColorPicker";
 
+/** Color picker props. */
 interface ColorControlProps {
+  /** Current CSS color value. */
   value: string;
+  /** Display fallback for an empty value, default #000000. */
   fallback?: string;
+  /** Button and dialog label, default Color. */
   label?: string;
+  /** Value submitted on reset; defaults to fallback. */
   resetTo?: string;
+  /** Receive the selected or reset color. */
   onChange: (value: string) => void;
 }
 
