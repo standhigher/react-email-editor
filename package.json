@@ -43,8 +43,7 @@
     "docs/**/*.md",
     "docs/**/*.svg",
     "README.md",
-    "README.zh-CN.md",
-    "CHANGELOG.md"
+    "README.zh-CN.md"
   ],
   "publishConfig": {
     "access": "public",

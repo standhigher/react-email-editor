@@ -48,6 +48,6 @@ Open [http://localhost:5173](http://localhost:5173); reuse an existing server wh
 - [Advanced examples](https://github.com/standhigher/react-email-editor/blob/main/docs/advanced-examples.md): validated saving, multiple instances, custom blocks, multiple editing regions, resource adapters and standalone export.
 - [Custom block guide](https://github.com/standhigher/react-email-editor/blob/main/docs/custom-blocks.md): detailed controls, plugins and rendering helpers.
 - [Release guide](https://github.com/standhigher/react-email-editor/blob/main/docs/release.md): package checks and manual npm publishing.
-- [Changelog](https://github.com/standhigher/react-email-editor/blob/main/CHANGELOG.md).
+- [Changelog](https://github.com/standhigher/react-email-editor/blob/main/docs/changelog.md).
 
 The document format is under development. Only `version: 4` is supported, without automatic migration of older documents.

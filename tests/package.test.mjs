@@ -22,12 +22,13 @@ test("发布包包含所有入口、类型和文档，排除开发文件与 PNG 
     manifest.main, manifest.module, manifest.types,
     manifest.exports["."].types, manifest.exports["."].import,
     manifest.exports["./styles.css"],
-    "package.json", "LICENSE", "README.md", "README.zh-CN.md", "CHANGELOG.md",
+    "package.json", "LICENSE", "README.md", "README.zh-CN.md",
+    "docs/changelog.md", "docs/changelog.zh-CN.md",
     "docs/release.md", "docs/release.zh-CN.md",
     "docs/assets/architecture.svg", "docs/assets/architecture.zh-CN.svg",
   ]) assert.ok(files.has(path.replace(/^\.\//, "")), path);
   for (const path of files) {
-    assert.match(path, /^(?:dist\/(?:index\.js|index\.d\.ts|styles\.css)|docs\/.+\.(?:md|svg)|package\.json|LICENSE|README(?:\.zh-CN)?\.md|CHANGELOG\.md)$/);
+    assert.match(path, /^(?:dist\/(?:index\.js|index\.d\.ts|styles\.css)|docs\/.+\.(?:md|svg)|package\.json|LICENSE|README(?:\.zh-CN)?\.md)$/);
   }
   assert.equal(packed.bundled.length, 0);
 });

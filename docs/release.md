@@ -8,7 +8,7 @@ Development uses Node 24 LTS (`.nvmrc`) and pnpm 10.16.1 (`packageManager`). The
 
 The manifest declares MIT licensing, repository, homepage, issue tracker and the public npm registry. `sideEffects: ["**/*.css"]` preserves CSS imports while allowing unused JavaScript modules to be removed. Actual tree shaking depends on module contents and the consumer's bundler.
 
-The package includes built assets, Markdown documentation and SVGs, plus both READMEs and the changelog. npm automatically includes `package.json` and `LICENSE`. Source, playground, tests, caches and PNG originals are excluded.
+The package includes built assets, Markdown documentation and SVGs under `docs/` (including [English](./changelog.md) and [Chinese](./changelog.zh-CN.md) changelogs), plus both READMEs. npm automatically includes `package.json` and `LICENSE`. Source, playground, tests, caches and PNG originals are excluded.
 
 ## README images
 
@@ -28,7 +28,7 @@ npm pack --dry-run
 
 `pnpm check` runs type checking, linting, build and Node tests in order. Tests cover package contents, README image URLs and consumer CSS preservation. `pnpm test` requires an existing build. `prepack` builds assets; `prepublishOnly` runs the complete check before local publishing.
 
-To publish locally, first update the changelog and select an unpublished version:
+To publish locally, first update both changelogs and select an unpublished version:
 
 ```bash
 npm login --registry=https://registry.npmjs.org/

@@ -8,7 +8,7 @@
 
 `package.json` 声明 MIT 许可证、仓库、主页、Issue 地址及公开 npm registry。`sideEffects: ["**/*.css"]` 保留消费方的 CSS 导入，允许 bundler 丢弃未使用的 JavaScript 模块；实际裁剪效果取决于模块内容和消费方 bundler。
 
-`files` 只发布构建产物、Markdown 文档和 SVG，以及 README、更新日志；npm 自动包含 `package.json` 和 `LICENSE`。源码、playground、测试、本地缓存和 PNG 原图不进入包。
+`files` 只发布构建产物、`docs/` 下的 Markdown 文档和 SVG（含[英文](./changelog.md)与[中文](./changelog.zh-CN.md)更新日志），以及中英文 README；npm 自动包含 `package.json` 和 `LICENSE`。源码、playground、测试、本地缓存和 PNG 原图不进入包。
 
 ## README 图片
 
@@ -28,7 +28,7 @@ npm pack --dry-run
 
 `pnpm check` 顺序执行类型检查、lint、构建和 Node 测试；测试包含发布文件范围、README 图片地址及消费方 CSS 保留验证。`pnpm test` 只执行测试，需先构建。`prepack` 负责构建；本地 `npm publish` 的 `prepublishOnly` 会执行完整校验。
 
-需要本地手动发布时，在确认版本未发布、更新日志已同步后执行：
+需要本地手动发布时，在确认版本未发布、中英文更新日志已同步后执行：
 
 ```bash
 npm login --registry=https://registry.npmjs.org/
