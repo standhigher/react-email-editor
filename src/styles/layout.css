@@ -151,6 +151,20 @@
   flex-shrink: 0;
 }
 
+.ree-library-head {
+  justify-content: space-between;
+}
+
+.ree-col-left.is-collapsed {
+  width: 52px;
+}
+
+.ree-col-left.is-collapsed .ree-library-head {
+  justify-content: center;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
 .ree-col-center {
   flex: 1;
   min-width: 0;

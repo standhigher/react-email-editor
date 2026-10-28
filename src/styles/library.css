@@ -8,6 +8,10 @@
   overflow-y: auto;
 }
 
+.ree-lib[hidden] {
+  display: none;
+}
+
 .ree-lib-item {
   display: flex;
   align-items: center;

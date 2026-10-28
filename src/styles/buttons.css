@@ -68,6 +68,75 @@
   padding: calc(var(--ree-button-padding-y) - 1px) calc(var(--ree-button-padding-x) - 1px);
 }
 
+.ree-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  --ree-button-padding-y: 0px;
+  --ree-button-padding-x: 0px;
+  border-color: transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ree-muted);
+}
+
+.ree-btn-icon:hover {
+  border-color: transparent;
+  color: var(--ree-text);
+}
+
+.ree-btn-icon:focus-visible {
+  padding: 0;
+}
+
+.ree-btn-has-tooltip {
+  position: relative;
+}
+
+.ree-block-tooltip,
+.ree-btn-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 10;
+  display: none;
+  padding: 6px 9px;
+  border-radius: var(--ree-radius-sm);
+  background: var(--ree-text);
+  color: var(--ree-panel);
+  box-shadow: var(--ree-shadow-md);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.ree-block-tooltip::before,
+.ree-btn-tooltip::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+}
+
+.ree-btn-tooltip {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.ree-block-btn:hover .ree-block-tooltip,
+.ree-block-btn:focus-visible .ree-block-tooltip,
+.ree-btn-has-tooltip:hover .ree-btn-tooltip,
+.ree-btn-has-tooltip:focus-visible .ree-btn-tooltip {
+  display: block;
+}
+
 .ree-reset {
   appearance: none;
   display: inline-flex;
