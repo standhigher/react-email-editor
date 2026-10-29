@@ -28,10 +28,6 @@ export function EmailPage() {
 }
 ```
 
-With Next.js App Router, add `"use client"` to the integration component and import CSS from an allowed global stylesheet entry. Your app implements persistence, resource uploads and email delivery.
-
-Custom blocks that omit `icon` use the first character of their trimmed `title` as the icon: `Coupon` displays `C` and `优惠券` displays `优`. An explicit `icon` takes precedence.
-
 ## Run locally
 
 Use Node.js 24 LTS (`.nvmrc`; at least 22.18 for the complete test suite):
