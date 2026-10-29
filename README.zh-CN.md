@@ -15,7 +15,7 @@
 需要 React 18 和 React DOM 18；包提供 ESM 和 TypeScript 类型。
 
 ```bash
-pnpm add @standhigher/react-email-editor
+npm install @standhigher/react-email-editor
 ```
 
 ```tsx
@@ -32,11 +32,11 @@ Next.js App Router 的接入组件需声明 `"use client"`；样式在应用允�
 
 ## 本地启动
 
-推荐 Node.js 24 LTS（`.nvmrc`；完整测试最低需要 22.18）和 pnpm 10.16.1（`packageManager`）：
+推荐 Node.js 24 LTS（`.nvmrc`；完整测试最低需要 22.18）：
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm dev
+npm install
+npm run dev
 ```
 
 打开 [http://localhost:5173](http://localhost:5173)，已有服务时优先复用。构建与校验命令见 [API 文档的开发说明](https://github.com/standhigher/react-email-editor/blob/main/docs/api.zh-CN.md#开发与本地联调)。
@@ -49,5 +49,3 @@ pnpm dev
 - [自定义区块指南](https://github.com/standhigher/react-email-editor/blob/main/docs/custom-blocks.zh-CN.md)：控件、插件和渲染工具的完整说明。
 - [发布指南](https://github.com/standhigher/react-email-editor/blob/main/docs/release.zh-CN.md)：发布包校验与本地手动发布。
 - [更新记录](https://github.com/standhigher/react-email-editor/blob/main/docs/changelog.zh-CN.md)。
-
-文档格式仍处于开发阶段，当前只支持 `version: 4`，不自动迁移旧版文档。

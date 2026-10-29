@@ -4,7 +4,7 @@
 
 ## 工具链与包配置
 
-开发默认使用 Node 24 LTS（`.nvmrc`）和 pnpm 10.16.1（`packageManager`）。完整测试最低需要 Node 22.18；这不是消费方安装要求，因此包没有添加 `engines` 限制。当前仍只声明 React 18 / React DOM 18 支持，React 19 需完成独立兼容性验证后再扩大 peer 范围。
+开发默认使用 Node 24 LTS（`.nvmrc`）和 npm 11.13.0（`packageManager`）。完整测试最低需要 Node 22.18；这不是消费方安装要求，因此包没有添加 `engines` 限制。当前仍只声明 React 18 / React DOM 18 支持，React 19 需完成独立兼容性验证后再扩大 peer 范围。
 
 `package.json` 声明 MIT 许可证、仓库、主页、Issue 地址及公开 npm registry。`sideEffects: ["**/*.css"]` 保留消费方的 CSS 导入，允许 bundler 丢弃未使用的 JavaScript 模块；实际裁剪效果取决于模块内容和消费方 bundler。
 
@@ -21,12 +21,12 @@ README 的语言切换、文档、更新日志和章节导航使用 GitHub `blob
 ## 本地检查与发布
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm check
+npm ci
+npm run check
 npm pack --dry-run
 ```
 
-`pnpm check` 顺序执行类型检查、lint、构建和 Node 测试；测试包含发布文件范围、README 图片地址及消费方 CSS 保留验证。`pnpm test` 只执行测试，需先构建。`prepack` 负责构建；本地 `npm publish` 的 `prepublishOnly` 会执行完整校验。
+`npm run check` 顺序执行类型检查、lint、构建和 Node 测试；测试包含发布文件范围、README 图片地址及消费方 CSS 保留验证。`npm test` 只执行测试，需先构建。`prepack` 负责构建；本地 `npm publish` 的 `prepublishOnly` 会执行完整校验。
 
 需要本地手动发布时，在确认版本未发布、中英文更新日志已同步后执行：
 

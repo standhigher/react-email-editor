@@ -4,7 +4,7 @@ English | [简体中文](./release.zh-CN.md)
 
 ## Toolchain and package configuration
 
-Development uses Node 24 LTS (`.nvmrc`) and pnpm 10.16.1 (`packageManager`). The complete test suite needs Node 22.18+. These development requirements are not consumer requirements, so the package does not declare `engines`. React / React DOM 18 remain the supported peers; React 19 requires a separate compatibility validation.
+Development uses Node 24 LTS (`.nvmrc`) and npm 11.13.0 (`packageManager`). The complete test suite needs Node 22.18+. These development requirements are not consumer requirements, so the package does not declare `engines`. React / React DOM 18 remain the supported peers; React 19 requires a separate compatibility validation.
 
 The manifest declares MIT licensing, repository, homepage, issue tracker and the public npm registry. `sideEffects: ["**/*.css"]` preserves CSS imports while allowing unused JavaScript modules to be removed. Actual tree shaking depends on module contents and the consumer's bundler.
 
@@ -21,12 +21,12 @@ README language switches, documentation, changelog and section links use absolut
 ## Local checks and publishing
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm check
+npm ci
+npm run check
 npm pack --dry-run
 ```
 
-`pnpm check` runs type checking, linting, build and Node tests in order. Tests cover package contents, README image URLs and consumer CSS preservation. `pnpm test` requires an existing build. `prepack` builds assets; `prepublishOnly` runs the complete check before local publishing.
+`npm run check` runs type checking, linting, build and Node tests in order. Tests cover package contents, README image URLs and consumer CSS preservation. `npm test` requires an existing build. `prepack` builds assets; `prepublishOnly` runs the complete check before local publishing.
 
 To publish locally, first update both changelogs and select an unpublished version:
 

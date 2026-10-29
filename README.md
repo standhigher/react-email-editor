@@ -15,7 +15,7 @@ Drag content onto a canvas, style your email, preview it, then save editable JSO
 Requires React 18 and React DOM 18. Ships ESM and TypeScript declarations.
 
 ```bash
-pnpm add @standhigher/react-email-editor
+npm install @standhigher/react-email-editor
 ```
 
 ```tsx
@@ -32,11 +32,11 @@ With Next.js App Router, add `"use client"` to the integration component and imp
 
 ## Run locally
 
-Use Node.js 24 LTS (`.nvmrc`; at least 22.18 for the complete test suite) and pnpm 10.16.1 (`packageManager`):
+Use Node.js 24 LTS (`.nvmrc`; at least 22.18 for the complete test suite):
 
 ```bash
-pnpm install --frozen-lockfile
-pnpm dev
+npm install
+npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173); reuse an existing server when available. See [development and local linking](https://github.com/standhigher/react-email-editor/blob/main/docs/api.md#development-and-local-linking) for build and validation commands.
@@ -49,5 +49,3 @@ Open [http://localhost:5173](http://localhost:5173); reuse an existing server wh
 - [Custom block guide](https://github.com/standhigher/react-email-editor/blob/main/docs/custom-blocks.md): detailed controls, plugins and rendering helpers.
 - [Release guide](https://github.com/standhigher/react-email-editor/blob/main/docs/release.md): package checks and manual npm publishing.
 - [Changelog](https://github.com/standhigher/react-email-editor/blob/main/docs/changelog.md).
-
-The document format is under development. Only `version: 4` is supported, without automatic migration of older documents.

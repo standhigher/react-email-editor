@@ -8,7 +8,7 @@
 
 ## 项目定位
 
-本项目是 `@standhigher/react-email-editor` React 组件库，使用 TypeScript、React 18、`@dnd-kit` 和 TipTap。发布产物是 ESM 包。`playground/` 只给 `pnpm dev` 在本地挂载编辑器，不参与 `tsup` 构建，也不进入 `files`。
+本项目是 `@standhigher/react-email-editor` React 组件库，使用 TypeScript、React 18、`@dnd-kit` 和 TipTap。发布产物是 ESM 包。`playground/` 只给 `npm run dev` 在本地挂载编辑器，不参与 `tsup` 构建，也不进入 `files`。
 
 核心行为如下：
 
@@ -27,7 +27,7 @@
 2. 运行 `git status --short`，确认工作区已有修改。已有修改属于当前工作，不得覆盖、回滚或格式化无关文件。
 3. 先定位现有实现和调用方，再决定是否新增抽象。不要凭个人习惯引入新的目录层级、状态管理库、CSS 框架或构建系统。
 4. 如果任务涉及公开 API、文档结构、渲染结果或默认值，先检查 `src/index.ts`、`src/types/`、`src/document/`、`src/render/` 和相关测试。
-5. 如果任务涉及 UI，先确认是否已有消费方开发服务或浏览器页面。有消费方页面时复用该服务；没有时使用本仓库的 `pnpm dev`（`playground/`）。不要再另起预览服务。
+5. 如果任务涉及 UI，先确认是否已有消费方开发服务或浏览器页面。有消费方页面时复用该服务；没有时使用本仓库的 `npm run dev`（`playground/`）。不要再另起预览服务。
 
 ## 目录与职责
 
@@ -133,29 +133,29 @@ tests/
 ## CSS 与构建产物
 
 - `src/styles.css` 是 CSS 总入口；`tsup.config.ts` 的 `onSuccess` 调用 `scripts/copy-style.mjs`，构建后生成展开的 `dist/styles.css`。
-- 不要手工编辑 `dist/`；它是构建产物，已被 `.gitignore` 忽略。需要验证 CSS 时先运行 `pnpm build`。
+- 不要手工编辑 `dist/`；它是构建产物，已被 `.gitignore` 忽略。需要验证 CSS 时先运行 `npm run build`。
 - 不要提交 `node_modules/`、`dist/`、`*.tsbuildinfo`、`.DS_Store` 或调试截图/临时文件。
 - `tsup.config.ts` 的 ESM、dts、external、`"use client"` banner 和 CSS 复制行为是发布契约。修改前必须确认消费方和 README 仍然适用。
 
 ## 测试与验证
 
-默认使用 pnpm，并在项目根目录执行。仓库使用 `pnpm-lock.yaml`，不混用 npm/yarn 锁文件。依赖未安装时优先运行 `pnpm install --frozen-lockfile`；仅在任务确实改变依赖时更新清单和锁文件。`packageManager` 固定 pnpm 10.16.1，`.nvmrc` 推荐 Node 24 LTS，完整校验最低需要 Node 22.18。未声明消费方 `engines`；不要将开发测试的 Node 要求当作消费方安装门槛。不得假定团队成员拥有某个个人路径下的 Node/pnpm；首次使用应检查 `node --version` 和 `pnpm --version`。
+默认使用 npm，并在项目根目录执行。仓库使用 `package-lock.json`，不混用 pnpm/yarn 锁文件。依赖未安装时优先运行 `npm ci`；仅在任务确实改变依赖时更新清单和锁文件。`packageManager` 固定 npm 11.13.0，`.nvmrc` 推荐 Node 24 LTS，完整校验最低需要 Node 22.18。未声明消费方 `engines`；不要将开发测试的 Node 要求当作消费方安装门槛。不得假定团队成员拥有某个个人路径下的 Node/npm；首次使用应检查 `node --version` 和 `npm --version`。
 
 ```bash
-pnpm typecheck
-pnpm lint
-pnpm build
+npm run typecheck
+npm run lint
+npm run build
 node --test tests/*.test.mjs tests/*.test.ts
 ```
 
-`pnpm check` 按上述顺序执行完整校验；`pnpm test` 只执行 Node 测试，运行前需要已有构建产物。`prepack` 构建发布产物，`prepublishOnly` 执行完整校验。npm 使用本地手动发布，流程见 `docs/release.zh-CN.md`。
+`npm run check` 按上述顺序执行完整校验；`npm test` 只执行 Node 测试，运行前需要已有构建产物。`prepack` 构建发布产物，`prepublishOnly` 执行完整校验。npm 使用本地手动发布，流程见 `docs/release.zh-CN.md`。
 
 验证要求：
 
-- Oxlint 使用仓库内开发依赖及 `.oxlintrc.json`，启用 TypeScript、Unicorn、Oxc、React 内置 Rust 插件的 correctness 规则，并显式检查 `typescript/no-explicit-any` 和 `react/rules-of-hooks`；React 检查包括 Hook 依赖、ref 和 effect，不代表完整覆盖官方 React Compiler 插件的所有规则。JavaScript 启用 `no-undef`，TypeScript 文件的未定义标识符及组件 Props 交由 `pnpm typecheck` 检查。`pnpm lint` 检查源码、playground、脚本、配置及测试，任何 warning 和无效的禁用指令都视为失败；`pnpm lint:fix` 仅应用安全自动修复，不替代人工 review。构建产物和本地 pnpm store 不参与检查，不依赖全局工具或临时下载；有意忽略的诊断使用 `oxlint-disable-next-line` 并说明原因。
+- Oxlint 使用仓库内开发依赖及 `.oxlintrc.json`，启用 TypeScript、Unicorn、Oxc、React 内置 Rust 插件的 correctness 规则，并显式检查 `typescript/no-explicit-any` 和 `react/rules-of-hooks`；React 检查包括 Hook 依赖、ref 和 effect，不代表完整覆盖官方 React Compiler 插件的所有规则。JavaScript 启用 `no-undef`，TypeScript 文件的未定义标识符及组件 Props 交由 `npm run typecheck` 检查。`npm run lint` 检查源码、playground、脚本、配置及测试，任何 warning 和无效的禁用指令都视为失败；`npm run lint:fix` 仅应用安全自动修复，不替代人工 review。构建产物和本地 pnpm store 不参与检查，不依赖全局工具或临时下载；有意忽略的诊断使用 `oxlint-disable-next-line` 并说明原因。
 - 文档-only 修改检查路径、命令、规则与源码是否一致，并运行 `git diff --check`；无需为纯文档改动添加实现测试或启动浏览器。
-- TypeScript、公共 API、文档模型或渲染逻辑变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build` 和相关 Node 测试；检查因环境问题不可用时报告实际原因，并继续执行其他可用检查。
-- `pnpm typecheck` 同时检查 `src/`、`playground/` 和 `tests/plugin-types.ts` 的插件类型契约。UI/CSS/字段交互变更：至少运行 `pnpm typecheck`、`pnpm lint`、`pnpm build`。有消费方页面时复用该服务；否则用 `pnpm dev` 打开 playground，在浏览器里核对 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景。
+- TypeScript、公共 API、文档模型或渲染逻辑变更：至少运行 `npm run typecheck`、`npm run lint`、`npm run build` 和相关 Node 测试；检查因环境问题不可用时报告实际原因，并继续执行其他可用检查。
+- `npm run typecheck` 同时检查 `src/`、`playground/` 和 `tests/plugin-types.ts` 的插件类型契约。UI/CSS/字段交互变更：至少运行 `npm run typecheck`、`npm run lint`、`npm run build`。有消费方页面时复用该服务；否则用 `npm run dev` 打开 playground，在浏览器里核对 DOM、computed style、hover、点击展开、弹窗、分页、响应式或 iframe 场景。
 - `tests/*.test.mjs` 依赖构建后的 `dist/index.js` 和 `dist/styles.css`，必须先构建再运行；不要只测试 `src` 的假入口。`tests/*.test.ts` 覆盖未从包入口导出的内部模块，由 Node 类型剥离直接执行，需要 Node 22.18 或更新版本。
 - 只运行了部分检查时，最终报告必须明确列出实际运行的命令和结果；不能把未运行的检查写成已通过。
 - 浏览器或跨域 iframe 无法操作时，明确记录限制和未覆盖的交互，不要声称完成了点击级验证。

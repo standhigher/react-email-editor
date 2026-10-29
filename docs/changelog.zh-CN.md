@@ -2,6 +2,19 @@
 
 [English](./changelog.md) | 简体中文
 
+## 未发布 — 2026-10-29
+
+### 工具链与文档
+
+- 项目包管理器从 pnpm 迁移为 npm 11.13.0，使用 `package-lock.json` 替换 `pnpm-lock.yaml`，保持所有直接依赖版本不变。
+- 开发启动统一使用 `npm install` 和 `npm run dev`；固定锁文件安装使用 `npm ci`。检查、自动修复、打包和发布前校验脚本均改为 npm，移除 pnpm 专属配置。
+- 同步中英文 README、API 开发与本地联调说明、发布指南及项目协作规则中的安装和命令说明。
+
+### 验证
+
+- `npm ci` 安装成功；`npm run check` 通过类型检查、Oxlint、构建及全部 103 项 Node 测试。
+- `npm run dev` 启动成功，首页和 `main.tsx` 入口模块均返回 HTTP 200。
+
 ## 0.4.3 — 2026-10-28
 
 ### 修复与改进

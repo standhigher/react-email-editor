@@ -2,6 +2,19 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## Unreleased — 2026-10-29
+
+### Toolchain and documentation
+
+- Migrate project package management from pnpm to npm 11.13.0, replacing `pnpm-lock.yaml` with `package-lock.json` while preserving all direct dependency versions.
+- Use `npm install` and `npm run dev` for local development and `npm ci` for locked installs. Switch validation, automatic fixes, packaging and pre-publish checks to npm, and remove pnpm-specific configuration.
+- Update installation and command instructions in both READMEs, API development and local linking documentation, release guides and project collaboration rules.
+
+### Validation
+
+- `npm ci` succeeds; `npm run check` passes type checking, Oxlint, build and all 103 Node tests.
+- `npm run dev` starts successfully; the homepage and `main.tsx` entry module both return HTTP 200.
+
 ## 0.4.3 — 2026-10-28
 
 ### Fixes and improvements
