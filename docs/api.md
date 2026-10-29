@@ -168,7 +168,9 @@ Use these components only within a plugin Canvas or Inspector.
 | `getBlockDefinition(type, definitions?)` | Type and optional registry, default builtins | Matching runtime definition or undefined. Do not mutate frozen configuration definitions. |
 | `generateId(prefix = "block")` | String ID prefix | String with a random suffix; applications must still ensure IDs are unique within a document. |
 
-EmailDocument contains version/body/blocks/subject?; EmailBlockNode contains id/type/controls/style?/defaultData?. Only DOCUMENT_VERSION = 4 is supported; older documents are not migrated. JSON stores no components or render functions; register matching plugins again when loading it.
+EmailDocument contains version/body/blocks/subject?; EmailBlockNode contains id/type/controls/style?/defaultData?. `version: number` is only a format identifier: new documents use `DOCUMENT_VERSION = 4`, while loading and exporting preserve the supplied value without version-based rejection or automatic migration of older structures. JSON stores no components or render functions; register matching plugins again when loading it.
+
+Initialization, `setDocument()`, `config.validate()` and HTML export require a document object, a `blocks` array, non-empty string `id/type` values and an object `controls` for every block. Invalid structure throws a `TypeError` with the field path. A supplied `subject` must be a string; a supplied non-null `body` must be an object, with omitted settings still filled by `resolveEmailBody()`. Nodes with only legacy `fields` and no `controls` are rejected; control values continue to be normalized and validated by the plugin schema.
 
 Canvas, preview and email HTML share body settings:
 
@@ -260,7 +262,7 @@ Props and `RichText.inherited` fields are documented in the published `.d.ts`; u
 | --- | --- |
 | BLOCK_TYPES / BuiltinBlockType | heading/text/button/image/divider/spacer/html. |
 | DEFAULT_BLOCKS | All builtin BlockPlugin definitions; custom registries use config.definitions. |
-| DEFAULT_EMAIL_BODY / DOCUMENT_VERSION | Default body / document version 4. Do not mutate the default object. |
+| DEFAULT_EMAIL_BODY / DOCUMENT_VERSION | Default body / format identifier 4 for new documents. Do not mutate the default object. |
 | FONT_FAMILIES | Readonly label/value font options. |
 | STYLE_GROUPS / StyleGroup | general/dimension/typography/decorations identifiers and display names. |
 | BORDER_STYLES / BorderStyle | none/solid/dashed/dotted. |

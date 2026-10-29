@@ -130,7 +130,7 @@ Preview precedence is node defaultData > templateData > variables, merged by top
 | `controlPath` | `string` | Control path, such as terms[0].text; empty when the plugin is missing. |
 | `message` | `string` | Reason validation failed. |
 
-Unsupported document versions throw directly. validate() does not check renderer execution; export can still fail due to a rendering error.
+Invalid basic document structure throws a `TypeError`; documents are not rejected based on their `version` value. validate() does not check renderer execution; export can still fail due to a rendering error.
 
 ## 2. defineBlock(options)
 
@@ -467,7 +467,7 @@ Links allow http/https/mailto/tel, anchors, or templates; images allow http/http
 
 EmailBlockNode contains required id, type, controls and optional style/defaultData. EmailDocument contains version, body, blocks, and optional subject. Register matching plugins after JSON reload; JSON does not store components or renderers.
 
-The current document version is **4**. The entire API uses controls, with no old API aliases, old-data compatibility, or automatic migration. Unsupported versions throw. Create new data with createEmailDocument() and config.createBlock(); do not merely change an old JSON version number.
+New documents use the format identifier **4**. `version` has type `number` and is only an identifier; loading checks the actual structure and preserves the supplied version. The entire API uses controls, with no old API aliases, old-data compatibility, or automatic migration. Changing an old JSON version number cannot make nodes without controls pass structural checks. Create new data with createEmailDocument() and config.createBlock().
 
 Missing plugins produce a canvas placeholder and preserve the node; email export throws. Canvas, Inspector, and canvas rendering errors are isolated by block with retry. Email rendering errors identify the block type, ID, and reason. getData()/getDocument() and onChange/onBodyChange arguments provide independent snapshots.
 

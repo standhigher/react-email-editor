@@ -129,7 +129,7 @@ function useCouponConfig() {
 | `controlPath` | `string` | 控件路径，例如 `terms[0].text`；插件缺失时为空字符串。 |
 | `message` | `string` | 校验失败原因。 |
 
-不支持的文档版本会直接抛错。`validate()` 不检查渲染器能否成功运行，导出仍可能因渲染错误失败。
+文档基本结构不合法时直接抛出 `TypeError`，不根据 `version` 值拒绝文档。`validate()` 不检查渲染器能否成功运行，导出仍可能因渲染错误失败。
 
 ## 2. defineBlock(options)
 
@@ -466,7 +466,7 @@ renderEmail: ({ controls, email }) => email.html`
 
 节点使用 `EmailBlockNode`，包含必填 id、type、controls，以及可选 style、defaultData。文档使用 `EmailDocument`，包含 version、body、blocks 和可选 subject。保存 JSON 后重新加载时，仍需注册同 type 的插件，JSON 不保存组件或渲染函数。
 
-当前文档版本为 **4**。全链路使用 controls，不提供旧 API 别名、旧数据兼容或自动迁移；不支持的版本明确报错。请用 createEmailDocument() 和 config.createBlock() 创建新数据，不要只修改旧 JSON 的版本号。
+新建文档的格式标识为 **4**。`version` 类型为 `number`，只做标识；接入依据实际数据结构，并保留传入的版本号。全链路使用 controls，不提供旧 API 别名、旧数据兼容或自动迁移；仅修改旧 JSON 的版本号不能让缺失 controls 的节点通过结构检查。请用 createEmailDocument() 和 config.createBlock() 创建新数据。
 
 缺少插件时画布显示占位并保留原始节点，邮件导出报错。Canvas、Inspector 及画布渲染异常按区块隔离并提供重试；邮件渲染错误包含区块 type、id 和原因。getData()/getDocument() 和 onChange/onBodyChange 参数均为独立快照。
 

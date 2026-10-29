@@ -61,6 +61,10 @@ function useTypeContract() {
   const state = useEmailEditorState(editor);
   const props: import("../src/index").EmailEditorProps = { editor, height: 720 };
   editor.setDocument(editor.getDocument());
+  // 文档版本是数字标识，不再限定为字面量 4。
+  editor.setDocument({ ...editor.getDocument(), version: 5 });
+  // @ts-expect-error 版本标识仍要求数字。
+  editor.setDocument({ ...editor.getDocument(), version: "5" });
   editor.reset();
   editor.validate();
   // @ts-expect-error 配置公开列表只读，不支持移除已注册插件。

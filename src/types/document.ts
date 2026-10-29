@@ -1,5 +1,4 @@
 import type { BorderStyle, FontWeight, HorizontalAlign, LinkDecoration, TextAlign } from "../constants/style-values";
-import { DOCUMENT_VERSION } from "../document/constants";
 
 /** Email body layout and inherited defaults. */
 export interface EmailBodySettings {
@@ -29,10 +28,10 @@ export interface EmailBodySettings {
   borderColor: string;
 }
 
-/** Persistable email document; only v4 is supported. */
+/** Persistable email document, accepted according to its structure. */
 export interface EmailDocument {
-  /** Format version; must be DOCUMENT_VERSION (4). */
-  version: typeof DOCUMENT_VERSION;
+  /** Format identifier; new documents use DOCUMENT_VERSION (4), without version-based rejection. */
+  version: number;
   /** Optional subject, separate from exported HTML content. */
   subject?: string;
   /** Complete body layout and style settings. */

@@ -52,13 +52,29 @@ test('同一配置用于区块注册、节点创建、JSON 恢复及独立导出
   assert.throws(() => config.createBlock('unknown'), /Unknown block plugin/);
 });
 
-test('v4 拒绝使用 fields 的旧版本文档，不提供自动迁移', () => {
+test('按实际结构拒绝仅有 fields 的文档，不依赖版本号且不提供自动迁移', () => {
   const config = renderConfig({ plugins: [card()] });
-  const legacy = { ...createEmailDocument(), version: 3, blocks: [{ id: 'old', type: 'test.card', fields: { title: 'Legacy' } }] };
-  const before = JSON.stringify(legacy);
-  assert.throws(() => config.validate(legacy), /Unsupported email document version: 3/);
-  assert.throws(() => config.toHtml(legacy), /Unsupported email document version: 3/);
-  assert.equal(JSON.stringify(legacy), before);
+  for (const version of [3, 4, 5]) {
+    const legacy = { ...createEmailDocument(), version, blocks: [{ id: 'old', type: 'test.card', fields: { title: 'Legacy' } }] };
+    const before = JSON.stringify(legacy);
+    assert.throws(() => config.validate(legacy), /blocks\[0\]\.controls must be an object/);
+    assert.throws(() => config.toHtml(legacy), /blocks\[0\]\.controls must be an object/);
+    assert.equal(JSON.stringify(legacy), before);
+  }
+});
+
+test('结构正确的不同版本文档均可校验、导出和解析预览', () => {
+  const config = renderConfig({ plugins: [card()] });
+  for (const version of [1, 3, 4, 5]) {
+    const block = config.createBlock('test.card');
+    block.controls.title = '{{ name }}';
+    const document = { ...createEmailDocument([block]), version };
+    const before = structuredClone(document);
+    assert.deepEqual(config.validate(document), []);
+    assert.match(config.toHtml(document), /<p>{{ name }}<\/p>/);
+    assert.match(config.toHtml(document, { resolveHtmlTemplates: true, templateData: { name: 'Ada' } }), /<p>Ada<\/p>/);
+    assert.deepEqual(document, before);
+  }
 });
 
 test('内置区块可隐藏和排序，隐藏不妨碍已有节点渲染；覆盖必须显式声明', (t) => {

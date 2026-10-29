@@ -105,7 +105,7 @@ test('所有内置区块的画布上下文与邮件输出都忽略未声明的�
   }
 });
 
-test('自定义区块仅渲染启用的样式，默认对象独立，旧文档版本被拒绝', () => {
+test('自定义区块仅渲染启用的样式，默认对象独立，不按文档版本拒绝导出', () => {
   const definition = defineBlock({
     type: 'card', title: 'Card', containerStyles: false,
     styleControls: [{ id: 'dimension.height' }, { id: 'typography.fontSize' }],
@@ -120,7 +120,7 @@ test('自定义区块仅渲染启用的样式，默认对象独立，旧文档�
   assert.match(blockToHtml(second, [definition]), /height="72"/);
   const doc = createEmailDocument([second]);
   assert.equal(doc.version, 4);
-  for (const version of [1, 2, 3]) assert.throws(() => documentToHtml({ ...doc, version }, [definition]), /Unsupported email document version/);
+  for (const version of [1, 2, 3, 5]) assert.match(documentToHtml({ ...doc, version }, [definition]), /height="72"/);
 });
 
 

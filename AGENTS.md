@@ -90,7 +90,7 @@ tests/
 
 - 文档创建和归一化统一经过 `src/document/create-document.ts` 的 `createEmailDocument`、`resolveEmailBody`、`ensureEmailDocument` 等函数；不要在组件中复制默认值或自行拼装不完整文档。
 - 区块创建统一优先使用配置的 `config.createBlock()`（底层复用 `createBlockNode()`），默认字段、默认样式和 `defaultData` 必须从插件声明派生，并在需要时使用深拷贝，避免共享可变对象。
-- `EmailDocument.version` 是持久化版本字段。变更数据结构时必须检查默认值、导出兼容性和版本语义，并补充测试。当前 README 明确处于开发阶段、不迁移旧版区块字段；不要无需求增加迁移框架。若任务涉及存量文档兼容，先明确支持范围，再实现归一化或迁移。
+- `EmailDocument.version` 是数字类型的持久化格式标识，新建文档写入 `DOCUMENT_VERSION = 4`；接入与导出保留传入值，不根据版本号拒绝文档。`ensureEmailDocument()` 统一检查文档和区块的必要结构，并归一化主体设置；不迁移旧版区块字段。变更数据结构时必须检查默认值、导出兼容性并补充测试，不要无需求增加迁移框架。若任务涉及存量文档兼容，先明确支持范围，再实现归一化或迁移。
 - mutations 应保持状态更新边界清晰，避免直接修改不属于当前操作的对象。对外快照和重置逻辑必须保持独立引用。
 - 邮件主体与区块样式分层：`EmailDocument.body` / `EmailBodySettings` 保存主体布局、外观及文字颜色、字体、字重、链接颜色和下划线默认值；其余基础排版使用内部 `DEFAULT_TYPOGRAPHY`，富文本显式格式优先。主体只有一个 `backgroundColor`，固定居中，不支持主体圆角。内置区块容器使用 `dimension`、`decorations`，按钮/图片/分割线等元素自身样式使用 `element`；文字格式只存于 `controls.html`，不读取旧 `label` 或区块文字样式。自定义区块可以显式声明 `typography` 字段。新建默认样式、画布和邮件渲染只读取该区块启用的 `styleControls`。文档当前版本为 `4`，不迁移旧版文档。
 - CSS 值应使用现有 `src/utils/css-values.ts` 的归一化和校验函数；不要在多个模块重复实现长度、颜色、边框或间距解析。
@@ -171,6 +171,7 @@ node --test tests/*.test.mjs tests/*.test.ts
 
 - 只修改完成任务所需的文件。不要顺手重排无关代码、批量格式化全仓库或覆盖工作区已有改动。
 - 不擅自提交。完成代码、测试和变更摘要后先交给用户 review；只有用户明确回复“提交”“可以提交”等确认后，才执行 `git add` / `git commit`。
+- 每次提交前，自动根据本次实际变更生成或更新 `docs/changelog.zh-CN.md` 和 `docs/changelog.md`，保持中英文内容一致，说明主要行为变化、兼容性影响及实际验证结果；更新日志与版本决策应一并交给用户 review。根据变更影响决定 npm 包版本：不兼容的公开契约变化考虑 major（大版本），向后兼容的新增能力考虑 minor（中版本），向后兼容的修复考虑 patch（小版本）；纯文档、测试或不影响对外行为的内部调整可不升级，不机械地每次提交都升级。升级时同步 `package.json` 和 `package-lock.json` 的包版本；不升级时将新增记录放入 `Unreleased`（未发布）章节，后续发布时归入对应版本，不改写已发布版本的历史记录。npm 包版本与 `EmailDocument.version` 独立，不联动升级。此规则不代表授权提交、打标签或发布。
 - 提交信息遵循 Conventional Commits：`<type>: 中文摘要`，不添加 `(scope)`，例如 `fix: 修复邮件区块样式继承`。正文用中文说明影响范围、修改范围、主要行为变化和验证结果；拆分提交时每个提交分别写清对应范围。
 - 只暂存和提交用户授权的文件或变更片段，不使用 `git add .` / `git add -A` 混入其他会话改动。提交前检查暂存区；已有不相关暂存内容不得擅自重置或包含在本次提交中。
 - 提交前再次运行 `git status --short` 和必要的验证命令，确认没有临时文件、构建产物或不相关改动进入提交。

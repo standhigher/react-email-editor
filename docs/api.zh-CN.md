@@ -168,7 +168,9 @@ export const coupon = defineBlock({
 | `getBlockDefinition(type, definitions?)` | 类型与可选注册表，默认内置定义 | 匹配的运行时定义或 `undefined`。不要修改配置中的冻结定义。 |
 | `generateId(prefix = "block")` | ID 前缀字符串 | 带随机后缀的字符串；应用仍需保持文档内 ID 唯一。 |
 
-`EmailDocument` 含 `version/body/blocks/subject?`；`EmailBlockNode` 含 `id/type/controls/style?/defaultData?`。只支持 `DOCUMENT_VERSION = 4`，不迁移旧文档。JSON 不包含插件组件与渲染逻辑，重新加载时仍需注册相同类型。
+`EmailDocument` 含 `version/body/blocks/subject?`；`EmailBlockNode` 含 `id/type/controls/style?/defaultData?`。`version: number` 只做格式标识：新建文档写入 `DOCUMENT_VERSION = 4`，接入与导出保留传入值，不根据版本号拒绝文档，也不自动迁移旧结构。JSON 不包含插件组件与渲染逻辑，重新加载时仍需注册相同类型。
+
+初始化、`setDocument()`、`config.validate()` 和 HTML 导出统一检查文档为对象、`blocks` 为数组、每个区块的 `id/type` 为非空字符串、`controls` 为对象；结构不合法时直接抛出 `TypeError`，错误包含字段路径。`subject` 提供时必须为字符串；`body` 提供且非 `null` 时必须为对象，缺省值继续由 `resolveEmailBody()` 补齐。仅有旧 `fields` 而没有 `controls` 的节点不能接入；控件值仍按插件声明归一化与校验。
 
 主体设置由画布、预览和邮件 HTML 共用：
 
@@ -260,7 +262,7 @@ Props 及 `RichText.inherited` 的字段说明包含在发布包的 `.d.ts` 注�
 | --- | --- |
 | `BLOCK_TYPES` / `BuiltinBlockType` | heading、text、button、image、divider、spacer、html。 |
 | `DEFAULT_BLOCKS` | 所有内置 BlockPlugin 定义；自定义注册表使用 config.definitions。 |
-| `DEFAULT_EMAIL_BODY` / `DOCUMENT_VERSION` | 默认主体设置 / 文档版本 4。不要直接修改默认对象。 |
+| `DEFAULT_EMAIL_BODY` / `DOCUMENT_VERSION` | 默认主体设置 / 新建文档的格式标识 4。不要直接修改默认对象。 |
 | `FONT_FAMILIES` | 只读字体选项 `{ label, value }[]`。 |
 | `STYLE_GROUPS` / `StyleGroup` | general/dimension/typography/decorations 的标识及展示名称。 |
 | `BORDER_STYLES` / `BorderStyle` | none/solid/dashed/dotted。 |

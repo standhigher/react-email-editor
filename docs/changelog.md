@@ -2,6 +2,20 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.5.1 — 2026-10-29
+
+### Fixes and improvements
+
+- Accept documents according to their actual structure without requiring `version === 4`. Widen `EmailDocument.version` to `number`, preserving the supplied value through initialization, replacement, snapshots, reset and export; new documents still use `4`.
+- Share structural checks across initialization, document replacement, validation and HTML export for the document object, `blocks` array and block `id/type/controls`. Invalid structure throws a `TypeError` with the field path. Preserve body normalization and plugin control defaults without automatically migrating nodes that only contain legacy `fields`.
+- Update both API references and custom block guides. Require automatic updates to both changelogs before commits and choose major, minor, patch or no version bump according to the changes; keep the npm package version independent of the document format identifier.
+- Bump the npm package from `0.5.0` to `0.5.1` as a patch correcting document loading restrictions, without changing the persisted document structure.
+
+### Validation
+
+- Type checking, Oxlint, the build and all 127 Node tests pass, covering different document versions, invalid structures, plugin validation, template preview, snapshot isolation, subscriptions and reset.
+- `git diff --check` passes. No UI or styles changed, so browser validation was not run.
+
 ## 0.5.0 — 2026-10-29
 
 ### Template preview and custom engines

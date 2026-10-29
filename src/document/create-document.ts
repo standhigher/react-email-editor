@@ -45,9 +45,35 @@ export function createEmptyDocument(): EmailDocument {
   return { version: DOCUMENT_VERSION, subject: "", body: resolveEmailBody(), blocks: [] };
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
 export function ensureEmailDocument(document: EmailDocument): EmailDocument {
-  if (document.version !== DOCUMENT_VERSION) {
-    throw new Error(`Unsupported email document version: ${document.version}. Expected ${DOCUMENT_VERSION}.`);
+  if (!isRecord(document)) {
+    throw new TypeError("Invalid email document: expected an object.");
+  }
+  if (!Array.isArray(document.blocks)) {
+    throw new TypeError("Invalid email document: blocks must be an array.");
+  }
+  if (document.body != null && !isRecord(document.body)) {
+    throw new TypeError("Invalid email document: body must be an object when provided.");
+  }
+  if (document.subject !== undefined && typeof document.subject !== "string") {
+    throw new TypeError("Invalid email document: subject must be a string when provided.");
+  }
+  for (const [index, block] of document.blocks.entries()) {
+    const path = `Invalid email document: blocks[${index}]`;
+    if (!isRecord(block)) throw new TypeError(`${path} must be an object.`);
+    if (typeof block.id !== "string" || !block.id.trim()) {
+      throw new TypeError(`${path}.id must be a non-empty string.`);
+    }
+    if (typeof block.type !== "string" || !block.type.trim()) {
+      throw new TypeError(`${path}.type must be a non-empty string.`);
+    }
+    if (!isRecord(block.controls)) {
+      throw new TypeError(`${path}.controls must be an object.`);
+    }
   }
   return { ...document, body: resolveEmailBody(document.body) };
 }

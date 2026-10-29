@@ -212,7 +212,7 @@ test("共享配置的实例状态与生命周期隔离，卸载界面订阅后�
   assert.equal(editor.getDocument().subject, undefined);
 });
 
-test("SSR 可通过 Hooks 初始化并独立导出，拒绝旧版本且不改变现有文档", (t) => {
+test("SSR 可通过 Hooks 初始化并独立导出，拒绝非法结构且不改变现有文档", (t) => {
   function ServerExport() {
     const editor = useEmailEditor();
     return createElement("pre", null, editor.getJson());
@@ -220,8 +220,37 @@ test("SSR 可通过 Hooks 初始化并独立导出，拒绝旧版本且不改变
   assert.match(renderToStaticMarkup(createElement(ServerExport)), /&quot;version&quot;: 4/);
   const view = fixture(t);
   const { editor } = view.current();
-  assert.throws(() => editor.setDocument({ ...createEmailDocument(), version: 3 }), /Unsupported email document version/);
+  assert.throws(() => editor.setDocument({ ...createEmailDocument(), blocks: null }), /blocks must be an array/);
   assert.equal(editor.getDocument().version, 4);
+});
+
+test("版本仅做标识，初始化、替换、订阅、快照与重置保留传入版本", (t) => {
+  const changes = [];
+  const initialDocument = { ...createEmailDocument(), version: 3 };
+  const view = fixture(t, { initialDocument, onChange: (document) => changes.push(document) });
+  const { editor } = view.current();
+  assert.equal(editor.getDocument().version, 3);
+  const block = view.current().config.createBlock('text');
+  block.controls.html = '<p>Version {{ name }}</p>';
+  const next = { ...createEmailDocument([block]), version: 5 };
+  view.update({ variables: [{ name: '{{ name }}', value: 'Ada' }], onChange: (document) => changes.push(document) });
+  act(() => editor.setDocument(next));
+  assert.equal(view.state().document.version, 5);
+  assert.equal(JSON.parse(editor.getJson()).version, 5);
+  assert.equal(changes[0].version, 5);
+  assert.deepEqual(editor.validate(), []);
+  assert.match(editor.getRenderedHtml(), /Version Ada/);
+  next.version = 99;
+  const data = editor.getData();
+  data.document.version = 99;
+  assert.equal(editor.getDocument().version, 5);
+  const state = view.state();
+  assert.throws(() => editor.setDocument({ ...next, blocks: [{ ...block, controls: null }] }), /blocks\[0\]\.controls/);
+  assert.equal(view.state(), state);
+  assert.equal(changes.length, 1);
+  act(() => editor.reset());
+  assert.equal(editor.getDocument().version, 3);
+  assert.equal(initialDocument.version, 3);
 });
 
 test("子组件 layout effect 使用已提交的新配置、变量、主体与回调，通知不在 insertion effect 内执行", (t) => {
