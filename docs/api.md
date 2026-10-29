@@ -100,7 +100,7 @@ export const coupon = defineBlock({
 | `type` / `title` | Required nonempty unique type and library title. |
 | `renderEmail(ctx)` | Required; returns inner HTML or `EmailMarkup`; ctx contains `block/controls/style/body/mode/email`. |
 | `controls` | Map of names to EmailControls declarations, default `{}`; values and defaults are inferred. |
-| `icon` / `description` | Optional ReactNode/string icon and description. |
+| `icon` / `description` | Optional ReactNode/HTML string icon and description. The icon defaults to the first character of the trimmed `title`, preserving case and displaying it as text. |
 | `override` | Must be true to replace a builtin with the same type. |
 | `containerStyles` | Spacing and appearance enabled by default; false disables all; `{ spacing?: boolean, appearance?: boolean }` controls each group. |
 | `styleControls` | Additional styles; matching IDs replace default container controls. |

@@ -163,7 +163,7 @@ const banner = defineBlock({
 | --- | --- | --- |
 | `type` | 是 | 唯一且稳定的类型标识；建议业务命名空间，例如 `my-app.banner`。持久化后不能随意变更。 |
 | `title` | 是 | 区块库和检查器名称。`type` / `title` 不允许为空白。 |
-| `icon` | 否 | 字符串或 ReactNode 图标。 |
+| `icon` | 否 | HTML 字符串或 ReactNode 图标；省略时使用 `title` 去除首尾空白后的第一个字符，保留大小写并按纯文本显示，例如 `Coupon` → `C`、`优惠券` → `优`。 |
 | `description` | 否 | 区块说明。 |
 | `override` | 否 | 默认 `false`；允许在注册时替换同类型的内置区块。 |
 | `controls` | 否 | `ControlSchema` 对象；按声明顺序定义内容控件，自动推导值类型，默认空对象。 |

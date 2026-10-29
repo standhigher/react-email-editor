@@ -114,7 +114,7 @@ export interface BlockPluginOptions<Schema extends ControlSchema, Type extends s
   type: Type;
   /** Nonempty library title. */
   title: string;
-  /** Library icon or string. */
+  /** Library React icon or HTML string; defaults to the first character of the trimmed title. */
   icon?: ReactNode | string;
   /** Library description. */
   description?: string;

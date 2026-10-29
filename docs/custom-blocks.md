@@ -164,7 +164,7 @@ const banner = defineBlock({
 | --- | --- | --- |
 | `type` | Yes | Stable unique type. Use an application namespace, such as my-app.banner. Do not casually change persisted types. |
 | `title` | Yes | Library and inspector name. type/title cannot be blank. |
-| `icon` | No | A string or ReactNode icon. |
+| `icon` | No | HTML string or ReactNode icon; defaults to the first character of the trimmed `title`, preserving case and displaying it as text, e.g. `Coupon` → `C`, `优惠券` → `优`. |
 | `description` | No | Block description. |
 | `override` | No | Defaults to false; allows replacing a built-in with the same type during registration. |
 | `controls` | No | ControlSchema object defining content controls in declaration order, with inferred value types. Defaults to an empty object. |

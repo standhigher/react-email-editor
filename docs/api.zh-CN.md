@@ -100,7 +100,7 @@ export const coupon = defineBlock({
 | `type` / `title` | 必填非空字符串，分别为唯一类型与区块库标题。 |
 | `renderEmail(ctx)` | 必填，返回内部 HTML 字符串或 `EmailMarkup`；`ctx` 包含 `block/controls/style/body/mode/email`。 |
 | `controls` | 名称到 `EmailControls` 声明的映射，默认 `{}`；自动推导值类型与默认值。 |
-| `icon` / `description` | 可选图标（ReactNode 或字符串）及说明。 |
+| `icon` / `description` | 可选图标（ReactNode 或 HTML 字符串）及说明。省略图标时，使用 `title` 去除首尾空白后的第一个字符，保留大小写并按纯文本显示。 |
 | `override` | 替换内置同名类型时必需设为 `true`。 |
 | `containerStyles` | 默认提供间距与外观；`false` 全禁用；`{ spacing?: boolean, appearance?: boolean }` 可分别禁用。 |
 | `styleControls` | 额外样式能力；同 `id` 覆盖默认容器能力。 |

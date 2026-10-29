@@ -17,6 +17,27 @@ function card(overrides = {}) {
   });
 }
 
+test('未传图标时使用标题首字符，支持中文及 Unicode 并转义 HTML 字符', () => {
+  for (const [title, expected] of [
+    ['Card', 'C'], ['  coupon  ', 'c'], [' 优惠券 ', '优'],
+    ['📦 Product', '📦'], ['𠮷祥', '𠮷'], ['<Card>', '&lt;'], ['&Card', '&amp;'],
+  ]) {
+    const plugin = card({ title });
+    const config = renderConfig({ builtins: false, plugins: [plugin] });
+    assert.equal(config.library[0].icon, expected);
+    assert.equal(config.definitions.find((item) => item.type === plugin.type).icon, expected);
+  }
+});
+
+test('显式图标保持原样，React 图标保留元素身份', () => {
+  const reactIcon = createElement('svg', { viewBox: '0 0 24 24' });
+  for (const icon of ['<svg viewBox="0 0 24 24"></svg>', '★', reactIcon, '']) {
+    const plugin = card({ icon });
+    const config = renderConfig({ builtins: false, plugins: [plugin] });
+    assert.equal(config.library[0].icon, icon);
+  }
+});
+
 test('同一配置用于区块注册、节点创建、JSON 恢复及独立导出', () => {
   const config = renderConfig({ plugins: [card()] });
   const document = createEmailDocument([config.createBlock('test.card')]);

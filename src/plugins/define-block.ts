@@ -4,6 +4,7 @@ import { WRAPPER_STYLE_CONTROLS } from "../blocks/style-controls";
 import { createEmailTools, emailMarkup } from "./email-tools";
 import { readControlValues } from "./controls";
 import { snapshotValue } from "../utils/snapshot";
+import { esc } from "../utils/html";
 import type { BlockPlugin, BlockPluginOptions, ControlSchema, ControlValues } from "./types";
 
 export function defineBlock<Schema extends ControlSchema, const Type extends string>(input: BlockPluginOptions<Schema, Type>): BlockPlugin<Schema, Type> {
@@ -21,7 +22,8 @@ export function defineBlock<Schema extends ControlSchema, const Type extends str
   const inline = Object.entries(schema).filter(([, spec]) => spec.kind === "richText" && spec.inline);
   if (inline.length > 1 && !options.Canvas) throw new Error(`${options.type}: multiple inline controls require a Canvas component.`);
   return snapshotValue({
-    type: options.type, title: options.title, description: options.description, icon: options.icon,
+    type: options.type, title: options.title, description: options.description,
+    icon: options.icon ?? esc(Array.from(options.title.trim())[0]),
     override: options.override, schema,
     controls: Object.entries(schema).map(([name, spec]) => ({ ...spec, name })),
     readControls,

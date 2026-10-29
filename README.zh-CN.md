@@ -30,6 +30,8 @@ export function EmailPage() {
 
 Next.js App Router 的接入组件需声明 `"use client"`；样式在应用允许的全局样式入口引入。保存、上传资源与发送邮件由你的应用实现。
 
+自定义区块省略 `icon` 时，默认使用 `title` 去除首尾空白后的第一个字符作为图标，例如 `Coupon` 显示 `C`、`优惠券` 显示 `优`；传入的 `icon` 优先使用。
+
 ## 本地启动
 
 推荐 Node.js 24 LTS（`.nvmrc`；完整测试最低需要 22.18）：
