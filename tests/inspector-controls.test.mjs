@@ -10,6 +10,7 @@ import { EmailControls, resolveEmailBody } from "../dist/index.js";
 const { ListControl } = await import("../src/inspector/components/ListControl.tsx");
 const { ControlRenderer } = await import("../src/inspector/ControlRenderer.tsx");
 const { RichTextControl } = await import("../src/inspector/components/RichTextControl.tsx");
+const { BodyControls } = await import("../src/inspector/BodyControls.tsx");
 const { EditorConfigContext } = await import("../src/plugins/editor-context.ts");
 
 function listFixture(t) {
@@ -103,6 +104,25 @@ test("可选下拉框显示空选项，选中后可以恢复空值，并保持�
   act(() => select().props.onChange({ target: { value: "" } }));
   act(() => renderer.update(render()));
   assert.equal(select().props.value, "");
+  act(() => renderer.unmount());
+});
+
+test("BODY 字体默认显示 Default，选择字体后可以恢复默认并保留显式 Arial", () => {
+  let renderer;
+  let body = resolveEmailBody();
+  const render = () => createElement(BodyControls, {
+    body, onChange: (patch) => { body = resolveEmailBody({ ...body, ...patch }); },
+  });
+  act(() => { renderer = create(render()); });
+  const select = () => renderer.root.findAllByType("select").find((node) => node.props["aria-label"] === "Font family");
+  assert.equal(select().props.value, "");
+  assert.equal(select().findAllByType("option")[0].children.join(""), "Default");
+  for (const value of ["Georgia, serif", "", "Arial, Helvetica, sans-serif", ""]) {
+    act(() => select().props.onChange({ target: { value } }));
+    act(() => renderer.update(render()));
+    assert.equal(body.fontFamily, value);
+    assert.equal(select().props.value, value);
+  }
   act(() => renderer.unmount());
 });
 

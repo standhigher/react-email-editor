@@ -177,7 +177,7 @@ Canvas, preview and email HTML share body settings:
 | textColor | #000000; default text color. |
 | backgroundColor | #ffffff; centered content background; outside remains white. |
 | contentWidth | 600; maximum content width in px. |
-| fontFamily | Arial, Helvetica, sans-serif. |
+| fontFamily | `""`; the inspector shows `Default`. Omitted or empty values render with Arial, Helvetica, sans-serif. |
 | fontWeight | normal; also supports bold. |
 | linkColor / linkDecoration | #005bd3 / underline. |
 | contentPadding | 0px; CSS padding inside the border. |

@@ -2,7 +2,7 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
-## Unreleased — 2026-10-29
+## 0.5.0 — 2026-10-29
 
 ### Template preview and custom engines
 
@@ -13,17 +13,24 @@ English | [简体中文](./changelog.zh-CN.md)
 - Fix Unicode field paths and condition truthiness for Date, Map, Set and plain objects. Normalize non-`Error` render and validation exceptions while preserving the original `cause`, with error display, Retry and recovery after replacing an engine.
 - Add dedicated English and Chinese template-engine documentation and integration examples; keep only documentation links in the READMEs.
 
+### Editor defaults
+
+- Add and initially select `Default` in BODY Font family, storing `body.fontFamily` as `""` by default. Omitted, empty and whitespace-only values use the internal Arial, Helvetica, sans-serif font stack in the canvas, preview and exported email. Preserve explicit fonts and rich-text formatting; the document version remains `4`.
+- When custom blocks omit `icon`, use the first Unicode code point of the trimmed `title` as the default icon and escape HTML special characters. Explicit icons retain precedence.
+
 ### Toolchain and documentation
 
 - Migrate project package management from pnpm to npm 11.13.0, replacing `pnpm-lock.yaml` with `package-lock.json` while preserving all direct dependency versions.
 - Use `npm install` and `npm run dev` for local development and `npm ci` for locked installs. Switch validation, automatic fixes, packaging and pre-publish checks to npm, and remove pnpm-specific configuration.
 - Update installation and command instructions in both READMEs, API development and local linking documentation, release guides and project collaboration rules.
+- Limit READMEs to basic integration examples and documentation navigation; maintain feature details, defaults and behavior descriptions in `docs/`.
 
 ### Validation
 
-- `npm ci` succeeds; `npm run check` passes type checking, Oxlint, build and all 121 Node tests, covering engine selection, context, escaping, data isolation, variable normalization and error recovery.
+- `npm ci` succeeds; `npm run check` passes type checking, Oxlint, build and all 123 Node tests, covering engine selection, context, escaping, data isolation, variable normalization, error recovery and body default-font fallback and switching.
 - `npm run dev` starts successfully; the homepage and `main.tsx` entry module both return HTTP 200.
 - Verify canvas and preview variable output, non-`Error` exception display, Retry and recovery after replacing engines in Chrome; `git diff --check` passes.
+- Verify initial BODY `Default` selection, explicit font switching and restoring the default in Chrome, with matching default fonts in the canvas, HTML-block iframe and desktop/mobile email previews.
 
 ## 0.4.3 — 2026-10-28
 

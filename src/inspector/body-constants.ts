@@ -13,7 +13,7 @@ export const BODY_CONTROL_SECTIONS: BodyControlSection[] = [
   { title: "General", controls: [
     { id: "textColor", group: "typography", label: "Text color", control: "color" },
     { id: "linkColor", group: "typography", label: "Link color", control: "color" },
-    { id: "fontFamily", group: "typography", label: "Font family", control: "select", options: copyFontFamilies() },
+    { id: "fontFamily", group: "typography", label: "Font family", control: "select", options: [{ label: "Default", value: "" }, ...copyFontFamilies()] },
     { ...FONT_WEIGHT, id: "fontWeight", label: "Font weight" },
   ] },
   { title: "Content", controls: [

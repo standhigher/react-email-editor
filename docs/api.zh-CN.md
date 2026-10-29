@@ -177,7 +177,7 @@ export const coupon = defineBlock({
 | `textColor` | `#000000`，文字颜色。 |
 | `backgroundColor` | `#ffffff`，居中内容容器背景；外侧白色。 |
 | `contentWidth` | `600`，内容最大宽度 px。 |
-| `fontFamily` | `Arial, Helvetica, sans-serif`。 |
+| `fontFamily` | `""`，检查器显示 `Default`；未指定或为空时，渲染使用 `Arial, Helvetica, sans-serif`。 |
 | `fontWeight` | `normal`；也可 `bold`。 |
 | `linkColor` / `linkDecoration` | `#005bd3` / `underline`。 |
 | `contentPadding` | `0px`，边框内部 CSS padding。 |

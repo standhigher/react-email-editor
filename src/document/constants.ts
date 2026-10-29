@@ -41,7 +41,7 @@ export const DEFAULT_EMAIL_BODY: EmailBodySettings = {
   textColor: "#000000",
   backgroundColor: "#ffffff",
   contentWidth: CANVAS_DEVICE_WIDTH.desktop,
-  fontFamily: "Arial, Helvetica, sans-serif",
+  fontFamily: "",
   fontWeight: FONT_WEIGHTS.normal,
   linkColor: "#005bd3",
   linkDecoration: LINK_DECORATIONS.underline,

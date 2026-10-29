@@ -40,6 +40,27 @@ test('Body 归一化主体尺寸、间距、颜色和基础排版', () => {
   assert.equal(invalid.linkDecoration, DEFAULT_EMAIL_BODY.linkDecoration);
 });
 
+test('Body 未指定或清空字体时保留默认状态，画布、邮件和预览回退到默认字体', () => {
+  assert.equal(createEmailDocument().body.fontFamily, '');
+  for (const fontFamily of [undefined, '', '   ']) {
+    const body = resolveEmailBody({ fontFamily });
+    assert.equal(body.fontFamily, '');
+    const block = createBlockNode('text');
+    block.controls.html = '<p>Default <span style="font-family:Georgia, serif">Explicit</span></p>';
+    const doc = { ...createEmailDocument([block]), body };
+    const outputs = [
+      editor.blockToHtml(block, DEFAULT_BLOCKS, 'canvas', { body }),
+      documentToHtml(doc),
+      documentToHtml(doc, DEFAULT_BLOCKS, { resolveHtmlTemplates: true }),
+    ];
+    for (const html of outputs) {
+      assert.ok(html.includes('font-family:Arial, Helvetica, sans-serif'));
+      assert.ok(html.includes('font-family:Georgia, serif'));
+    }
+    assert.equal(doc.body.fontFamily, '');
+  }
+});
+
 test('画布和邮件主体使用一致的相对尺寸与基础排版', (t) => {
   const reportError = console.error.bind(console);
   // 这里只比较首次渲染标记；React 18 的服务端 layout effect 提示与此检查无关。

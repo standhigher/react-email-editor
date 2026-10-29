@@ -9,7 +9,7 @@ export interface EmailBodySettings {
   backgroundColor: string;
   /** Maximum content width in px, normalized to an integer from 320 to 900. */
   contentWidth: number;
-  /** Default CSS font stack. */
+  /** CSS font stack; empty uses the internal default Arial, Helvetica, sans-serif. */
   fontFamily: string;
   /** Default font weight: normal or bold. */
   fontWeight: FontWeight;
