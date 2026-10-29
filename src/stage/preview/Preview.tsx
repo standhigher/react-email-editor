@@ -1,79 +1,45 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { viewportWidth } from "../../render/layout";
-import type { EmailEditorConfig } from "../../plugins/types";
-import type { Variable } from "../../types/block";
-import type { EmailDocument } from "../../types/document";
-import type { EditorDevice } from "../../types/editor";
+import { useRef } from "react";
+import { Button } from "../../components/Button";
+import { PREVIEW_BUFFER_SLOTS } from "./constants";
+import { PreviewFrame } from "./PreviewFrame";
+import type { PreviewBufferState } from "./types";
 
-interface PreviewProps {
-  document: EmailDocument;
-  config: EmailEditorConfig;
-  variables: Variable[];
-  device: EditorDevice;
+interface PreviewProps extends PreviewBufferState {
+  onReady: (id: number) => void;
+  onFailed: (id: number, message: string) => void;
+  onRetry: () => void;
 }
 
-export function Preview({ document, config, variables, device }: PreviewProps) {
-  const frameRef = useRef<HTMLIFrameElement>(null);
-  const cleanupRef = useRef<() => void>();
-  const html = useMemo(
-    () => config.toHtml(document, {
-      resolveHtmlTemplates: true,
-      variables,
-    }),
-    [document, config, variables],
-  );
-
-  const observeContent = useCallback(() => {
-    cleanupRef.current?.();
-    const frame = frameRef.current;
-    const frameDocument = frame?.contentDocument;
-    const frameWindow = frameDocument?.defaultView;
-    if (!frame || !frameDocument?.body || !frameWindow) return;
-
-    let animationFrame = 0;
-    const fit = () => {
-      frame.style.height = `${frameDocument.body.getBoundingClientRect().height}px`;
-    };
-    const scheduleFit = () => {
-      frameWindow.cancelAnimationFrame(animationFrame);
-      animationFrame = frameWindow.requestAnimationFrame(fit);
-    };
-
-    // 正文高度独立于 iframe 视口，内容、图片和设备宽度变化后重新测量。
-    const observer = new frameWindow.ResizeObserver(scheduleFit);
-    observer.observe(frameDocument.body);
-    frameDocument.addEventListener("load", scheduleFit, true);
-    fit();
-    cleanupRef.current = () => {
-      observer.disconnect();
-      frameDocument.removeEventListener("load", scheduleFit, true);
-      frameWindow.cancelAnimationFrame(animationFrame);
-    };
-  }, []);
-
-  useEffect(() => () => cleanupRef.current?.(), [html]);
-
+export function Preview({ frames, front, failure, onReady, onFailed, onRetry }: PreviewProps) {
+  const scrollRef = useRef({ top: 0, left: 0 });
   return (
-    <div className="ree-preview-stage">
-      <div
-        className="ree-email-viewport"
-        style={{
-          width: viewportWidth(device, document.body),
-          marginLeft: "auto",
-          marginRight: "auto",
-        }}
-      >
-        <iframe
-          ref={frameRef}
-          className="ree-preview-frame"
-          title="Email preview"
-          srcDoc={html}
-          onLoad={observeContent}
-          style={{
-            backgroundColor: "#ffffff",
-          }}
-        />
-      </div>
+    <div className="ree-preview-buffer">
+      {PREVIEW_BUFFER_SLOTS.map((index) => {
+        const snapshot = frames[index];
+        const visible = front === index;
+        return (
+          <div
+            key={index}
+            className={`ree-preview-stage${visible ? "" : " is-buffered"}`}
+            aria-hidden={!visible}
+            {...(!visible ? { inert: "" } : {})}
+            ref={(node) => {
+              if (node && visible) {
+                node.scrollTop = scrollRef.current.top;
+                node.scrollLeft = scrollRef.current.left;
+              }
+            }}
+            onScroll={(event) => {
+              if (visible) scrollRef.current = { top: event.currentTarget.scrollTop, left: event.currentTarget.scrollLeft };
+            }}
+          >
+            <div className="ree-email-viewport" style={{ width: snapshot?.width, marginLeft: "auto", marginRight: "auto" }}>
+              {snapshot ? <PreviewFrame key={snapshot.id} snapshot={snapshot} onReady={onReady} onFailed={onFailed} /> : null}
+            </div>
+          </div>
+        );
+      })}
+      {failure ? <div className="ree-plugin-error ree-preview-error" role="alert"><p>{failure.message}</p><Button onClick={onRetry}>Retry</Button></div> : null}
     </div>
   );
 }

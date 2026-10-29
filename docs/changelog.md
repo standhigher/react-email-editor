@@ -2,6 +2,22 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.5.2 — 2026-10-29
+
+### Fixes and improvements
+
+- Fix canvas recreation and flicker when switching between editing and preview. Keep the editing canvas mounted and swap two iframe buffers after standby loading and height measurement, preserving separate editing and preview scroll positions. Exclude the hidden canvas from focus, keyboard and drag interactions while previewing.
+- Debounce document, configuration, variable and device-width changes for 400ms with a maximum wait of 2 seconds and idle scheduling support. Process Preview and Retry clicks immediately while continuing to debounce subsequent changes in preview mode. Reuse ready or loading buffers with identical HTML and width to avoid remounts.
+- Use `sandbox="allow-same-origin"` on preview iframes to block scripts and event handlers while retaining height measurement. Preserve exported HTML; this restriction is not complete HTML sanitization.
+- Handle generation, load and measurement errors, including a 15-second load/measurement timeout, with error messages and Retry. Retain existing previews on failure and force a new load on retry. Prevent callbacks from stale, replaced or failed buffers from overwriting current content, and clean up timers, observers, listeners and animation frames on unmount.
+- Update both template-engine guides. Bump the npm package from `0.5.1` to `0.5.2` as a patch, preserving the public API, email export and persisted document format. Preview no longer executes scripts in email HTML; custom engines and `renderEmail` should be pure and allow repeated background calls.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build and all 144 Node tests, covering debounce, maximum wait, buffer reuse, stale callbacks, timeouts, exceptions, retry and cleanup.
+- Reuse the existing Chrome page to verify blocked scripts and event handlers, unchanged iframe nodes after subject-only edits, one load for five consecutive changes in preview mode, and a 15-second timeout that retains the old preview and recovers through Retry.
+- Verify desktop 600px and mobile 360px previews and five consecutive editing/preview round trips. Canvas, rich-text and iframe nodes remain mounted, with no visible blank or unmeasured frame in sampled states. Restore the test document and remove temporary probes. `git diff --check` passes.
+
 ## 0.5.1 — 2026-10-29
 
 ### Fixes and improvements

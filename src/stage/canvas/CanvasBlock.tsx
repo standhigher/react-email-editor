@@ -14,6 +14,7 @@ import type { EmailBlockNode, EmailBodySettings } from "../../types/document";
 import type { CanvasDragData } from "../../types/editor";
 
 interface CanvasBlockProps {
+  active?: boolean;
   block: EmailBlockNode;
   body: EmailBodySettings;
   definition: BlockDefinition | undefined;
@@ -30,6 +31,7 @@ interface CanvasBlockProps {
 }
 
 export function CanvasBlock({
+  active = true,
   block: sourceBlock,
   body,
   definition,
@@ -50,7 +52,7 @@ export function CanvasBlock({
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const dragData: CanvasDragData = { kind: "canvas" };
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: block.id, data: dragData });
+    useSortable({ id: block.id, data: dragData, disabled: !active });
 
   const select = (event?: SyntheticEvent) => {
     event?.stopPropagation();

@@ -1,5 +1,37 @@
 /* ---------- 画布 ---------- */
 
+.ree-stage-content,
+.ree-preview-buffer {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  isolation: isolate;
+}
+
+.ree-stage-view.is-buffered,
+.ree-preview-stage.is-buffered {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ree-preview-pending {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border: 1px solid var(--ree-border);
+  border-radius: 6px;
+  background: var(--ree-panel);
+  color: var(--ree-muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+
 .ree-stage-view {
   display: flex;
   flex: 1;
@@ -81,4 +113,16 @@
 .ree-canvas .ree-email-viewport {
   background: rgb(246, 246, 247);
   box-shadow: var(--ree-shadow-md);
+}
+
+.ree-preview-error {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  max-width: calc(100% - 24px);
+  border: 1px solid var(--ree-border);
+  border-radius: 6px;
+  background: var(--ree-panel);
 }

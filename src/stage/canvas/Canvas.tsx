@@ -15,6 +15,7 @@ import type { EmailBlockNode, EmailBodySettings } from "../../types/document";
 import type { EditorDevice } from "../../types/editor";
 
 interface CanvasProps {
+  active?: boolean;
   blocks: EmailBlockNode[];
   body: EmailBodySettings;
   definitions: readonly BlockDefinition[];
@@ -33,6 +34,7 @@ interface CanvasProps {
 }
 
 export function Canvas({
+  active = true,
   blocks,
   body,
   definitions,
@@ -51,6 +53,7 @@ export function Canvas({
 }: CanvasProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: CANVAS_DROP_ID,
+    disabled: !active,
     data: { kind: "canvas" },
   });
   return (
@@ -105,6 +108,7 @@ export function Canvas({
                   <CanvasBlock
                     key={block.id}
                     block={block}
+                    active={active}
                     body={body}
                     definition={getBlockDefinition(block.type, definitions)}
                     selected={block.id === selectedId}

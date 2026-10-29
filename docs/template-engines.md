@@ -36,6 +36,14 @@ Field names support Unicode letters, digits and underscores, starting with a let
 
 Functions (including `eq/ne/and/or/not/len/index/printf/html`), pipelines, parentheses, local variables, template definitions/calls, comments and other full Go features require an external engine. Unsupported syntax or incomplete control structures preserve the **entire input for that render**, without partial evaluation. In the editor this preserves that block's HTML template.
 
+## Switching between editing and preview
+
+The editing canvas stays mounted, so switching modes preserves rich-text editors and HTML block iframes. Editing and preview retain their own scroll positions. While preview is requested, the canvas is excluded from focus, keyboard and drag interactions, and rich-text toolbars are hidden.
+
+Changes to the document, configuration, variables or device width schedule a complete email preview after a 400ms debounce, using an idle callback with a maximum wait of 2 seconds during continuous changes. Browsers without `requestIdleCallback` use a timer. Clicking Preview or Retry bypasses the wait and prepares the latest revision; subsequent changes in preview mode still use the same debounce. HTML generation still runs synchronously on the main thread; custom engines and `renderEmail` should be pure and allow repeated background calls.
+
+Two iframe buffers keep loading and measurement in the standby layer. A buffer becomes visible only after it has loaded and its height has been measured. Until the latest revision is ready, the current view remains visible with a preparation status. Stale revisions cannot replace newer content. Identical HTML and width reuse a ready or loading buffer to avoid unnecessary reloads. Generation, load or measurement failures, including a 15-second load/measurement timeout, show an error and Retry while retaining any existing preview. Retry forces a new load. Preview iframes use `sandbox="allow-same-origin"` to block scripts and event handlers while allowing the host to measure height; this is not complete HTML sanitization and does not rewrite exported HTML. This cache only serves the UI; explicit export APIs synchronously generate from the latest document at call time.
+
 ## Integration example
 
 Wrap your template library as TemplateEngine and pass the same adapter to editing and standalone preview. The caller provides templateEngine in this example:
