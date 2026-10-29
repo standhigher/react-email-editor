@@ -10,6 +10,7 @@ import { getBlockDefinition } from "../../document/registry";
 import { CanvasBlock } from "./CanvasBlock";
 import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
+import type { TemplateEngine } from "../../types/template";
 import type { EmailBlockNode, EmailBodySettings } from "../../types/document";
 import type { EditorDevice } from "../../types/editor";
 
@@ -21,6 +22,7 @@ interface CanvasProps {
   dropTargetId: string | null;
   dropEdge: DropEdge | null;
   variables: Variable[];
+  templateEngine: TemplateEngine;
   device: EditorDevice;
   onSelect: (id: string | null) => void;
   onCommitControl: (id: string, name: string, value: unknown) => void;
@@ -38,6 +40,7 @@ export function Canvas({
   dropTargetId,
   dropEdge,
   variables,
+  templateEngine,
   device,
   onSelect,
   onCommitControl,
@@ -107,6 +110,7 @@ export function Canvas({
                     selected={block.id === selectedId}
                     dropEdge={dropTargetId === block.id ? dropEdge : null}
                     variables={variables}
+                    templateEngine={templateEngine}
                     onSelect={() => onSelect(block.id)}
                     onCommitControl={onCommitControl} onCommitControls={onCommitControls}
                     onCommitStyle={onCommitStyle}

@@ -10,10 +10,10 @@ import {
 } from "./block-html";
 import type { BlockDefinition, Variable } from "../types/block";
 import type { EmailDocument } from "../types/document";
-import type { TemplateData } from "./template-preview";
+import type { TemplateData, TemplateEngineOptions } from "../types/template";
 
 /** Complete document HTML export options. */
-export interface DocumentHtmlOptions {
+export interface DocumentHtmlOptions extends TemplateEngineOptions {
   /** Resolve templates for preview; default false. */
   resolveHtmlTemplates?: boolean;
   /** Exact inserted tokens and optional preview values, default []. */
@@ -38,6 +38,7 @@ export function documentToHtml(
       };
       const block = blockToHtml(node, definitions, "email", {
         resolveHtmlTemplate: options.resolveHtmlTemplates,
+        templateEngine: options.templateEngine,
         body,
         variables: options.variables,
         templateData: mergeTemplateData(

@@ -1,4 +1,16 @@
 import { useEmailEditorConfig, useEmailEditor, useEmailEditorState, defineBlock, EmailControls, blockToHtml, renderBlockContent } from "../src/index";
+import { renderTemplatePreview, validateTemplate, defaultTemplateEngine } from "../src/index";
+import type { TemplateEngine, TemplateValidationIssue } from "../src/index";
+
+const templateEngine: TemplateEngine = {
+  render: (_template, data) => String(data.name ?? ""),
+  validate: () => [],
+};
+const templateIssues: TemplateValidationIssue[] | undefined = validateTemplate("{{.name}}", { templateEngine });
+renderTemplatePreview("{{.name}}", { name: "Ada" }, { templateEngine });
+// @ts-expect-error 模板接口保持同步，不接受异步引擎。
+const asyncTemplateEngine: TemplateEngine = { render: async () => "" };
+void templateIssues; void asyncTemplateEngine;
 
 // @ts-expect-error 旧配置工厂已移除，不提供别名。
 type RemovedConfigFactory = typeof import("../src/index").createEmailEditorConfig;
@@ -41,8 +53,11 @@ const plugin = defineBlock({
 });
 
 function useTypeContract() {
-  const config = useEmailEditorConfig({ plugins: [plugin] });
+  const config = useEmailEditorConfig({ plugins: [plugin], templateEngine });
+  const normalizedEngine: TemplateEngine = config.templateEngine;
+  void normalizedEngine;
   const editor = useEmailEditor({ config });
+  config.toHtml(editor.getDocument(), { resolveHtmlTemplates: true, templateEngine: defaultTemplateEngine });
   const state = useEmailEditorState(editor);
   const props: import("../src/index").EmailEditorProps = { editor, height: 720 };
   editor.setDocument(editor.getDocument());
@@ -68,8 +83,8 @@ function useTypeContract() {
   // @ts-expect-error 组件不再接收旧 blocks Prop。
   const blocksProps: import("../src/index").EmailEditorProps = { editor, blocks: [plugin] };
   const block = config.createBlock(plugin.type);
-  blockToHtml(block, config.definitions, "email", { resolveHtmlTemplate: true });
-  renderBlockContent(block, config.definitions, "canvas", { resolveHtmlTemplate: true });
+  blockToHtml(block, config.definitions, "email", { resolveHtmlTemplate: true, templateEngine });
+  renderBlockContent(block, config.definitions, "canvas", { resolveHtmlTemplate: true, templateEngine });
   // @ts-expect-error 渲染参数只接受配置对象，拒绝旧 boolean 参数。
   blockToHtml(block, config.definitions, "email", true);
   // @ts-expect-error 内容渲染同样拒绝旧 boolean 参数。

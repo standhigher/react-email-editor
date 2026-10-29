@@ -1,26 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { viewportWidth } from "../../render/layout";
-import { documentToHtml } from "../../render/document-html";
-import type { BlockDefinition, Variable } from "../../types/block";
+import type { EmailEditorConfig } from "../../plugins/types";
+import type { Variable } from "../../types/block";
 import type { EmailDocument } from "../../types/document";
 import type { EditorDevice } from "../../types/editor";
 
 interface PreviewProps {
   document: EmailDocument;
-  definitions: readonly BlockDefinition[];
+  config: EmailEditorConfig;
   variables: Variable[];
   device: EditorDevice;
 }
 
-export function Preview({ document, definitions, variables, device }: PreviewProps) {
+export function Preview({ document, config, variables, device }: PreviewProps) {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const cleanupRef = useRef<() => void>();
   const html = useMemo(
-    () => documentToHtml(document, definitions, {
+    () => config.toHtml(document, {
       resolveHtmlTemplates: true,
       variables,
     }),
-    [document, definitions, variables],
+    [document, config, variables],
   );
 
   const observeContent = useCallback(() => {

@@ -262,4 +262,8 @@ export const fragment = blockToHtml(block, undefined, "email", {
 });
 ```
 
-完整文档自动按顶层浅合并 `variables → templateData → block.defaultData`，后者优先。单区块不会自动合并变量；示例显式合并，并使用单数 `resolveHtmlTemplate`。真实发送端的模板引擎由应用决定，预览仅支持部分 Go template 语法。
+完整文档自动按顶层浅合并 `variables → templateData → block.defaultData`，后者优先。预览和发送会先按变量清单补点，存储中的模板原文保持不变；单区块不会自动合并变量，示例显式合并，并使用单数 `resolveHtmlTemplate`。真实发送端的模板引擎由应用决定；默认预览仅支持基础语法，完整 Go 语义通过 `templateEngine` 注入。
+
+## 自定义模板引擎与独立预览
+
+完整说明与接入示例见 [模板预览与自定义引擎](https://github.com/standhigher/react-email-editor/blob/main/docs/template-engines.zh-CN.md)。

@@ -31,8 +31,9 @@ export {
   variablesToTemplateData,
 } from "./render/block-html";
 export type { BlockRenderOptions } from "./render/block-html";
-export { renderTemplatePreview } from "./render/template-preview";
-export type { TemplateData } from "./render/template-preview";
+export { renderTemplatePreview, validateTemplate } from "./render/template-preview";
+export { defaultTemplateEngine } from "./render/default-template-engine";
+export type { TemplateData, TemplateEngine, TemplateEngineOptions, TemplateValidationIssue } from "./types/template";
 export { buildRenderContext } from "./render/context";
 export { getBlockDefinition } from "./document/registry";
 export { generateId } from "./utils/id";

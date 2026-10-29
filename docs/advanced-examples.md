@@ -262,4 +262,8 @@ export const fragment = blockToHtml(block, undefined, "email", {
 });
 ```
 
-Complete documents shallow-merge variables → templateData → block.defaultData, with later data winning. Single-block rendering does not merge variables automatically; this example merges explicitly and uses the singular resolveHtmlTemplate option. Your application chooses the actual sending engine; preview only supports a subset of Go templates.
+Complete documents shallow-merge variables → templateData → block.defaultData, with later data winning. Preview and sending apply listed-variable dot normalization while preserving the stored template source. Single-block rendering does not merge variables automatically; this example merges explicitly and uses the singular resolveHtmlTemplate option. Your application chooses the actual sending engine. The default preview supports basic syntax; inject templateEngine for complete Go semantics.
+
+## Custom template engine and standalone preview
+
+See [Template preview and custom engines](https://github.com/standhigher/react-email-editor/blob/main/docs/template-engines.md) for supported syntax, adapter behavior and integration examples.

@@ -9,15 +9,15 @@ import { buildRenderContext } from "./context";
 import { renderTemplatePreview } from "./template-preview";
 import type { BlockDefinition, BlockRenderContext, RenderMode, Variable } from "../types/block";
 import type { EmailBlockNode, EmailBodySettings } from "../types/document";
-import type { TemplateData } from "./template-preview";
+import type { TemplateData, TemplateEngineOptions } from "../types/template";
 
 /** Single-block rendering options; must be an object. */
-export interface BlockRenderOptions {
+export interface BlockRenderOptions extends TemplateEngineOptions {
   /** Resolve templates, default false; single-block rendering does not auto-merge variables. */
   resolveHtmlTemplate?: boolean;
   /** Explicit preview data; defaults to node defaultData. */
   templateData?: TemplateData;
-  /** Exact token dot normalization on export; merge preview data explicitly. */
+  /** Exact token dot normalization before export or preview; merge preview data explicitly. */
   variables?: Variable[];
   /** Body defaults; defaults to DEFAULT_EMAIL_BODY. */
   body?: EmailBodySettings;
@@ -49,7 +49,7 @@ function variableControlName(name: string): string | null {
   const token = /^\{\{-?\s*([\s\S]*?)\s*-?\}\}$/.exec(name.trim());
   const inner = (token ? token[1] : name).trim();
   const control = inner.startsWith(".") ? inner.slice(1) : inner;
-  if (!control || !/^[A-Za-z_][\w.]*$/.test(control)) return null;
+  if (!control || !/^[\p{L}_][\p{L}\p{Nd}_]*(?:\.[\p{L}_][\p{L}\p{Nd}_]*)*$/u.test(control)) return null;
   return control;
 }
 
@@ -133,14 +133,13 @@ export function renderBlockContent(
 }
 
 function resolveBlockContent(rendered: string, node: EmailBlockNode, options: BlockRenderOptions): string {
-  // 预览展开作用于每个区块 render 产出的 HTML，不限于 HTML 区块。
-  // 导出不替换 value，只给变量列表中的原文补点。
-  if (!options.resolveHtmlTemplate) {
-    return applyListedVariableDots(rendered, options.variables ?? []);
-  }
+  // 预览与发送统一补点，仅匹配变量清单原文，不改动存储内容。
+  const normalized = applyListedVariableDots(rendered, options.variables ?? []);
+  if (!options.resolveHtmlTemplate) return normalized;
   return renderTemplatePreview(
-    rendered,
+    normalized,
     options.templateData ?? node.defaultData,
+    options,
   );
 }
 

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { BlockErrorBoundary } from "../plugins/components/BlockErrorBoundary";
 import { Canvas } from "./canvas/Canvas";
 import { Preview } from "./preview/Preview";
@@ -22,6 +23,7 @@ export function Stage({
   onDeviceChange,
   onSelectBlock,
 }: StageProps) {
+  const previewKey = useMemo(() => ({ config: session.config, variables: session.variables }), [session.config, session.variables]);
   const { targetId, dropEdge } = useEditorDragState();
 
   return (
@@ -42,6 +44,7 @@ export function Stage({
             dropTargetId={targetId}
             dropEdge={dropEdge}
             variables={session.variables}
+            templateEngine={session.config.templateEngine}
             device={device}
             onSelect={onSelectBlock}
             onCommitControl={session.updateControl} onCommitControls={session.updateControls}
@@ -52,10 +55,10 @@ export function Stage({
         </div>
       ) : (
         <div className="ree-stage-view">
-          <BlockErrorBoundary identity={session.document} resetKey={session.definitions}>
+          <BlockErrorBoundary identity={session.document} resetKey={previewKey}>
           <Preview
             document={session.document}
-            definitions={session.definitions}
+            config={session.config}
             variables={session.variables}
             device={device}
           />

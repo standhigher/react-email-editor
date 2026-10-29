@@ -39,8 +39,10 @@ test("编辑保留变量原文，预览替换 value，导出只给变量列表�
     resolveHtmlTemplates: true,
     variables: [storeVariable, userVariable],
   });
-  assert.match(preview, /店铺名称/);
-  assert.doesNotMatch(preview, /\{\{ {2}store_name \}\}/);
+  // 先复用发送补点规则；混有未支持函数时引擎保留规范化后的整段。
+  assert.match(preview, /\{\{ {2}\.store_name \}\}/);
+  assert.match(preview, /\{\{if not \.ready\}\}/);
+  assert.equal(renderTemplatePreview("{{  store_name }}", { store_name: "店铺名称" }), "店铺名称");
 
   assert.equal(
     renderTemplatePreview("{{ user.name }}", variablesToTemplateData([userVariable])),

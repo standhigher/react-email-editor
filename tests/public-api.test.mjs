@@ -31,8 +31,12 @@ test("源码不再声明或读取旧 API 字段，避免重新引入兼容层", 
     const source = ts.createSourceFile(file, readFileSync(new URL(file, root), "utf8"), ts.ScriptTarget.Latest, true);
     const visit = (node) => {
       if (ts.isIdentifier(node) && removedIdentifiers.has(node.text)) issues.push(`${file}: ${node.text}`);
+      // 模板适配器的 render 是独立契约，不是旧区块插件的 render 兼容入口。
+      const isTemplateRender =
+        (file === "types/template.ts" && ts.isPropertySignature(node) && ts.isInterfaceDeclaration(node.parent) && node.parent.name.text === "TemplateEngine") ||
+        (file === "render/template-preview.ts" && ts.isPropertyAccessExpression(node) && node.expression.getText(source) === "engine");
       // React 错误边界的 render() 生命周期有效；插件的旧 render 属性入口无效。
-      if ((ts.isPropertyAccessExpression(node) || ts.isPropertyAssignment(node) || ts.isPropertySignature(node)) && node.name?.getText(source) === "render") {
+      if ((ts.isPropertyAccessExpression(node) || ts.isPropertyAssignment(node) || ts.isPropertySignature(node)) && node.name?.getText(source) === "render" && !isTemplateRender) {
         issues.push(`${file}: render property`);
       }
       if (ts.isElementAccessExpression(node) && ts.isStringLiteral(node.argumentExpression) && (removedIdentifiers.has(node.argumentExpression.text) || node.argumentExpression.text === "render")) {

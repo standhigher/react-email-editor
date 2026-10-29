@@ -68,6 +68,7 @@ export function EmailPage() {
 | `plugins` | `BlockPlugin[]` | `[]`，由 `defineBlock()` 创建。 |
 | `builtins` | `false \| string[]` | 省略显示全部；`false` 隐藏全部内置区块；数组筛选并排序。隐藏不影响已有节点渲染。自定义类型追加到后面。 |
 | `pickImage` | `(context: ImagePickerContext) => Promise<string \| null>` | 图片资源选择器；返回 URL，`null` 取消，抛错显示重试；`context` 提供 `value/label/signal`。 |
+| `templateEngine` | `TemplateEngine` | 模板预览适配器；省略时使用默认基础引擎。 |
 
 插件建议模块级声明；依赖状态时用 `useMemo`。保持参数引用稳定可复用配置；内联数组不会重建编辑器或清空文档。配置返回值：
 
@@ -76,6 +77,7 @@ export function EmailPage() {
 | `definitions` | 全部注册插件的只读列表，包含隐藏的内置区块。 |
 | `library` | 按展示顺序排列的可插入区块只读列表。 |
 | `pickImage` | 注册的资源选择器。 |
+| `templateEngine` | 当前画布、预览和解析导出共用的模板引擎。 |
 | `createBlock(type)` | 已注册的类型字符串 → 独立默认 `EmailBlockNode`；未知类型抛错。 |
 | `toHtml(document, options?)` | v4 文档与 `DocumentHtmlOptions` → 完整 HTML；自动使用当前注册表。 |
 | `validate(document)` | 文档 → `ValidationIssue[]`，不渲染 HTML。 |
@@ -195,6 +197,7 @@ export const coupon = defineBlock({
 | `resolveHtmlTemplates` | `false` 保留模板；`true` 解析预览值。 |
 | `variables` | `[]`，变量原文与预览文本。 |
 | `templateData` | 可选 `TemplateData`，全局对象或列表数据。 |
+| `templateEngine` | 可选 `TemplateEngine`；省略时使用默认基础引擎。外部引擎负责完整语义和 HTML 转义，输出不会被重复转义。 |
 
 数据按顶层浅合并，优先级：节点 `defaultData` > `templateData` > `variables`。默认导出仅给与 `variables[].name` 精确匹配且缺点的 token 补点，并保留空格，例如 `{{ store_name }}` → `{{ .store_name }}`；列表外的 Go template 保持原样。变量 `description` 为空时不显示副文案，`value` 只用于预览。
 
@@ -208,11 +211,18 @@ export const coupon = defineBlock({
 | `buildRenderContext(node, mode, body = DEFAULT_EMAIL_BODY, definition = 内置查找结果)` | mode 必填；自定义区块需显式传入 definition | 独立归一化 `BlockRenderContext`，不渲染。 |
 | `variablesToTemplateData(variables)` | 必填 `Variable[]` | 以 name 路径为键、value 为值的 `TemplateData`；支持嵌套路径，忽略无 value 的项。 |
 | `mergeTemplateData(variables, defaultData?)` | 变量数组与可选对象 | 顶层合并，defaultData 覆盖变量；两者均无数据时返回 undefined。 |
-| `renderTemplatePreview(html, defaultData?)` | HTML 字符串与可选预览对象 | 支持部分字段路径、range、if、with 等 Go template 语法；省略数据时保留原文。 |
+| `renderTemplatePreview(template, data?, options?)` | 模板、预览数据和可选 `templateEngine` | 使用注入引擎渲染；默认引擎支持基础字段路径、`range`、`if`、`with`，遇到不支持的表达式时保留完整输入。 |
+| `validateTemplate(template, options?)` | 模板与可选 `templateEngine` | 显式调用外部引擎校验；未提供校验器时返回 `undefined`，不会自动阻止保存。 |
 
-`BlockRenderOptions` 含 `resolveHtmlTemplate?: boolean`（注意单数）、`templateData?: TemplateData`、`variables?: Variable[]`、`body?: EmailBodySettings`。`body` 默认 `DEFAULT_EMAIL_BODY`；模板默认不解析。单区块预览取 `templateData ?? node.defaultData`，不会自动合并 variables；需要时显式调用 `mergeTemplateData()`。第四个参数必须为对象，传 boolean 或 null 会抛出 TypeError。
+`DocumentHtmlOptions` 和 `BlockRenderOptions` 都含 `templateEngine?: TemplateEngine`。`BlockRenderOptions` 含 `resolveHtmlTemplate?: boolean`（注意单数）、`templateData?: TemplateData`、`variables?: Variable[]`、`body?: EmailBodySettings`。`body` 默认 `DEFAULT_EMAIL_BODY`；模板默认不解析。单区块预览取 `templateData ?? node.defaultData`，不会自动合并 variables；需要时显式调用 `mergeTemplateData()`。第四个参数必须为对象，传 boolean 或 null 会抛出 TypeError。
+
+`config.toHtml()` 默认使用配置中的引擎，`options.templateEngine` 可按次覆盖。只传 `config.definitions` 不会携带模板引擎配置。
 
 `mode` 表示消费场景：`canvas` 供画布，`email` 执行邮件控件校验；它不决定是否解析模板。模板预览不是完整 Go 引擎，也不是 HTML 消毒器或安全沙箱。
+
+### 自定义模板引擎
+
+完整说明与接入示例见 [模板预览与自定义引擎](https://github.com/standhigher/react-email-editor/blob/main/docs/template-engines.zh-CN.md)。
 
 ### renderEmail 中的 email 工具
 

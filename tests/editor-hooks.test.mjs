@@ -115,6 +115,52 @@ test("配置与变量更新保留文档和实例，并使用最新插件与预�
   assert.throws(() => editor.getHtml(), /Missing block plugin/);
 });
 
+test("模板引擎更新保留文档、订阅快照与实例，多实例使用各自引擎", (t) => {
+  const changes = [];
+  const makeEngine = (label) => ({
+    render(template, data) {
+      assert.equal(template, "<p>{{ name }}</p>");
+      const name = data.name;
+      data.nested.value = "Changed by engine";
+      return `<p>${label}:${name}</p>`;
+    },
+    validate() { assert.fail("保存和导出不应自动校验模板"); },
+  });
+  const firstEngine = makeEngine("First");
+  const configOptions = { plugins: [coupon], templateEngine: firstEngine };
+  const first = fixture(t, { configOptions, onChange: (document) => changes.push(document) });
+  const { editor, config } = first.current();
+  const block = config.createBlock(coupon.type);
+  block.defaultData = { name: "Block", nested: { value: "Original" } };
+  const document = createEmailDocument([block]);
+  act(() => editor.setDocument(document));
+  const state = first.state();
+  const secondEngine = makeEngine("Second");
+  const second = fixture(t, { configOptions: { plugins: [coupon], templateEngine: secondEngine }, initialDocument: document });
+  assert.match(editor.getRenderedHtml(), /First:Block/);
+  assert.match(second.current().editor.getRenderedHtml(), /Second:Block/);
+  const output = editor.getData();
+  assert.match(output.renderedHtml, /First:Block/);
+  assert.ok(output.html.includes("{{ name }}"));
+  assert.ok(output.json.includes("{{ name }}"));
+  assert.deepEqual(output.document, document);
+  first.update({ configOptions, onChange: (next) => changes.push(next) });
+  assert.equal(first.current().config, config);
+  first.update({ configOptions: { ...configOptions, templateEngine: secondEngine }, onChange: (next) => changes.push(next) });
+  assert.equal(first.current().editor, editor);
+  assert.equal(first.current().config.templateEngine, secondEngine);
+  assert.match(editor.getRenderedHtml(), /Second:Block/);
+  assert.equal(first.state(), state);
+  assert.deepEqual(editor.getDocument(), document);
+  assert.equal(changes.length, 1);
+  output.document.blocks[0].defaultData.nested.value = "External";
+  assert.equal(editor.getDocument().blocks[0].defaultData.nested.value, "Original");
+  first.update({ configOptions: { plugins: [coupon] } });
+  assert.equal(first.current().config.templateEngine, api.defaultTemplateEngine);
+  assert.match(editor.getRenderedHtml(), /<p>Block<\/p>/);
+  assert.match(second.current().editor.getRenderedHtml(), /Second:Block/);
+});
+
 test("初始文档只读一次，外部 body 按输入值变化合并，回调及重置基准独立", (t) => {
   const original = { ...createEmailDocument(), subject: "Original" };
   const onChangeCalls = [];

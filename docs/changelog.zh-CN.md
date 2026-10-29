@@ -4,6 +4,15 @@
 
 ## 未发布 — 2026-10-29
 
+### 模板预览与自定义引擎
+
+- 新增同步 `TemplateEngine` 适配器，通过 `useEmailEditorConfig({ templateEngine })` 让画布、编辑器预览和解析导出共用外部引擎；`renderTemplatePreview()`、文档及单区块渲染支持相同的 `templateEngine` 选项。
+- 导出 `defaultTemplateEngine` 与按需调用的 `validateTemplate()`；语法校验不会自动阻止保存。引擎更新保留文档与实例，多实例之间独立，传入引擎的数据为隔离副本。
+- 默认引擎支持基础变量、根上下文及 `if/range/with`；包含未支持语法或不完整控制结构时保留该次渲染的完整输入。函数、管道及局部变量交由外部引擎处理，外部输出不重复转义。
+- 统一画布、预览和发送 HTML 的变量清单补点规则，保留空白与 trim 标记；JSON 保存模板原文。
+- 修复 Unicode 字段路径解析，以及 Date、Map、Set 和普通对象的条件真值判断；渲染与校验将非 `Error` 异常归一化并保留原始 `cause`，支持错误提示、Retry 及更换引擎恢复。
+- 新增中英文模板引擎独立文档与接入示例，README 仅保留文档引用。
+
 ### 工具链与文档
 
 - 项目包管理器从 pnpm 迁移为 npm 11.13.0，使用 `package-lock.json` 替换 `pnpm-lock.yaml`，保持所有直接依赖版本不变。
@@ -12,8 +21,9 @@
 
 ### 验证
 
-- `npm ci` 安装成功；`npm run check` 通过类型检查、Oxlint、构建及全部 103 项 Node 测试。
+- `npm ci` 安装成功；`npm run check` 通过类型检查、Oxlint、构建及全部 121 项 Node 测试，覆盖模板引擎选择、上下文、转义、数据隔离、变量补点与异常恢复。
 - `npm run dev` 启动成功，首页和 `main.tsx` 入口模块均返回 HTTP 200。
+- Chrome 验证画布与预览的变量结果，以及非 `Error` 异常提示、Retry 和更换引擎恢复；`git diff --check` 通过。
 
 ## 0.4.3 — 2026-10-28
 

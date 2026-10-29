@@ -5,6 +5,6 @@ import { buildEmailEditorConfig } from "./config";
 import type { EmailEditorConfig, UseEmailEditorConfigOptions } from "./types";
 
 export function useEmailEditorConfig(options: UseEmailEditorConfigOptions = {}): EmailEditorConfig {
-  const { plugins, builtins, pickImage } = options;
-  return useMemo(() => buildEmailEditorConfig({ plugins, builtins, pickImage }), [plugins, builtins, pickImage]);
+  const { plugins, builtins, pickImage, templateEngine } = options;
+  return useMemo(() => buildEmailEditorConfig({ plugins, builtins, pickImage, templateEngine }), [plugins, builtins, pickImage, templateEngine]);
 }

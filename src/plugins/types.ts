@@ -1,6 +1,7 @@
 import type { ComponentType, ReactNode } from "react";
 import type { BlockDefinition, BlockInspectorSection, BlockRenderContext, ControlOption, RichTextProfile, StyleControlConfig, Variable } from "../types/block";
 import type { EmailBlockNode, EmailBlockStyle, EmailBodySettings, EmailDocument } from "../types/document";
+import type { TemplateEngine } from "../types/template";
 import type { DocumentHtmlOptions } from "../render/document-html";
 import type { EmailMarkup, EmailTools } from "./email-tools";
 
@@ -177,6 +178,8 @@ export interface ValidationIssue {
 
 /** Block registration and image resource adapter options. */
 export interface UseEmailEditorConfigOptions {
+  /** Shared synchronous template adapter; defaults to the basic engine. */
+  templateEngine?: TemplateEngine;
   /** Plugins created by defineBlock, default []. */
   plugins?: BlockPlugin[];
   /** All by default; false hides all; arrays filter/order; hidden nodes still render. */
@@ -187,6 +190,8 @@ export interface UseEmailEditorConfigOptions {
 
 /** Shared configuration for editing, creation and standalone export. */
 export interface EmailEditorConfig {
+  /** Normalized engine used by canvas, preview and resolved HTML export. */
+  readonly templateEngine: TemplateEngine;
   /** All registered definitions including hidden builtins. */
   readonly definitions: readonly BlockPlugin[];
   /** Insertable blocks in display order. */

@@ -4,6 +4,15 @@ English | [简体中文](./changelog.zh-CN.md)
 
 ## Unreleased — 2026-10-29
 
+### Template preview and custom engines
+
+- Add a synchronous `TemplateEngine` adapter through `useEmailEditorConfig({ templateEngine })`, sharing external rendering across canvas, editor preview and resolved export. `renderTemplatePreview()`, document rendering and single-block helpers accept the same `templateEngine` option.
+- Export `defaultTemplateEngine` and explicitly invoked `validateTemplate()` without automatically blocking saving. Engine updates preserve documents and instances, instances remain isolated, and engines receive detached data copies.
+- Support basic variables, root context and `if/range/with` in the default engine; preserve the entire render input when syntax is unsupported or control structures are incomplete. Delegate functions, pipelines and local variables to external engines without escaping their output again.
+- Apply the same listed-variable dot normalization to canvas, preview and sending HTML, preserving whitespace and trim markers; JSON retains template source.
+- Fix Unicode field paths and condition truthiness for Date, Map, Set and plain objects. Normalize non-`Error` render and validation exceptions while preserving the original `cause`, with error display, Retry and recovery after replacing an engine.
+- Add dedicated English and Chinese template-engine documentation and integration examples; keep only documentation links in the READMEs.
+
 ### Toolchain and documentation
 
 - Migrate project package management from pnpm to npm 11.13.0, replacing `pnpm-lock.yaml` with `package-lock.json` while preserving all direct dependency versions.
@@ -12,8 +21,9 @@ English | [简体中文](./changelog.zh-CN.md)
 
 ### Validation
 
-- `npm ci` succeeds; `npm run check` passes type checking, Oxlint, build and all 103 Node tests.
+- `npm ci` succeeds; `npm run check` passes type checking, Oxlint, build and all 121 Node tests, covering engine selection, context, escaping, data isolation, variable normalization and error recovery.
 - `npm run dev` starts successfully; the homepage and `main.tsx` entry module both return HTTP 200.
+- Verify canvas and preview variable output, non-`Error` exception display, Retry and recovery after replacing engines in Chrome; `git diff --check` passes.
 
 ## 0.4.3 — 2026-10-28
 

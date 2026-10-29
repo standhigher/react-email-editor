@@ -68,6 +68,7 @@ Requires an instance from `useEmailEditor()`. Returns cached `{ document }`, a d
 | `plugins` | `BlockPlugin[]` | `[]`; plugins created by `defineBlock()`. |
 | `builtins` | `false \| string[]` | All by default; false hides all builtins; arrays filter and order them. Hidden blocks still render existing nodes. Custom types are appended. |
 | `pickImage` | `(context: ImagePickerContext) => Promise<string \| null>` | Resolve a URL; null cancels; throwing shows retry. Context contains `value/label/signal`. |
+| `templateEngine` | `TemplateEngine` | Shared synchronous template adapter; defaults to the basic engine. |
 
 Declare plugins at module scope, or use `useMemo` when they depend on application state. Stable option references reuse configuration; inline arrays do not recreate the editor or reset its document. The returned object contains:
 
@@ -76,6 +77,7 @@ Declare plugins at module scope, or use `useMemo` when they depend on applicatio
 | `definitions` | Readonly list of all registered plugins, including hidden builtins. |
 | `library` | Readonly list of insertable blocks in display order. |
 | `pickImage` | Registered resource picker. |
+| `templateEngine` | Normalized engine shared by canvas, preview and resolved export. |
 | `createBlock(type)` | Registered type string → detached default `EmailBlockNode`; unknown types throw. |
 | `toHtml(document, options?)` | v4 document and `DocumentHtmlOptions` → complete HTML using this registry. |
 | `validate(document)` | Document → `ValidationIssue[]`, without rendering HTML. |
@@ -195,6 +197,7 @@ The required document must use v4. Definitions default to DEFAULT_BLOCKS; for cu
 | resolveHtmlTemplates | false preserves templates; true resolves preview data. |
 | variables | [] of exact inserted tokens and preview values. |
 | templateData | Optional TemplateData for global objects and arrays. |
+| templateEngine | Optional TemplateEngine; defaults to the basic engine. |
 
 Data is shallow-merged at the top level: node defaultData > templateData > variables. Default export only adds missing dots to tokens exactly matching variables[].name, preserving spaces: `{{ store_name }}` → `{{ .store_name }}`. Unlisted Go templates stay unchanged. Empty variable descriptions are hidden; value is only preview data.
 
@@ -208,11 +211,18 @@ Data is shallow-merged at the top level: node defaultData > templateData > varia
 | `buildRenderContext(node, mode, body = DEFAULT_EMAIL_BODY, definition = builtin lookup)` | Required mode; explicitly pass a custom definition | Detached normalized BlockRenderContext without rendering. |
 | `variablesToTemplateData(variables)` | Required Variable[] | TemplateData keyed by token paths with value as preview data; ignores absent values. |
 | `mergeTemplateData(variables, defaultData?)` | Variables and optional object | Shallow merge, defaultData wins; undefined if both contain no data. |
-| `renderTemplatePreview(html, defaultData?)` | HTML string and optional data | Supports a subset of Go paths, range, if and with; preserves input when data is omitted. |
+| `renderTemplatePreview(template, data?, options?)` | Template, data and TemplateEngineOptions | Synchronous preview with the selected engine. The basic engine preserves the entire input when it contains unsupported syntax. |
+| `validateTemplate(template, options?)` | Template and TemplateEngineOptions | TemplateValidationIssue[]; undefined when validation is unavailable. Never invoked automatically. |
 
-BlockRenderOptions contains resolveHtmlTemplate?: boolean (singular), templateData?: TemplateData, variables?: Variable[], body?: EmailBodySettings. Body defaults to DEFAULT_EMAIL_BODY; templates are preserved by default. Single-block preview uses templateData ?? node.defaultData and does not merge variables automatically; call mergeTemplateData explicitly when needed. The fourth argument must be an object; boolean or null throws TypeError.
+Both DocumentHtmlOptions and BlockRenderOptions accept templateEngine?: TemplateEngine. BlockRenderOptions contains resolveHtmlTemplate?: boolean (singular), templateData?: TemplateData, variables?: Variable[], body?: EmailBodySettings. Body defaults to DEFAULT_EMAIL_BODY; templates are preserved by default. Single-block preview uses templateData ?? node.defaultData and does not merge variables automatically; call mergeTemplateData explicitly when needed. The fourth argument must be an object; boolean or null throws TypeError.
+
+config.toHtml() uses the configured engine unless options.templateEngine explicitly overrides it. Passing config.definitions alone does not carry engine configuration.
 
 Mode selects the consumer: canvas for editing, email for control validation. It does not enable template resolution. Preview is a subset of Go templates, not a complete Go engine, HTML sanitizer or security sandbox.
+
+### Custom template engines
+
+See [Template preview and custom engines](https://github.com/standhigher/react-email-editor/blob/main/docs/template-engines.md) for supported syntax, adapter behavior and integration examples.
 
 ### email helpers in renderEmail
 

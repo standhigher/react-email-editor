@@ -47,6 +47,7 @@ Open [http://localhost:5173](http://localhost:5173); reuse an existing server wh
 
 - [API reference](https://github.com/standhigher/react-email-editor/blob/main/docs/api.md): every public export, parameter, default and type.
 - [Basic examples](https://github.com/standhigher/react-email-editor/blob/main/docs/basic-examples.md): initial content, saving/loading, body styles, variables and preview.
+- [Template preview and custom engines](https://github.com/standhigher/react-email-editor/blob/main/docs/template-engines.md).
 - [Advanced examples](https://github.com/standhigher/react-email-editor/blob/main/docs/advanced-examples.md): validated saving, multiple instances, custom blocks, multiple editing regions, resource adapters and standalone export.
 - [Custom block guide](https://github.com/standhigher/react-email-editor/blob/main/docs/custom-blocks.md): detailed controls, plugins and rendering helpers.
 - [Release guide](https://github.com/standhigher/react-email-editor/blob/main/docs/release.md): package checks and manual npm publishing.

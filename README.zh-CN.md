@@ -47,6 +47,7 @@ npm run dev
 
 - [API 参考](https://github.com/standhigher/react-email-editor/blob/main/docs/api.zh-CN.md)：所有公共导出、参数、默认值与类型。
 - [基础场景](https://github.com/standhigher/react-email-editor/blob/main/docs/basic-examples.zh-CN.md)：初始内容、保存恢复、主体样式、变量及预览。
+- [模板预览与自定义引擎](https://github.com/standhigher/react-email-editor/blob/main/docs/template-engines.zh-CN.md)。
 - [复杂场景](https://github.com/standhigher/react-email-editor/blob/main/docs/advanced-examples.zh-CN.md)：校验后保存、多实例、自定义区块、多区域编辑、资源适配与独立导出。
 - [自定义区块指南](https://github.com/standhigher/react-email-editor/blob/main/docs/custom-blocks.zh-CN.md)：控件、插件和渲染工具的完整说明。
 - [发布指南](https://github.com/standhigher/react-email-editor/blob/main/docs/release.zh-CN.md)：发布包校验与本地手动发布。

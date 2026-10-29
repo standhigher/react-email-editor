@@ -9,6 +9,7 @@ import { BlockActions } from "./components/BlockActions";
 import { canvasBlockStyle } from "./block-style";
 import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
+import type { TemplateEngine } from "../../types/template";
 import type { EmailBlockNode, EmailBodySettings } from "../../types/document";
 import type { CanvasDragData } from "../../types/editor";
 
@@ -19,6 +20,7 @@ interface CanvasBlockProps {
   selected: boolean;
   dropEdge: DropEdge | null;
   variables: Variable[];
+  templateEngine: TemplateEngine;
   onSelect: () => void;
   onCommitControl: (id: string, name: string, value: unknown) => void;
   onCommitControls: (id: string, patch: Record<string, unknown>) => void;
@@ -34,6 +36,7 @@ export function CanvasBlock({
   selected,
   dropEdge,
   variables,
+  templateEngine,
   onSelect,
   onCommitControl,
   onCommitControls,
@@ -42,6 +45,7 @@ export function CanvasBlock({
   onRemove,
 }: CanvasBlockProps) {
   const block = useMemo(() => ({ ...sourceBlock, style: resolveBlockStyle(sourceBlock.style, definition) }), [sourceBlock, definition]);
+  const renderKey = useMemo(() => ({ definition, templateEngine, variables }), [definition, templateEngine, variables]);
   const toolbarId = useId();
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const dragData: CanvasDragData = { kind: "canvas" };
@@ -105,8 +109,8 @@ export function CanvasBlock({
         className={`ree-block-content${definition?.inlineControl ? " is-inline" : ""}`}
         style={canvasBlockStyle(block, body)}
       >
-        <BlockErrorBoundary identity={sourceBlock} resetKey={definition}>
-          <PluginCanvasContent block={block} body={body} definition={definition} variables={variables} selected={selected} toolbarId={toolbarId} toolbarCollapsed={toolbarCollapsed} select={onSelect} onCommitControl={onCommitControl} onCommitControls={onCommitControls} onCommitStyle={onCommitStyle} />
+        <BlockErrorBoundary identity={sourceBlock} resetKey={renderKey}>
+          <PluginCanvasContent block={block} body={body} definition={definition} variables={variables} templateEngine={templateEngine} selected={selected} toolbarId={toolbarId} toolbarCollapsed={toolbarCollapsed} select={onSelect} onCommitControl={onCommitControl} onCommitControls={onCommitControls} onCommitStyle={onCommitStyle} />
         </BlockErrorBoundary>
       </div>
 
