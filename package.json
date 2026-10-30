@@ -1,6 +1,6 @@
 {
   "name": "@standhigher/react-email-editor",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "type": "module",
   "description": "React email template editor with drag-and-drop blocks, rich text, JSON storage, and HTML export.",
   "keywords": [

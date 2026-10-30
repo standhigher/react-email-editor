@@ -2,6 +2,19 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.7.2 — 2026-10-30
+
+### Fixes and improvements
+
+- Refine Chinese spacer names and descriptions, the inspector's accessible name, body and block border disclosure labels, side and corner synchronization labels, and image URL protocol and template-variable guidance.
+- Simplify linked spacing and corner controls in all UI languages: hide the uniform slider's repeated visible label and move its value to the right of the synchronization checkbox. Preserve accessible slider names and directional labels with independent sliders when unlinked.
+- Bump the npm package from `0.7.1` to `0.7.2` as a patch; public APIs, document format `4`, style value updates, and email export remain unchanged.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build, and all 162 Node tests. `git diff --check` passes.
+- Reuse the existing Chrome page and service on port 5173 to verify Chinese copy, hidden duplicate labels and aligned values when linked, directional labels when unlinked, independent keyboard adjustments for sides and corners, uniform adjustments after relinking, and expanding and collapsing the spacing group and body border settings. Restore the values used for verification.
+
 ## 0.7.1 — 2026-10-30
 
 ### Fixes and improvements

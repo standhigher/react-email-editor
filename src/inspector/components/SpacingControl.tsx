@@ -35,6 +35,8 @@ export function SpacingControl({
   const sides = expand(value);
   const equal = sides.every((side) => sideAmount(side, max) === sideAmount(sides[0], max));
   const [independent, setIndependent] = useState(!equal);
+  const linked = !independent && equal;
+  const amount = sideAmount(sides[0] ?? "0px", max);
   const slider = (sideLabel: string, sideValue: string, commit: (next: string) => void) => {
     const amount = sideAmount(sideValue, max);
     return (
@@ -49,17 +51,20 @@ export function SpacingControl({
   };
   return (
     <div className="ree-spacing-control">
-      <CheckboxControl
-        className="ree-spacing-link"
-        label={linkLabel ?? t("inspector.linkSides")}
-        checked={!independent && equal}
-        onChange={(checked) => {
-          setIndependent(!checked);
-          if (checked) onChange(`${sideAmount(sides[0] ?? "0px", max)}px`);
-        }}
-      />
-      {!independent && equal
-        ? slider(uniformLabel ?? t("inspector.allSides", { label }), sides[0] ?? "0px", onChange)
+      <div className="ree-field-label">
+        <CheckboxControl
+          className="ree-spacing-link"
+          label={linkLabel ?? t("inspector.linkSides")}
+          checked={linked}
+          onChange={(checked) => {
+            setIndependent(!checked);
+            if (checked) onChange(`${amount}px`);
+          }}
+        />
+        {linked ? <span className="ree-field-value">{amount}px</span> : null}
+      </div>
+      {linked
+        ? <RangeControl label={uniformLabel ?? t("inspector.allSides", { label })} value={amount} min={0} max={max} step={1} onChange={(next) => onChange(`${next}px`)} />
         : (
           <div className="ree-spacing-grid">
             {sideLabels.map((side, index) => slider(side, sides[index] ?? "0px", (next) => {

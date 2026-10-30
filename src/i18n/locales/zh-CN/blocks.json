@@ -20,8 +20,8 @@
     "description": "水平分割线"
   },
   "spacer": {
-    "title": "间隔",
-    "description": "垂直留白"
+    "title": "留白",
+    "description": "调整内容之间的上下间距"
   },
   "html": {
     "title": "HTML",
