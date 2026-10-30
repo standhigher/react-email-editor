@@ -2,6 +2,19 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.7.1 — 2026-10-30
+
+### Fixes and improvements
+
+- Fix the brief English UI shown when initially selecting a non-English locale. Preserve the editor height in an empty container with `aria-busy` until the language pack is ready, then display the target language directly. English and cached languages display immediately.
+- Show only an error and retry action when the initial language load fails, continuing to wait during retry. Subsequent switches retain the current UI and editing state. Update error messages in all five languages to remove the claim that the current language remains available, which does not apply to an initial failure.
+- Update both API references while retaining on-demand loading, caching, request deduplication, and stale-request protection. Bump the npm package from `0.7.0` to `0.7.1` as a patch; public APIs, persisted document format `4`, and email export remain unchanged.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build, and all 162 Node tests, covering initial waiting, failure and retry, successful display, retaining the UI after subsequent switch failures, caching, rapid switching, unmounting, instance isolation, and unchanged documents and exports. `git diff --check` passes.
+- For this fix, reused Chrome and the existing service on port 5173 with controlled delays and failures to verify no English controls during loading, a preserved 720px container height, direct Chinese display after retry, retained inspector collapse state while French loads, and immediate English and cached Chinese display. Removed temporary verification files and the tab.
+
 ## 0.7.0 — 2026-10-30
 
 ### Added and improved

@@ -3,7 +3,8 @@ import { DEFAULT_TRANSLATION, getLoadedTranslation, loadTranslation, normalizeLo
 
 export function useEditorLocale(input?: string) {
   const locale = normalizeLocale(input);
-  const [current, setCurrent] = useState(() => getLoadedTranslation(locale) ?? DEFAULT_TRANSLATION);
+  const [current, setCurrent] = useState(() => getLoadedTranslation(locale));
+  const translation = getLoadedTranslation(locale) ?? current;
   const [attempt, setAttempt] = useState(0);
   const request = useMemo(() => ({ locale, attempt }), [locale, attempt]);
   const [failure, setFailure] = useState<typeof request | null>(null);
@@ -17,8 +18,9 @@ export function useEditorLocale(input?: string) {
     return () => { cancelled = true; };
   }, [locale, request]);
   return {
-    translation: current,
-    loading: current.locale !== locale && failure !== request,
+    translation: translation ?? DEFAULT_TRANSLATION,
+    ready: translation !== undefined,
+    loading: translation?.locale !== locale && failure !== request,
     failed: failure === request,
     retry: () => setAttempt((value) => value + 1),
   };

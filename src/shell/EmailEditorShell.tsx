@@ -70,13 +70,18 @@ export function EmailEditorShell({ editor, height = "100%" }: EmailEditorProps) 
   };
 
   const showCanvas = () => setViewMode("edit");
+  const localeError = language.failed ? <div className="ree-plugin-error" role="alert">{t("editor.localeError")} <Button onClick={language.retry}>{t("common.retry")}</Button></div> : null;
+
+  if (!language.ready) {
+    return <div className="ree-root" style={{ height }} aria-busy={language.loading}>{localeError}</div>;
+  }
 
   return (
     <EditorLocaleContext.Provider value={language.translation}>
     <EditorConfigContext.Provider value={session.config}>
     <RichTextFocusContext.Provider value={{ active: activeRichText, activate: setActiveRichText }}>
     <div key={session.resetKey} className="ree-root" lang={language.translation.locale} style={{ height }} onKeyDown={handleKeyDown}>
-      {language.failed ? <div className="ree-plugin-error" role="alert">{t("editor.localeError")} <Button onClick={language.retry}>{t("common.retry")}</Button></div> : null}
+      {localeError}
       <SubjectBar
         subject={session.document.subject ?? ""}
         variables={session.variables}

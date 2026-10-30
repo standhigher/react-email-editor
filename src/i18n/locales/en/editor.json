@@ -17,7 +17,7 @@
   "emailSubject": "Email subject",
   "variableHint": "Personalization fields will appear blank if no data is available.",
   "missingPlugin": "Missing block plugin: {{type}}. Original data is preserved.",
-  "localeError": "Unable to load the requested language. The current language is still available.",
+  "localeError": "Unable to load the requested language.",
   "desktopWidth": "Desktop width",
   "mobileWidth": "Mobile width"
 }

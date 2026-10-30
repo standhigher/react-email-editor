@@ -12,6 +12,9 @@ const { createTranslation } = await import("../src/i18n/create-translation.ts");
 const { LOCALE_LOADERS } = await import("../src/i18n/constants.ts");
 const { DEFAULT_TRANSLATION, getLoadedTranslation, loadTranslation, normalizeLocale } = await import("../src/i18n/runtime.ts");
 const { useEditorLocale } = await import("../src/i18n/useEditorLocale.ts");
+const { EmailEditorShell } = await import("../src/shell/EmailEditorShell.tsx");
+const { createEditorStore } = await import("../src/shell/editor-store.ts");
+const { buildEmailEditorConfig } = await import("../src/plugins/config.ts");
 const { EditorLocaleContext } = await import("../src/i18n/context.ts");
 const { localizeDefinition } = await import("../src/i18n/metadata.ts");
 const { BodyControls } = await import("../src/inspector/BodyControls.tsx");
@@ -86,6 +89,49 @@ test("最小翻译函数支持英文回退和原样插值，不递归解析模�
   assert.equal(DEFAULT_TRANSLATION.t("inspector.moveItemUp", { label: "Row", index: 0 }), "Move Row item 0 up");
 });
 
+test("首次语言加载完成前不挂载编辑界面，失败仅显示重试且保留高度", async (t) => {
+  let reject;
+  let resolve;
+  let requests = 0;
+  t.mock.method(LOCALE_LOADERS, "fr", () => {
+    requests++;
+    return new Promise((done, fail) => { resolve = done; reject = fail; });
+  });
+  const changes = [];
+  const store = createEditorStore({ config: buildEmailEditorConfig({ locale: "fr" }), onChange: (document) => changes.push(document) });
+  const original = store.editor.getData();
+  let view;
+  act(() => { view = create(createElement(EmailEditorShell, { editor: store.editor, height: 720 })); });
+  t.after(() => act(() => view.unmount()));
+  const root = () => view.root.findByProps({ className: "ree-root" });
+  assert.equal(root().props.style.height, 720);
+  assert.equal(root().props["aria-busy"], true);
+  assert.equal(view.toJSON().children, null);
+  await act(async () => { reject(new Error("Network unavailable")); });
+  assert.equal(root().props["aria-busy"], false);
+  assert.equal(view.root.findAllByProps({ className: "ree-body" }).length, 0);
+  assert.equal(view.root.findAllByProps({ role: "alert" }).length, 1);
+  act(() => view.root.findByType("button").props.onClick());
+  assert.equal(root().props["aria-busy"], true);
+  assert.equal(view.toJSON().children, null);
+  await act(async () => { resolve(french); });
+  assert.equal(root().props.lang, "fr");
+  assert.equal(view.root.findAllByProps({ className: "ree-body" }).length, 1);
+  assert.equal(view.root.findAllByProps({ role: "alert" }).length, 0);
+  assert.equal(requests, 2);
+  const body = view.root.findByProps({ className: "ree-body" });
+  t.mock.method(LOCALE_LOADERS, "es", () => Promise.reject(new Error("Network unavailable")));
+  await act(async () => {
+    store.updateOptions({ config: buildEmailEditorConfig({ locale: "es" }) });
+    store.flushOptions();
+  });
+  assert.equal(root().props.lang, "fr");
+  assert.equal(view.root.findByProps({ className: "ree-body" }), body);
+  assert.equal(view.root.findByProps({ role: "alert" }).children[0], french.editor.localeError);
+  assert.deepEqual(store.editor.getData(), original);
+  assert.deepEqual(changes, []);
+});
+
 test("异步语言失败可重试，并发去重、快速切换、卸载与实例隔离", async (t) => {
   let resolve;
   let requests = 0;
@@ -99,7 +145,7 @@ test("异步语言失败可重试，并发去重、快速切换、卸载与实�
   function Probe({ locale, receive }) {
     const state = useEditorLocale(locale);
     useLayoutEffect(() => { receive(state); });
-    return createElement("span", null, state.translation.t("common.edit"));
+    return state.ready ? createElement("span", null, state.translation.t("common.edit")) : null;
   }
   const tree = (locale, includeSecond = false) => createElement("div", null,
     createElement(Probe, { locale, receive: (state) => { first = state; } }),
@@ -108,10 +154,12 @@ test("异步语言失败可重试，并发去重、快速切换、卸载与实�
   await act(async () => { renderer = create(tree("zh-CN")); });
   t.after(() => act(() => renderer.unmount()));
   assert.equal(first.failed, true);
+  assert.equal(first.ready, false);
   assert.equal(first.translation.locale, "en");
   await act(async () => { first.retry(); renderer.update(tree("zh-CN", true)); });
   assert.equal(first.failed, false);
   assert.equal(first.loading, true);
+  assert.equal(first.ready, false);
   let unmountedUpdates = 0;
   let transient;
   act(() => { transient = create(createElement(Probe, { locale: "zh-CN", receive: () => { unmountedUpdates++; } })); });
@@ -119,14 +167,21 @@ test("异步语言失败可重试，并发去重、快速切换、卸载与实�
   const updatesBeforeResolution = unmountedUpdates;
   assert.equal(requests, 2);
   assert.equal(loadTranslation("zh-CN"), loadTranslation("zh-CN"));
-  await act(async () => { renderer.update(tree("en", true)); });
+  act(() => {
+    renderer.update(tree("en", true));
+  });
+  assert.equal(first.ready, true);
+  assert.equal(first.loading, false);
+  assert.equal(second.ready, false);
   await act(async () => { resolve(chinese); });
   assert.equal(first.translation.t("common.edit"), "Edit");
   assert.equal(second.translation.t("common.edit"), "编辑");
+  assert.equal(second.ready, true);
   assert.equal(unmountedUpdates, updatesBeforeResolution);
   assert.equal(first.failed, false);
   await act(async () => { renderer.update(tree("zh-CN")); });
   assert.equal(first.translation.t("common.edit"), "编辑");
+  assert.equal(first.loading, false);
   assert.equal(requests, 2);
   assert.equal(await loadTranslation("en"), DEFAULT_TRANSLATION);
 });
