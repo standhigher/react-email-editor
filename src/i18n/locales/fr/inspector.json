@@ -41,5 +41,10 @@
   "lineStyle": "Style de ligne",
   "line": "Ligne",
   "contentWidth": "Largeur du contenu",
-  "blockGap": "Espacement entre les blocs"
+  "blockGap": "Espacement entre les blocs",
+  "expandHtml": "Agrandir l’éditeur HTML",
+  "htmlEditor": "Éditeur HTML",
+  "closeHtmlEditor": "Fermer l’éditeur HTML",
+  "liveHtml": "Les modifications sont appliquées automatiquement. Appuyez sur Échap pour fermer.",
+  "htmlSaved": "Vos modifications sont enregistrées automatiquement."
 }

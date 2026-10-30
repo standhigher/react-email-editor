@@ -41,5 +41,10 @@
   "lineStyle": "线条样式",
   "line": "线条",
   "contentWidth": "内容宽度",
-  "blockGap": "区块间距"
+  "blockGap": "区块间距",
+  "expandHtml": "展开 HTML 编辑器",
+  "htmlEditor": "HTML 编辑器",
+  "closeHtmlEditor": "关闭 HTML 编辑器",
+  "liveHtml": "修改实时生效，按 Esc 关闭。",
+  "htmlSaved": "当前编辑已实时保存"
 }

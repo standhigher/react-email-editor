@@ -42,32 +42,6 @@
   pointer-events: none;
 }
 
-.ree-personalization {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.ree-personalization-btn {
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid var(--ree-border);
-  background: var(--ree-panel);
-  color: var(--ree-text);
-  border-radius: var(--ree-radius);
-  padding: 7px 10px 7px 12px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.ree-personalization-btn:hover {
-  background: var(--ree-panel-secondary);
-}
-
 .ree-subject-hint {
   flex: 0 1 auto;
   margin: 0;

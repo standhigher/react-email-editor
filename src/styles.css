@@ -11,6 +11,7 @@
 @import "./styles/variables.css";
 @import "./styles/inspector.css";
 @import "./styles/inspector-controls.css";
+@import "./styles/html-dialog.css";
 @import "./styles/link-dialog.css";
 @import "./styles/drag.css";
 

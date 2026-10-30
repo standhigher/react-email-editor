@@ -17,5 +17,7 @@
   "emailSubject": "Assunto do e-mail",
   "variableHint": "Os campos de personalização ficam em branco se não houver dados disponíveis.",
   "missingPlugin": "Plugin do bloco em falta: {{type}}. Os dados originais são preservados.",
-  "localeError": "Não foi possível carregar o idioma pedido. O idioma atual continua disponível."
+  "localeError": "Não foi possível carregar o idioma pedido. O idioma atual continua disponível.",
+  "desktopWidth": "Largura de computador",
+  "mobileWidth": "Largura de telemóvel"
 }

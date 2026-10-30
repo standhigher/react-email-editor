@@ -161,6 +161,8 @@ export const coupon = defineBlock({
 | `list` | 推导的行对象数组，默认 `[]` | 必填 `controls: ControlSchema`；递归解析和校验。 |
 | `custom<T>` | 由调用方决定 | 必填 `defaultValue`、纯函数 `read(value: unknown): T` 和 `component`；值应可 JSON 持久化。 |
 
+`html` 控件提供带行号与语法高亮的源码编辑器，右上角可展开为接近全屏的弹窗，展开与收起保留同一编辑会话的光标、选区及撤销/重做历史。弹窗提供个性化变量菜单，按原文在光标处插入变量或替换选区，插入后返回编辑区并支持撤销；没有可用变量时隐藏菜单。修改实时写入文档；点击「完成」、关闭按钮或按 Esc 收起时保留修改，并将焦点返回展开按钮。弹窗内按 Windows/Linux 的 Ctrl+S 或 macOS 的 Command+S 会阻止浏览器另存为，并短暂提示「当前编辑已实时保存」；这里的保存指实时写入编辑器文档，持久化仍由集成方负责。
+
 ### 插件 React 编辑组件
 
 `PluginEditorProps` 提供 `block/controls/style/body/variables` 快照、`selected`、`renderedHtml`、`select()`、`setControl(name, value)`、`setControls(patch)` 和 `setStyle(id, value)`。批量更新浅合并顶层控件，触发一次文档通知；嵌套对象需提交完整新值。`renderedHtml` 在 Canvas 为解析后的内部 HTML，在 Inspector 为空。
@@ -226,6 +228,8 @@ export const coupon = defineBlock({
 | `templateEngine` | 可选 `TemplateEngine`；省略时使用默认基础引擎。外部引擎负责完整语义和 HTML 转义，输出不会被重复转义。 |
 
 数据按顶层浅合并，优先级：节点 `defaultData` > `templateData` > `variables`。默认导出仅给与 `variables[].name` 精确匹配且缺点的 token 补点，并保留空格，例如 `{{ store_name }}` → `{{ .store_name }}`；列表外的 Go template 保持原样。变量 `description` 为空时不显示副文案，`value` 只用于预览。
+
+邮件主题、富文本工具栏、HTML 编辑弹窗和配置区的变量图标共用变量菜单，统一使用蓝色变量名、灰色说明和相同的 hover、键盘焦点及 Esc 关闭交互。
 
 ### 单区块与底层工具
 

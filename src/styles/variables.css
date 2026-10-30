@@ -1,5 +1,38 @@
 /* ---------- 变量 ---------- */
 
+.ree-personalization {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.ree-personalization-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--ree-border);
+  background: var(--ree-panel);
+  color: var(--ree-text);
+  border-radius: var(--ree-radius);
+  padding: 7px 10px 7px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.ree-personalization-btn:hover {
+  background: var(--ree-panel-secondary);
+}
+
+.ree-personalization-compact {
+  height: 28px;
+  padding: 0 6px 0 8px;
+  border-color: transparent;
+  border-radius: var(--ree-radius-sm);
+}
+
 .ree-input-with-variable {
   position: relative;
 }
@@ -55,6 +88,7 @@
   max-height: 240px;
   overflow-y: auto;
   color: var(--ree-text, #202223);
+  font: 400 13px/1.4 var(--ree-font, Arial, sans-serif);
 }
 
 .ree-var-menu.ree-personalization-menu {
@@ -78,16 +112,24 @@
   border-radius: var(--ree-radius-sm);
   cursor: pointer;
   text-align: left;
+  color: var(--ree-text);
+  font: inherit;
 }
 
 .ree-var-item:hover {
   background: var(--ree-panel-secondary);
 }
 
+.ree-var-item:focus-visible {
+  outline: 2px solid var(--ree-text);
+  outline-offset: -2px;
+  background: var(--ree-panel-secondary);
+}
+
 .ree-var-name {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
-  color: var(--ree-primary);
+  color: var(--ree-variable-color, #005bd3);
 }
 
 .ree-var-name,

@@ -17,5 +17,7 @@
   "emailSubject": "邮件主题",
   "variableHint": "没有可用数据时，个性化字段将显示为空。",
   "missingPlugin": "缺少区块插件：{{type}}。原始数据已保留。",
-  "localeError": "无法加载所选语言，当前语言仍可使用。"
+  "localeError": "无法加载所选语言，当前语言仍可使用。",
+  "desktopWidth": "桌面宽度",
+  "mobileWidth": "移动端宽度"
 }

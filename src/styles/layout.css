@@ -29,6 +29,8 @@
 }
 
 .ree-stage-head {
+  position: relative;
+  z-index: 1;
   justify-content: center;
   gap: 12px;
   text-transform: none;
@@ -42,7 +44,7 @@
   align-items: stretch;
   border: 1px solid #c9cccf;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   background: #ffffff;
 }
 
@@ -63,6 +65,19 @@
   font-weight: 550;
   transition: background-color 0.16s ease, color 0.16s ease,
     box-shadow 0.16s ease;
+}
+
+.ree-segment-btn:first-child {
+  border-radius: 7px 0 0 7px;
+}
+
+.ree-segment-btn:last-child {
+  border-radius: 0 7px 7px 0;
+}
+
+.ree-stage-head .ree-btn-tooltip {
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .ree-segment-divider {
@@ -91,6 +106,8 @@
 }
 
 .ree-segment-btn:focus-visible {
+  border: none;
+  padding: 0 10px;
   outline: none;
   box-shadow: inset 0 0 0 2px var(--ree-primary);
 }

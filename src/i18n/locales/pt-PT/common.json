@@ -52,5 +52,6 @@
   "fontWeight": "Espessura da letra",
   "bold": "Negrito",
   "italic": "Itálico",
-  "underline": "Sublinhado"
+  "underline": "Sublinhado",
+  "done": "Concluído"
 }

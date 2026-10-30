@@ -52,5 +52,6 @@
   "fontWeight": "字重",
   "bold": "加粗",
   "italic": "斜体",
-  "underline": "下划线"
+  "underline": "下划线",
+  "done": "完成"
 }

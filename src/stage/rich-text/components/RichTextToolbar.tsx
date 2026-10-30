@@ -19,7 +19,7 @@ import { ToolbarIcon } from "./ToolbarIcon";
 import { ToolbarMenu } from "./ToolbarMenu";
 import { ParagraphMetricMenus } from "./ParagraphMetricMenus";
 import { preserveTemplateSpaces } from "../template-spaces";
-import { VariableMenu } from "./VariableMenu";
+import { PersonalizationMenu } from "../../../components/PersonalizationMenu";
 
 interface RichTextToolbarProps {
   id: string;
@@ -46,6 +46,7 @@ export function RichTextToolbar({
   const rootRef = useAnchoredToolbar(anchorRef, Boolean(state), profile === "button");
   const linkRange = useRef<EditorTextRange | null>(null);
   const colorRange = useRef<EditorTextRange | null>(null);
+  const variableRange = useRef<EditorTextRange | null>(null);
   const [markRange, setMarkRange] = useState<EditorTextRange | null>(null);
   const [menu, setMenu] = useState<RichTextMenu | null>(null);
   const [linkUrl, setLinkUrl] = useState("");
@@ -265,22 +266,16 @@ export function RichTextToolbar({
             onPick={(emoji) => run(() => editor.chain().focus().insertContent(emoji).run())}
           />
         </ToolbarMenu>
-        {variables.length > 0 ? (
-          <ToolbarMenu
-            title={t("editor.personalization")}
-            align="end"
-            open={menu === "variable"}
-            onToggle={() => toggleMenu("variable")}
-            label={t("editor.personalization")}
-          >
-            <VariableMenu
-              variables={variables}
-              onInsert={(token) =>
-                run(() => editor.chain().focus().insertContent(preserveTemplateSpaces(token)).run())
-              }
-            />
-          </ToolbarMenu>
-        ) : null}
+        <PersonalizationMenu
+          compact
+          keyboardScopeRef={anchorRef}
+          variables={variables}
+          onOpen={() => {
+            variableRange.current = currentSelection(editor);
+            setMenu(null);
+          }}
+          onInsert={(token) => run(() => focusSelection(editor, variableRange.current).insertContent(preserveTemplateSpaces(token)).run())}
+        />
       </div>
     </div>
   );

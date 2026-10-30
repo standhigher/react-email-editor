@@ -4,7 +4,6 @@ import { ColorControl } from "../../components/ColorControl";
 import { CheckboxControl } from "../../components/CheckboxControl";
 import { SelectControl } from "../../components/SelectControl";
 import { TextInput } from "../../components/TextInput";
-import { HtmlCodeEditor } from "../HtmlCodeEditor";
 import { PersonalizationMenu } from "../../components/PersonalizationMenu";
 import { safeEmailUrl } from "../../plugins/email-tools";
 import type { ControlRendererProps } from "../ControlRenderer";
@@ -26,7 +25,6 @@ export function BasicControl({ control, value, variables, onChange }: ControlRen
   };
   if (control.kind === "boolean") return <CheckboxControl label={control.label} checked={Boolean(value)} onChange={onChange} />;
   if (control.kind === "color") return <ColorControl label={control.label} value={shown} resetTo={String(control.defaultValue ?? "")} onChange={onChange} />;
-  if (control.kind === "html") return <div className="ree-field"><span className="ree-field-label">{control.label}</span><HtmlCodeEditor value={shown} placeholder={control.placeholder} rows={control.rows} onChange={onChange} /></div>;
   const textual = control.kind === "text" || control.kind === "textarea" || control.kind === "url";
   const hasVariables = textual && variables.length > 0;
   const invalidUrl = control.kind === "url" && shown.trim() && !safeEmailUrl(shown);

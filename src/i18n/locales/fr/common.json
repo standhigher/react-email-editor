@@ -52,5 +52,6 @@
   "fontWeight": "Graisse de police",
   "bold": "Gras",
   "italic": "Italique",
-  "underline": "Souligné"
+  "underline": "Souligné",
+  "done": "Terminé"
 }

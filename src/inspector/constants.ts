@@ -11,3 +11,5 @@ export const SPACING_SIDES = ["common.top", "common.right", "common.bottom", "co
 export const CORNER_SIDES = ["common.topLeft", "common.topRight", "common.bottomRight", "common.bottomLeft"] as const;
 
 export const SPACING_MAX = 120;
+
+export const HTML_SAVE_TOAST_DURATION = 2400;

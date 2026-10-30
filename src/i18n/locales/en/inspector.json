@@ -41,5 +41,10 @@
   "lineStyle": "Line style",
   "line": "Line",
   "contentWidth": "Content width",
-  "blockGap": "Block gap"
+  "blockGap": "Block gap",
+  "expandHtml": "Expand HTML editor",
+  "htmlEditor": "HTML editor",
+  "closeHtmlEditor": "Close HTML editor",
+  "liveHtml": "Changes are applied automatically. Press Esc to close.",
+  "htmlSaved": "Your edits are saved automatically."
 }

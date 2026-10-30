@@ -9,7 +9,7 @@ import {
   syntaxHighlighting,
 } from "@codemirror/language";
 import { parser as htmlParser } from "@lezer/html";
-import { EditorState, type Extension } from "@codemirror/state";
+import { EditorState, Transaction, type Extension } from "@codemirror/state";
 import {
   Decoration,
   EditorView,
@@ -141,7 +141,9 @@ export function createHtmlEditorExtensions(
     keymap.of([...defaultKeymap, ...historyKeymap]),
     placeholderText ? placeholder(placeholderText) : [],
     EditorView.updateListener.of((update) => {
-      if (update.docChanged) onChange(update.state.doc.toString());
+      if (update.transactions.some((transaction) => transaction.docChanged && !transaction.annotation(Transaction.remote))) {
+        onChange(update.state.doc.toString());
+      }
     }),
   ];
 }

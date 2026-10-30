@@ -15,6 +15,7 @@
   --ree-text: #202223;           /* --p-color-text */
   --ree-muted: #6d7175;          /* --p-color-text-subdued */
   --ree-primary: #005bd3;        /* --p-color-bg-fill-brand */
+  --ree-variable-color: var(--ree-primary);
   --ree-primary-hover: #084eb3;
   --ree-primary-fg: #ffffff;
   --ree-primary-soft: #eef4ff;

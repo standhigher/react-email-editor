@@ -12,6 +12,7 @@ export function usePersonalizationMenu(
   menuRef: RefObject<HTMLDivElement>,
   focusOnOpen: RefObject<boolean>,
   setOpen: (open: boolean) => void,
+  keyboardScopeRef?: RefObject<HTMLElement | null>,
 ) {
   const [position, setPosition] = useState<MenuPosition>({ left: 0, top: 0, maxHeight: 240 });
 
@@ -44,7 +45,7 @@ export function usePersonalizationMenu(
     };
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as Node;
-      if (!root.contains(target) && !menu.contains(target)) return;
+      if (!root.contains(target) && !menu.contains(target) && !keyboardScopeRef?.current?.contains(target)) return;
       if (event.key === "Tab" && menu.contains(target)) {
         const buttons = menu.querySelectorAll("button");
         if (target !== (event.shiftKey ? buttons[0] : buttons[buttons.length - 1])) return;
@@ -79,7 +80,7 @@ export function usePersonalizationMenu(
       ownerDocument.removeEventListener("pointerdown", onPointerDown, true);
       ownerDocument.removeEventListener("keydown", onKeyDown, true);
     };
-  }, [open, rootRef, menuRef, focusOnOpen, setOpen]);
+  }, [open, rootRef, menuRef, focusOnOpen, setOpen, keyboardScopeRef]);
 
   return position;
 }

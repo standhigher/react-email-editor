@@ -17,5 +17,7 @@
   "emailSubject": "Objet de l’e-mail",
   "variableHint": "Les champs de personnalisation restent vides si aucune donnée n’est disponible.",
   "missingPlugin": "Plugin de bloc manquant : {{type}}. Les données d’origine sont conservées.",
-  "localeError": "Impossible de charger la langue demandée. La langue actuelle reste disponible."
+  "localeError": "Impossible de charger la langue demandée. La langue actuelle reste disponible.",
+  "desktopWidth": "Largeur ordinateur",
+  "mobileWidth": "Largeur mobile"
 }

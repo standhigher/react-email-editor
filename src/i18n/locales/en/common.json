@@ -52,5 +52,6 @@
   "fontWeight": "Font weight",
   "bold": "Bold",
   "italic": "Italic",
-  "underline": "Underline"
+  "underline": "Underline",
+  "done": "Done"
 }

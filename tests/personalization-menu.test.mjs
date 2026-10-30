@@ -12,6 +12,8 @@ function fixture(t, keyboard = false) {
   const focuses = [];
   const trigger = { focus: () => focuses.push("trigger") };
   const buttons = [0, 1].map((index) => ({ focus: () => focuses.push(index) }));
+  const editor = {};
+  const keyboardScopeRef = { current: { contains: (target) => target === editor } };
   let bounds = { left: 970, right: 1000, top: 300, bottom: 326 };
   let inputBounds = { top: 294, bottom: 332 };
   let shows = 0;
@@ -50,7 +52,7 @@ function fixture(t, keyboard = false) {
   const refs = [{ current: root }, { current: menu }, { current: keyboard }];
   const setOpen = (next) => changes.push(next);
   function Probe({ open }) {
-    const position = usePersonalizationMenu(open, ...refs, setOpen);
+    const position = usePersonalizationMenu(open, ...refs, setOpen, keyboardScopeRef);
     return createElement("output", { position });
   }
   let renderer;
@@ -61,7 +63,7 @@ function fixture(t, keyboard = false) {
     else globalThis.ResizeObserver = previousObserver;
   });
   return {
-    changes, focuses, buttons, trigger, listeners, menu, ownerWindow,
+    changes, focuses, buttons, trigger, editor, listeners, menu, ownerWindow,
     position: () => renderer.root.findByType("output").props.position,
     setBounds: (next, input) => { bounds = next; inputBounds = input; },
     close: () => act(() => renderer.update(createElement(Probe, { open: false }))),
@@ -112,4 +114,15 @@ test("Escape 只关闭当前菜单，外部点击关闭，菜单内部点击不�
   assert.deepEqual(view.key("Escape", view.trigger), { prevented: true, stopped: true });
   act(() => view.listeners.get("pointerdown")({ target: {} }));
   assert.deepEqual(view.changes, [false, false]);
+});
+
+test("鼠标打开变量菜单后，关联编辑区的 Escape 关闭菜单，其它编辑区互不影响", (t) => {
+  const view = fixture(t);
+  assert.deepEqual(view.focuses, []);
+  assert.deepEqual(view.key("Escape", {}), { prevented: false, stopped: false });
+  assert.deepEqual(view.changes, []);
+  assert.deepEqual(view.key("a", view.editor), { prevented: false, stopped: false });
+  assert.deepEqual(view.key("Escape", view.editor), { prevented: true, stopped: true });
+  assert.deepEqual(view.changes, [false]);
+  assert.deepEqual(view.focuses, ["trigger"]);
 });

@@ -1,5 +1,5 @@
 import { useEditorTranslation } from "../../i18n/context";
-import { useId, useMemo, useState, type SyntheticEvent } from "react";
+import { useContext, useId, useMemo, useState, type SyntheticEvent } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cssSpacing } from "../../utils/css-values";
@@ -7,6 +7,7 @@ import { resolveBlockStyle } from "../../document/block-style";
 import { PluginCanvasContent } from "./components/PluginCanvasContent";
 import { BlockErrorBoundary } from "../../plugins/components/BlockErrorBoundary";
 import { BlockActions } from "./components/BlockActions";
+import { RichTextFocusContext } from "../../plugins/editor-context";
 import { canvasBlockStyle } from "./block-style";
 import type { DropEdge } from "../../editor-dnd/drop-target";
 import type { BlockDefinition, Variable } from "../../types/block";
@@ -51,13 +52,24 @@ export function CanvasBlock({
   const block = useMemo(() => ({ ...sourceBlock, style: resolveBlockStyle(sourceBlock.style, definition) }), [sourceBlock, definition]);
   const renderKey = useMemo(() => ({ definition, templateEngine, variables }), [definition, templateEngine, variables]);
   const toolbarId = useId();
+  const richTextFocus = useContext(RichTextFocusContext);
+  const hasActiveToolbar = Boolean(definition?.controls?.some((control) =>
+    control.kind === "richText" && richTextFocus.active === `${toolbarId}-${control.name}`,
+  ));
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const dragData: CanvasDragData = { kind: "canvas" };
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: block.id, data: dragData, disabled: !active });
 
-  const select = (event?: SyntheticEvent) => {
+  const select = (event?: SyntheticEvent<HTMLElement>) => {
     event?.stopPropagation();
+    const target = event?.target;
+    const ownerWindow = event?.currentTarget.ownerDocument.defaultView;
+    // Portal 菜单属于 React 子树，但不是画布区块的 DOM 内容。
+    if (ownerWindow && target instanceof ownerWindow.Node && !event?.currentTarget.contains(target)) return;
+    if (ownerWindow && target instanceof ownerWindow.Element && !target.closest(".ree-rte")) {
+      richTextFocus.activate(null);
+    }
     onSelect();
   };
   return (
@@ -100,7 +112,7 @@ export function CanvasBlock({
 
       {selected ? (
         <BlockActions
-          inlineEdit={Boolean(definition?.controls?.some((control) => control.kind === "richText"))}
+          hasActiveToolbar={hasActiveToolbar}
           toolbarId={toolbarId}
           toolbarCollapsed={toolbarCollapsed}
           onToggleToolbar={() => setToolbarCollapsed((collapsed) => !collapsed)}

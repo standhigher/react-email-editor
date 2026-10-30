@@ -2,7 +2,7 @@ import { useEditorTranslation } from "../../../i18n/context";
 import { useId } from "react";
 
 interface BlockActionsProps {
-  inlineEdit: boolean;
+  hasActiveToolbar: boolean;
   toolbarId: string;
   toolbarCollapsed: boolean;
   onToggleToolbar: () => void;
@@ -11,7 +11,7 @@ interface BlockActionsProps {
 }
 
 export function BlockActions({
-  inlineEdit,
+  hasActiveToolbar,
   toolbarId,
   toolbarCollapsed,
   onToggleToolbar,
@@ -62,7 +62,7 @@ export function BlockActions({
         </svg>
         <span id={`${tooltipId}-delete`} className="ree-block-tooltip" role="tooltip">{t("common.delete")}</span>
       </button>
-      {inlineEdit ? (
+      {hasActiveToolbar ? (
         <button
           type="button"
           className="ree-block-btn"

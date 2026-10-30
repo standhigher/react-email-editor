@@ -1,0 +1,148 @@
+.ree-html-expand .ree-btn-tooltip {
+  right: 0;
+  left: auto;
+}
+
+.ree-html-dialog {
+  position: fixed;
+  inset: 0;
+  width: calc(100vw - 48px);
+  height: calc(100dvh - 48px);
+  max-width: 1440px;
+  max-height: none;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--ree-border);
+  border-radius: var(--ree-radius-lg);
+  background: var(--ree-panel);
+  color: var(--ree-text);
+  box-shadow: var(--ree-shadow-lg);
+  font: 400 14px/1.5 var(--ree-font);
+}
+
+.ree-html-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.ree-html-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.ree-html-dialog-header,
+.ree-html-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 16px;
+  padding: 16px 24px;
+}
+
+.ree-html-dialog-header {
+  border-bottom: 1px solid var(--ree-border);
+  flex-wrap: wrap;
+}
+
+.ree-html-dialog-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.ree-html-dialog-header h2 {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.ree-html-dialog-header h2 span {
+  color: var(--ree-muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.ree-html-dialog-header .ree-btn-tooltip {
+  right: 0;
+  left: auto;
+}
+
+.ree-html-dialog-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding: 16px 24px;
+}
+
+.ree-html-dialog-content .ree-html-editor {
+  width: 100%;
+  min-height: 0;
+}
+
+.ree-html-dialog-content .cm-editor {
+  height: 100%;
+  max-height: none;
+}
+
+.ree-html-dialog-content .cm-scroller {
+  min-height: 0;
+  max-height: none;
+}
+
+.ree-html-dialog-footer {
+  border-top: 1px solid var(--ree-border);
+}
+
+.ree-html-dialog-footer p {
+  margin: 0;
+  color: var(--ree-muted);
+  font-size: 13px;
+}
+
+.ree-html-save-status {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  z-index: 1;
+  max-width: calc(100% - 32px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.ree-html-save-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--ree-radius-sm);
+  background: var(--ree-text);
+  color: var(--ree-panel);
+  box-shadow: var(--ree-shadow-md);
+  font-size: 13px;
+}
+
+.ree-html-save-toast svg {
+  flex-shrink: 0;
+}
+
+@media (width < 600px) {
+  .ree-html-dialog {
+    width: calc(100vw - 16px);
+    height: calc(100dvh - 16px);
+  }
+
+  .ree-html-dialog-header,
+  .ree-html-dialog-footer,
+  .ree-html-dialog-content {
+    padding: 12px;
+  }
+}

@@ -1,5 +1,5 @@
 import { useEditorTranslation } from "../i18n/context";
-import { useId, useRef, useState } from "react";
+import { useId, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import type { Variable } from "../types/block";
 import { usePersonalizationMenu } from "./usePersonalizationMenu";
@@ -8,12 +8,18 @@ interface PersonalizationMenuProps {
   variables: Variable[];
   onInsert: (name: string) => void;
   suffix?: boolean;
+  compact?: boolean;
+  onOpen?: () => void;
+  keyboardScopeRef?: RefObject<HTMLElement | null>;
 }
 
 export function PersonalizationMenu({
   variables,
   onInsert,
   suffix = false,
+  compact = false,
+  onOpen,
+  keyboardScopeRef,
 }: PersonalizationMenuProps) {
   const t = useEditorTranslation();
   const [open, setOpen] = useState(false);
@@ -22,7 +28,7 @@ export function PersonalizationMenu({
   const rootRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const focusOnOpen = useRef(false);
-  const position = usePersonalizationMenu(open && variables.length > 0, rootRef, menuRef, focusOnOpen, setOpen);
+  const position = usePersonalizationMenu(open && variables.length > 0, rootRef, menuRef, focusOnOpen, setOpen, keyboardScopeRef);
 
   if (variables.length === 0) return null;
 
@@ -30,15 +36,16 @@ export function PersonalizationMenu({
     <div className={suffix ? "ree-personalization ree-personalization-suffix" : "ree-personalization"} ref={rootRef}>
       <button
         type="button"
-        className={suffix ? "ree-personalization-suffix-btn" : "ree-personalization-btn"}
+        className={suffix ? "ree-personalization-suffix-btn" : `ree-personalization-btn${compact ? " ree-personalization-compact" : ""}`}
         aria-label={suffix ? t("editor.insertVariable") : undefined}
         title={suffix ? t("editor.personalization") : undefined}
         aria-expanded={open}
         aria-controls={open ? id : undefined}
         onClick={(event) => {
+          if (!open) onOpen?.();
           focusOnOpen.current = event.detail === 0;
           const root = rootRef.current;
-          if (root) setHost(root.closest<HTMLElement>(".ree-root") ?? root.ownerDocument.body);
+          if (root) setHost(root.closest<HTMLElement>(".ree-html-dialog, .ree-root, .ree-rte-toolbar") ?? root.ownerDocument.body);
           setOpen((current) => !current);
         }}
         onKeyDown={(event) => {

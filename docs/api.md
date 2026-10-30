@@ -161,6 +161,8 @@ Each factory takes an options object and returns `ControlDefinition<T>`. Common 
 | `list` | Inferred row array, default [] | Required `controls: ControlSchema`; recursive parsing and validation. |
 | `custom<T>` | Application-defined | Required defaultValue, pure `read(value: unknown): T`, and component; values must be JSON-persistable. |
 
+The `html` control provides a source editor with line numbers and syntax highlighting. Its upper-right button opens a nearly full-screen dialog while preserving the same editing session, cursor, selection, and undo/redo history across opening and closing. The dialog’s personalization menu inserts the original variable token at the cursor or replaces the selection, returns focus to the editor, and supports undo. The menu is hidden when no variables are available. Changes update the document immediately; Done, the close button, and Esc keep changes and return focus to the expand button. Inside the dialog, Ctrl+S on Windows/Linux or Command+S on macOS prevents the browser Save As action and briefly confirms that edits are saved automatically. Saving here means updating the editor document; persistence remains the integrator’s responsibility.
+
 ### Plugin React components
 
 `PluginEditorProps` provides `block/controls/style/body/variables` snapshots, selected, renderedHtml, select(), setControl(name, value), setControls(patch), and setStyle(id, value). Batch control updates shallow-merge once and notify once; replace nested objects entirely. renderedHtml contains resolved inner HTML in Canvas and is empty in Inspector.
@@ -226,6 +228,8 @@ The required document must use v4. Definitions default to DEFAULT_BLOCKS; for cu
 | templateEngine | Optional TemplateEngine; defaults to the basic engine. |
 
 Data is shallow-merged at the top level: node defaultData > templateData > variables. Default export only adds missing dots to tokens exactly matching variables[].name, preserving spaces: `{{ store_name }}` → `{{ .store_name }}`. Unlisted Go templates stay unchanged. Empty variable descriptions are hidden; value is only preview data.
+
+The subject, rich-text toolbar, HTML editor dialog, and inspector variable icons share one variable menu with blue variable names, gray descriptions, and consistent hover, keyboard focus, and Esc dismissal.
 
 ### Single-block and low-level helpers
 

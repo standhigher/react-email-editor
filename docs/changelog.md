@@ -2,6 +2,21 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.7.0 — 2026-10-30
+
+### Added and improved
+
+- Add a nearly full-screen native dialog to HTML controls, with line numbers, syntax highlighting, variable insertion, responsive sizing, and focus restoration after closing. Edits immediately update the editor document. Ctrl+S or Command+S prevents browser Save As and briefly confirms automatic updates; integrators remain responsible for persistence.
+- Preserve the same CodeMirror session, cursor, selection, and undo/redo history when opening and closing the dialog. External value synchronization does not create local undo entries.
+- Share the personalization menu across the subject bar, rich-text toolbar, inspector, and HTML dialog, with consistent variable names, descriptions, hover, and keyboard focus. Fix Esc dismissal when focus remains in the associated rich-text editor, preserving isolation from other editors. Keep menu portals within the nearest editor or HTML-dialog theme container, including consumer-native-dialog embedding.
+- Show the canvas toolbar toggle only when a rich-text toolbar is active, preserve block selection during portal-menu interactions, and use shared tooltips for editing/preview and device controls. Add corresponding UI text in all five languages and update both API references.
+- Rewrite `AGENTS.md` in English while explicitly requiring Chinese user responses and retaining the project collaboration rules. Bump the npm package from `0.6.0` to `0.7.0` for backward-compatible editor capabilities. Public APIs, persisted document format `4`, and email export remain unchanged.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build, and all 161 Node tests, including dialog shortcut handling, timer cleanup, editing-session reuse, associated-editor Esc dismissal, and isolation from other editors. `git diff --check` passes.
+- Reused Chrome and the existing preview service to verify variable insertion, undo/redo across dialog transitions, selection retention, focus restoration, Command+S feedback, Esc handling, theme inheritance inside consumer-native-dialog embedding, hover and keyboard focus, and desktop/390×700 layouts. Restored the original page state and removed temporary probes.
+
 ## 0.6.0 — 2026-10-30
 
 ### Added and improved

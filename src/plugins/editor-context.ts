@@ -11,7 +11,7 @@ export interface PluginEditingContext extends PluginEditorProps {
 
 export interface RichTextFocus {
   active: string | null;
-  activate: (id: string) => void;
+  activate: (id: string | null) => void;
 }
 
 export const RichTextFocusContext = createContext<RichTextFocus>({ active: null, activate: () => {} });

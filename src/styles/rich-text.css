@@ -217,10 +217,6 @@
   background: var(--ree-panel-secondary);
 }
 
-.ree-rte-variables {
-  min-width: 220px;
-}
-
 .ree-rte .ProseMirror {
   outline: none;
   display: flow-root;
