@@ -1,0 +1,9 @@
+{
+  "preparing": "A preparar a pré-visualização…",
+  "html": "Pré-visualização do bloco HTML",
+  "timeout": "A pré-visualização do e-mail excedeu o tempo limite. Tente novamente.",
+  "measureFailed": "Não foi possível medir a pré-visualização do e-mail. Tente novamente.",
+  "invalidHeight": "A pré-visualização do e-mail devolveu uma altura inválida. Tente novamente.",
+  "loadFailed": "Não foi possível carregar a pré-visualização do e-mail. Tente novamente.",
+  "title": "Pré-visualização do e-mail"
+}

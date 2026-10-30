@@ -1,0 +1,9 @@
+{
+  "preparing": "Preparing preview…",
+  "html": "HTML block preview",
+  "timeout": "Email preview timed out. Please retry.",
+  "measureFailed": "Email preview could not be measured. Please retry.",
+  "invalidHeight": "Email preview returned an invalid height. Please retry.",
+  "loadFailed": "Email preview could not be loaded. Please retry.",
+  "title": "Email preview"
+}

@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import { useId } from "react";
 import { cornerRadii, cssLength, formatCssLength, readCssLength } from "../utils/css-values";
 import { CORNER_SIDES } from "./constants";
@@ -28,7 +29,8 @@ function lengthUnits(config: StyleControlConfig): string[] {
   return [];
 }
 
-export function StyleControl({ config, value, fallback, resetLabel = "Reset", resetTo, showReset, onChange }: StyleControlProps) {
+export function StyleControl({ config, value, fallback, resetLabel, resetTo, showReset, onChange }: StyleControlProps) {
+  const t = useEditorTranslation();
   const id = useId();
   const units = lengthUnits(config);
   const stored = value === "auto" && units.length > 0 && !units.includes("auto") ? "" : value;
@@ -38,7 +40,7 @@ export function StyleControl({ config, value, fallback, resetLabel = "Reset", re
   const options = config.options ?? [];
   const selectOptions = actual && !options.some((option) => option.value === actual)
     ? [{ label: actual, value: actual }, ...options] : options;
-  const reset = (showReset ?? Boolean(value)) ? <ResetButton label={resetLabel} onClick={() => onChange(resetTo ?? "")} /> : null;
+  const reset = (showReset ?? Boolean(value)) ? <ResetButton label={resetLabel ?? t("common.reset")} onClick={() => onChange(resetTo ?? "")} /> : null;
 
   if (config.control === "color") {
     return (
@@ -89,9 +91,9 @@ export function StyleControl({ config, value, fallback, resetLabel = "Reset", re
           label={config.label}
           value={actual}
           max={config.max ?? 48}
-          sides={CORNER_SIDES}
-          linkLabel="Link corners"
-          uniformLabel="All corners"
+          sides={CORNER_SIDES.map((key) => t(key))}
+          linkLabel={t("inspector.linkCorners")}
+          uniformLabel={t("inspector.allCorners")}
           expand={cornerRadii}
           onChange={onChange}
         />

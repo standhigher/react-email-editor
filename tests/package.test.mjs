@@ -28,7 +28,7 @@ test("发布包包含所有入口、类型和文档，排除开发文件与 PNG 
     "docs/assets/architecture.svg", "docs/assets/architecture.zh-CN.svg",
   ]) assert.ok(files.has(path.replace(/^\.\//, "")), path);
   for (const path of files) {
-    assert.match(path, /^(?:dist\/(?:index\.js|index\.d\.ts|styles\.css)|docs\/.+\.(?:md|svg)|package\.json|LICENSE|README(?:\.zh-CN)?\.md)$/);
+    assert.match(path, /^(?:dist\/(?:index\.js|index\.d\.ts|styles\.css|chunk-[A-Z0-9]+\.js|(?:zh-CN|es|pt-PT|fr)-[A-Z0-9]+\.js)|docs\/.+\.(?:md|svg)|package\.json|LICENSE|README(?:\.zh-CN)?\.md)$/);
   }
   assert.equal(packed.bundled.length, 0);
 });
@@ -92,4 +92,31 @@ test("消费方可移除未使用的包导入，同时保留显式导入的编�
   assert.ok(javascript.length < 1000, "未使用的编辑器及依赖应被移除");
   assert.match(css, /\.ree-root\s*\{/);
   assert.match(css, /\.ree-btn\s*\{/);
+});
+
+test("消费方实际打包保留四种动态语言块，默认入口不内联语言包或依赖 i18next", async () => {
+  assert.equal(manifest.dependencies.i18next, undefined);
+  assert.equal(manifest.peerDependencies.i18next, undefined);
+  const result = await build({
+    root, configFile: false, logLevel: "error",
+    plugins: [{
+      name: "locale-consumer",
+      resolveId(id) { if (id === "virtual:locale-consumer") return "\0locale-consumer"; },
+      load(id) {
+        if (id === "\0locale-consumer") return `
+          import { EmailEditor, useEmailEditor, useEmailEditorConfig } from "@standhigher/react-email-editor";
+          console.log({ EmailEditor, useEmailEditor, useEmailEditorConfig });
+        `;
+      },
+    }],
+    build: { write: false, minify: false, rolldownOptions: { input: "virtual:locale-consumer", external: ["react", "react-dom", "react/jsx-runtime"] } },
+  });
+  const chunks = result.output.filter((file) => file.type === "chunk");
+  const entry = chunks.find((file) => file.isEntry);
+  for (const marker of ["邮件主题", "Asunto del correo", "Assunto do e-mail", "Objet de l’e-mail"]) {
+    const language = chunks.find((file) => file.code.includes(marker));
+    assert.ok(language && !language.isEntry, marker);
+    assert.ok(entry.dynamicImports.includes(language.fileName), marker);
+    assert.ok(!entry.code.includes(marker), marker);
+  }
 });

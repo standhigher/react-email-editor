@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import { TEXT_ALIGN_OPTIONS } from "../constants";
 
 interface AlignControlProps {
@@ -6,6 +7,7 @@ interface AlignControlProps {
 }
 
 export function AlignControl({ value, onChange }: AlignControlProps) {
+  const t = useEditorTranslation();
   return (
     <div className="ree-align-row">
       {TEXT_ALIGN_OPTIONS.map((option) => (
@@ -14,8 +16,8 @@ export function AlignControl({ value, onChange }: AlignControlProps) {
           type="button"
           className={`ree-align-btn${value === option.value ? " is-active" : ""}`}
           onClick={() => onChange(option.value)}
-          title={option.label}
-          aria-label={option.label}
+          title={t(option.labelKey)}
+          aria-label={t(option.labelKey)}
           aria-pressed={value === option.value}
         >
           {option.glyph}

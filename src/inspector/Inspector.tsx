@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import { BlockErrorBoundary } from "../plugins/components/BlockErrorBoundary";
 import { BodyControls } from "./BodyControls";
 import { InspectorControls } from "./InspectorControls";
@@ -31,19 +32,20 @@ export function Inspector({
   onCommitControls,
   onCommitStyle,
 }: InspectorProps) {
+  const t = useEditorTranslation();
   const showBlock = panel === "block" && block && definition;
 
   return (
     <aside className="ree-col ree-col-right">
       <div className="ree-col-head ree-inspector-bar">
-        <div className="ree-inspector-tabs" role="group" aria-label="Inspector panel">
+        <div className="ree-inspector-tabs" role="group" aria-label={t("inspector.title")}>
           <button
             type="button"
             className={`ree-inspector-tab${panel === "body" ? " is-active" : ""}`}
             aria-pressed={panel === "body"}
             onClick={() => onPanelChange("body")}
           >
-            BODY
+            {t("inspector.body")}
           </button>
           {block && definition ? (
             <button
@@ -52,7 +54,7 @@ export function Inspector({
               aria-pressed={Boolean(showBlock)}
               onClick={() => onPanelChange("block")}
             >
-              BLOCK
+              {t("inspector.block")}
             </button>
           ) : null}
         </div>

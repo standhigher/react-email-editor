@@ -1,0 +1,21 @@
+{
+  "insertVariable": "Insert variable",
+  "personalization": "Personalization",
+  "editorMode": "Editor mode",
+  "canvasDevice": "Canvas device",
+  "empty": "Drag a block here or click one to get started",
+  "dragToReorder": "Drag to reorder",
+  "expandToolbar": "Expand Toolbar",
+  "collapseToolbar": "Collapse Toolbar",
+  "blockActions": "Block actions",
+  "selectBlock": "Select block",
+  "placeholder": "Type something…",
+  "loading": "Loading editor…",
+  "blocks": "Blocks",
+  "expandBlocks": "Expand blocks sidebar",
+  "collapseBlocks": "Collapse blocks sidebar",
+  "emailSubject": "Email subject",
+  "variableHint": "Personalization fields will appear blank if no data is available.",
+  "missingPlugin": "Missing block plugin: {{type}}. Original data is preserved.",
+  "localeError": "Unable to load the requested language. The current language is still available."
+}

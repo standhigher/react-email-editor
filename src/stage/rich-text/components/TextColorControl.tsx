@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import { ColorPicker } from "../../../components/ColorPicker";
 import { useColorPicker } from "../../../components/color-picker/useColorPicker";
 import { ToolbarButton } from "./ToolbarButton";
@@ -11,12 +12,13 @@ interface TextColorControlProps {
 }
 
 export function TextColorControl({ value, fallback, onOpen, onChange, onReset }: TextColorControlProps) {
+  const t = useEditorTranslation();
   const { id, open, anchorRef, panelRef, toggle, close } = useColorPicker(onOpen);
 
   return (
     <div className="ree-rte-pop" ref={anchorRef}>
       <ToolbarButton
-        title="Text color"
+        title={t("common.textColor")}
         expanded={open}
         controls={open ? id : undefined}
         onClick={toggle}
@@ -25,7 +27,7 @@ export function TextColorControl({ value, fallback, onOpen, onChange, onReset }:
           A
         </span>
       </ToolbarButton>
-      {open ? <ColorPicker id={id} label="Text color" value={value} fallback={fallback} panelRef={panelRef} onChange={onChange} onReset={onReset} onClose={close} /> : null}
+      {open ? <ColorPicker id={id} label={t("common.textColor")} value={value} fallback={fallback} panelRef={panelRef} onChange={onChange} onReset={onReset} onClose={close} /> : null}
     </div>
   );
 }

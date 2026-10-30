@@ -42,6 +42,7 @@ src/
   block-library/        可拖拽区块库
   editor-dnd/           拖拽上下文和拖拽数据
   inspector/            主体/区块字段、样式控制器及检查器组件
+  i18n/                 内部语言资源、按需加载与实例界面翻译
   blocks/               内置区块定义、字段配置、图标和注册表
   plugins/              插件声明、字段工厂、统一配置、邮件工具及 React 编辑扩展
   document/             文档/区块创建、默认值、注册表和 mutations
@@ -107,6 +108,8 @@ tests/
 - 新增区块必须完整考虑：定义、字段、默认字段、默认样式、注册表、画布展示、邮件输出、模板数据和测试；不得只让画布能显示而邮件导出缺失。
 
 ## React 与 UI
+
+- 内部多语言资源放在 `src/i18n/locales/<locale>/`，按职责拆成 JSON（如 `common.json`、`toolbar.json`、`inspector.json`）。使用简短语义 key（如 `common.save`、`preview.timeout`），通用术语复用，不把英文整句或重复的区块/控件结构作为 key。英文资源推导 key 类型，各语言保持相同结构及插值参数；语言入口负责聚合 JSON，非默认语言仍按语言整体动态加载。内置展示元数据通过稳定 id 映射到 key，自定义区块文案由集成者管理。 翻译运行时只用内部最小函数完成查找、英文回退和简单插值，不引入第三方多语言依赖；支持 `en`（默认）、`zh-CN`、`es`、`pt-PT`、`fr`，其余 locale 回退英文。
 
 - 基础控件统一复用 `src/components/` 的 `TextInput`、`SelectControl`、`CheckboxControl`、`ColorControl`、`RangeControl` 和 `Button`；同外观、同交互的控件不得在业务模块重复实现。尺寸差异通过共享组件明确的 variant/compact 参数表达；工具栏菜单、图标按钮等已有专用封装继续按其职责复用。基础样式集中于 `src/styles/form-controls.css` 和 `src/styles/buttons.css`，聚焦使用无外围间距的黑色 border，业务样式只负责布局。
 - 这是一个无 UI 框架的组件库，不要引入 Tailwind、CSS-in-JS 或新的组件库来替代现有 CSS 体系。静态编辑器布局、间距、状态、响应式规则写入 `src/styles/`；运行时动态值可按现有模式使用 CSS 变量或内联样式。

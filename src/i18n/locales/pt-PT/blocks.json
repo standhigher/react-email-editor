@@ -1,0 +1,31 @@
+{
+  "heading": {
+    "title": "Título",
+    "description": "Título de secção em destaque"
+  },
+  "text": {
+    "title": "Texto",
+    "description": "Parágrafo de texto"
+  },
+  "button": {
+    "title": "Botão",
+    "description": "Botão de chamada para ação"
+  },
+  "image": {
+    "title": "Imagem",
+    "description": "Inserir uma imagem"
+  },
+  "divider": {
+    "title": "Separador",
+    "description": "Linha divisória horizontal"
+  },
+  "spacer": {
+    "title": "Espaçador",
+    "description": "Espaço vertical em branco"
+  },
+  "html": {
+    "title": "HTML",
+    "description": "Colar HTML em bruto",
+    "placeholder": "Cole HTML em bruto…"
+  }
+}

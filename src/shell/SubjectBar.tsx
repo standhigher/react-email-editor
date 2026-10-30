@@ -1,7 +1,7 @@
+import { useEditorTranslation } from "../i18n/context";
 import { useId, useRef } from "react";
 import { TextInput } from "../components/TextInput";
 import { SUBJECT_MAX_LENGTH } from "../constants/editor";
-import { PERSONALIZATION_HINT } from "./constants";
 import { PersonalizationMenu } from "../components/PersonalizationMenu";
 import type { Variable } from "../types/block";
 
@@ -16,6 +16,7 @@ export function SubjectBar({
   variables,
   onSubjectChange,
 }: SubjectBarProps) {
+  const t = useEditorTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const subjectId = useId();
   const countId = useId();
@@ -39,7 +40,7 @@ export function SubjectBar({
   return (
     <div className="ree-subject-bar">
       <label className="ree-subject-label" htmlFor={subjectId}>
-        Email subject
+        {t("editor.emailSubject")}
       </label>
       <div className="ree-subject-field">
         <TextInput
@@ -58,7 +59,7 @@ export function SubjectBar({
       {variables.length > 0 ? (
         <>
           <PersonalizationMenu variables={variables} onInsert={insertVariable} />
-          <p className="ree-subject-hint">{PERSONALIZATION_HINT}</p>
+          <p className="ree-subject-hint">{t("editor.variableHint")}</p>
         </>
       ) : null}
     </div>

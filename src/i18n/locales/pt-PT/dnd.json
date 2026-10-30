@@ -1,0 +1,8 @@
+{
+  "instructions": "Para pegar num item arrastável, prima a barra de espaços. Ao arrastar, use as setas para mover o item. Prima novamente a barra de espaços para largar ou Escape para cancelar.",
+  "start": "Pegou no item arrastável {{id}}.",
+  "over": "O item arrastável {{id}} foi movido sobre a área de destino {{over}}.",
+  "outside": "O item arrastável {{id}} já não está sobre uma área de destino.",
+  "end": "O item arrastável {{id}} foi largado na área de destino {{over}}.",
+  "cancel": "O arrastamento foi cancelado. O item {{id}} foi largado."
+}

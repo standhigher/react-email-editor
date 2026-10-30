@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import type { Editor } from "@tiptap/react";
 import { readCssLength } from "../../../utils/css-values";
 import { focusSelection } from "../formatting";
@@ -18,6 +19,7 @@ interface ListControlsProps {
 }
 
 export function ListControls({ editor, state, menu, range, inherited, onToggle }: ListControlsProps) {
+  const t = useEditorTranslation();
   const listType = state.orderedList ? "orderedList" : "bulletList";
   const spacing = state.listSpacing || inherited.listSpacing || "4px";
   const indent = state.listIndent || inherited.listIndent || "22px";
@@ -25,25 +27,25 @@ export function ListControls({ editor, state, menu, range, inherited, onToggle }
     focusSelection(editor, range).updateAttributes(listType, { [key]: value }).run();
   };
   return (
-    <div className="ree-rte-group" role="group" aria-label="Lists">
+    <div className="ree-rte-group" role="group" aria-label={t("toolbar.lists")}>
       <ToolbarButton
-        title="Bulleted list"
+        title={t("toolbar.bulletedList")}
         active={state.bulletList}
         onClick={() => toggleTextList(editor, "bulletList")}
       >
         <ToolbarIcon name="list-bullet" />
       </ToolbarButton>
       <ToolbarButton
-        title="Numbered list"
+        title={t("toolbar.numberedList")}
         active={state.orderedList}
         onClick={() => toggleTextList(editor, "orderedList")}
       >
         <ToolbarIcon name="list-ordered" />
       </ToolbarButton>
       {state.bulletList || state.orderedList ? (
-        <ToolbarMenu title="List settings" label="List" open={menu === "list"} onToggle={() => onToggle("list")}>
+        <ToolbarMenu title={t("toolbar.listSettings")} label={t("toolbar.list")} open={menu === "list"} onToggle={() => onToggle("list")}>
           <MetricSlider
-            label="List spacing"
+            label={t("toolbar.listSpacing")}
             value={readCssLength(spacing).amount}
             min={0}
             max={48}
@@ -54,7 +56,7 @@ export function ListControls({ editor, state, menu, range, inherited, onToggle }
             onReset={() => update("listSpacing", null)}
           />
           <MetricSlider
-            label="List indent"
+            label={t("toolbar.listIndent")}
             value={readCssLength(indent).amount}
             min={0}
             max={64}

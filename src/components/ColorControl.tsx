@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import { ColorPicker } from "./ColorPicker";
 import { colorToHex } from "./color-picker/colors";
 import { useColorPicker } from "./color-picker/useColorPicker";
@@ -16,7 +17,9 @@ interface ColorControlProps {
   onChange: (value: string) => void;
 }
 
-export function ColorControl({ value, fallback = "#000000", label = "Color", resetTo = fallback, onChange }: ColorControlProps) {
+export function ColorControl({ value, fallback = "#000000", label: inputLabel, resetTo = fallback, onChange }: ColorControlProps) {
+  const t = useEditorTranslation();
+  const label = inputLabel ?? t("common.color");
   const { id, open, anchorRef, panelRef, toggle, close } = useColorPicker();
   const actual = value || fallback;
   const normalized = colorToHex(actual);

@@ -1,0 +1,8 @@
+{
+  "instructions": "To pick up a draggable item, press the space bar. While dragging, use the arrow keys to move the item. Press space again to drop the item, or press escape to cancel.",
+  "start": "Picked up draggable item {{id}}.",
+  "over": "Draggable item {{id}} was moved over droppable area {{over}}.",
+  "outside": "Draggable item {{id}} is no longer over a droppable area.",
+  "end": "Draggable item {{id}} was dropped over droppable area {{over}}.",
+  "cancel": "Dragging was cancelled. Draggable item {{id}} was dropped."
+}

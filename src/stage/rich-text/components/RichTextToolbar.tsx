@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { isAllowedUri } from "@tiptap/extension-link";
 import { DEFAULT_TYPOGRAPHY } from "../../../constants/typography";
@@ -37,6 +38,7 @@ export function RichTextToolbar({
   anchorRef,
   inherited,
 }: RichTextToolbarProps) {
+  const t = useEditorTranslation();
   const state = useEditorState({
     editor,
     selector: ({ editor: current }) => (current ? readToolbarState(current) : null),
@@ -176,11 +178,11 @@ export function RichTextToolbar({
         />
       </TextFormatControls>
       {profile !== "button" ? (
-        <div className="ree-rte-group" role="group" aria-label="Paragraph">
+        <div className="ree-rte-group" role="group" aria-label={t("toolbar.paragraph")}>
           {TEXT_ALIGNS.filter((align) => profile === "text" || align.value !== "justify").map((align) => (
             <ToolbarButton
               key={align.value}
-              title={align.title}
+              title={t(align.titleKey)}
               active={state.align === align.value}
               onClick={() => formatText(editor, (chain) => chain.toggleTextAlign(align.value), null, "paragraph")}
             >
@@ -219,9 +221,9 @@ export function RichTextToolbar({
         />
       ) : null}
       {profile !== "button" ? (
-        <div className="ree-rte-group" role="group" aria-label="Links">
+        <div className="ree-rte-group" role="group" aria-label={t("toolbar.links")}>
           <ToolbarButton
-            title="Link"
+            title={t("common.link")}
             active={Boolean(state.linkHref)}
             onClick={() => toggleMenu("link")}
           >
@@ -244,14 +246,14 @@ export function RichTextToolbar({
               onClose={() => setMenu(null)}
             />
           ) : null}
-          <ToolbarButton title="Unlink" disabled={!state.linkHref} onClick={unlinkSelection}>
+          <ToolbarButton title={t("toolbar.unlink")} disabled={!state.linkHref} onClick={unlinkSelection}>
             <ToolbarIcon name="unlink" />
           </ToolbarButton>
         </div>
       ) : null}
-      <div className="ree-rte-group" role="group" aria-label="Insert">
+      <div className="ree-rte-group" role="group" aria-label={t("common.insert")}>
         <ToolbarMenu
-          title="Emoji"
+          title={t("toolbar.emoji")}
           variant="icon"
           caret={false}
           align="end"
@@ -265,11 +267,11 @@ export function RichTextToolbar({
         </ToolbarMenu>
         {variables.length > 0 ? (
           <ToolbarMenu
-            title="Personalization"
+            title={t("editor.personalization")}
             align="end"
             open={menu === "variable"}
             onToggle={() => toggleMenu("variable")}
-            label="Personalization"
+            label={t("editor.personalization")}
           >
             <VariableMenu
               variables={variables}

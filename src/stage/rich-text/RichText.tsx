@@ -1,12 +1,14 @@
 "use client";
 
+import { useEditorTranslation } from "../../i18n/context";
+
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { DEFAULT_TYPOGRAPHY } from "../../constants/typography";
 import type { RichTextProfile, Variable } from "../../types/block";
 import { RichTextToolbar } from "./components/RichTextToolbar";
-import { createRichTextExtensions } from "./extensions";
+import { createRichTextExtensions, createRichTextPlaceholder } from "./extensions";
 import { preserveTemplateSpaces, restoreTemplateSpaces } from "./template-spaces";
 import type { RichTextInheritedStyle } from "./types";
 
@@ -48,14 +50,23 @@ export function RichText({
   onCommit,
   onSelect,
 }: RichTextProps) {
+  const t = useEditorTranslation();
+  const hint = placeholder ?? t("editor.placeholder");
+  const [placeholderController] = useState(() => createRichTextPlaceholder(hint));
   const rootRef = useRef<HTMLDivElement>(null);
   const [host, setHost] = useState<HTMLElement | null>(null);
   const editor = useEditor({
-    extensions: createRichTextExtensions(placeholder ?? "Type something…", profile),
+    extensions: createRichTextExtensions(placeholderController.read, profile),
     content: preserveTemplateSpaces(initialHtml),
     immediatelyRender: false,
     onUpdate: ({ editor: current }) => onCommit(restoreTemplateSpaces(current.getHTML())),
   }, [profile]);
+
+  useLayoutEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    placeholderController.update(hint);
+    editor.view.dispatch(editor.state.tr.setMeta("ree-placeholder", true));
+  }, [editor, hint, placeholderController]);
 
   useLayoutEffect(() => {
     const node = rootRef.current;
@@ -83,7 +94,7 @@ export function RichText({
             host,
           )
         : null}
-      {editor ? <EditorContent editor={editor} /> : <div className="ree-rte-loading">Loading editor…</div>}
+      {editor ? <EditorContent editor={editor} /> : <div className="ree-rte-loading">{t("editor.loading")}</div>}
     </div>
   );
 }

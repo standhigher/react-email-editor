@@ -1,3 +1,5 @@
+import { registerBuiltinMetadata } from "../i18n/builtin-definitions";
+import { normalizeLocale } from "../i18n/runtime";
 import { DEFAULT_BLOCKS } from "../blocks/registry";
 import { createBlockNode } from "../document/create-block";
 import { defaultTemplateEngine } from "../render/default-template-engine";
@@ -20,9 +22,11 @@ export function buildEmailEditorConfig(options: UseEmailEditorConfigOptions = {}
   if (new Set(visibleBuiltins).size !== visibleBuiltins.length) throw new Error("Duplicate builtin in library order.");
   for (const type of visibleBuiltins) if (!builtinTypes.has(type)) throw new Error(`Unknown builtin block: ${type}`);
   const all = Object.freeze([...definitions.values()].map((plugin) => snapshotValue(plugin)));
+  for (const plugin of all) if (!customTypes.has(plugin.type)) registerBuiltinMetadata(plugin);
   const registered = new Map(all.map((plugin) => [plugin.type, plugin]));
   const templateEngine = options.templateEngine ?? defaultTemplateEngine;
   return Object.freeze({
+    locale: normalizeLocale(options.locale),
     templateEngine,
     definitions: all,
     library: Object.freeze([...visibleBuiltins.map((type) => registered.get(type)!), ...(options.plugins ?? []).filter((plugin) => !builtinTypes.has(plugin.type)).map((plugin) => registered.get(plugin.type)!)]),

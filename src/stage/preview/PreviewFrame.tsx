@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import { useLayoutEffect, useRef } from "react";
 import { PREVIEW_LOAD_TIMEOUT_MS } from "./constants";
 import type { PreviewSnapshot } from "./types";
@@ -9,6 +10,9 @@ interface PreviewFrameProps {
 }
 
 export function PreviewFrame({ snapshot, onReady, onFailed }: PreviewFrameProps) {
+  const t = useEditorTranslation();
+  const translationRef = useRef(t);
+  useLayoutEffect(() => { translationRef.current = t; }, [t]);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const { id, html } = snapshot;
 
@@ -26,7 +30,7 @@ export function PreviewFrame({ snapshot, onReady, onFailed }: PreviewFrameProps)
       stopObserving = undefined;
       onFailed(id, message);
     };
-    const timer = setTimeout(() => fail("Email preview timed out. Please retry."), PREVIEW_LOAD_TIMEOUT_MS);
+    const timer = setTimeout(() => fail(translationRef.current("preview.timeout")), PREVIEW_LOAD_TIMEOUT_MS);
     const observeContent = () => {
       if (status !== "loading") return;
       stopObserving?.();
@@ -34,17 +38,17 @@ export function PreviewFrame({ snapshot, onReady, onFailed }: PreviewFrameProps)
       try {
         const frameDocument = frame.contentDocument;
         const frameWindow = frameDocument?.defaultView;
-        if (!frameDocument?.body || !frameWindow) throw new Error("Email preview could not be measured. Please retry.");
+        if (!frameDocument?.body || !frameWindow) throw new Error(translationRef.current("preview.measureFailed"));
         let animationFrame = 0;
         let readyFrame = 0;
         const fit = () => {
           try {
             const height = frameDocument.body.getBoundingClientRect().height;
-            if (!Number.isFinite(height) || height < 0) throw new Error("Email preview returned an invalid height. Please retry.");
+            if (!Number.isFinite(height) || height < 0) throw new Error(translationRef.current("preview.invalidHeight"));
             frame.style.height = `${Math.max(1, height)}px`;
             return true;
           } catch (error) {
-            fail(error instanceof Error ? error.message : "Email preview could not be measured. Please retry.");
+            fail(error instanceof Error ? error.message : translationRef.current("preview.measureFailed"));
             return false;
           }
         };
@@ -70,10 +74,10 @@ export function PreviewFrame({ snapshot, onReady, onFailed }: PreviewFrameProps)
           onReady(id);
         });
       } catch (error) {
-        fail(error instanceof Error ? error.message : "Email preview could not be loaded. Please retry.");
+        fail(error instanceof Error ? error.message : translationRef.current("preview.loadFailed"));
       }
     };
-    const loadError = () => fail("Email preview could not be loaded. Please retry.");
+    const loadError = () => fail(translationRef.current("preview.loadFailed"));
     frame.addEventListener("load", observeContent);
     frame.addEventListener("error", loadError);
     return () => {
@@ -85,5 +89,5 @@ export function PreviewFrame({ snapshot, onReady, onFailed }: PreviewFrameProps)
     };
   }, [id, onReady, onFailed]);
 
-  return <iframe ref={frameRef} className="ree-preview-frame" title="Email preview" sandbox="allow-same-origin" srcDoc={html} />;
+  return <iframe ref={frameRef} className="ree-preview-frame" title={t("preview.title")} sandbox="allow-same-origin" srcDoc={html} />;
 }

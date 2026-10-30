@@ -1,3 +1,6 @@
+import { translateMetadata } from "../i18n/metadata";
+import { GROUP_KEYS } from "../i18n/metadata-keys";
+import { useEditorTranslation } from "../i18n/context";
 import { buildRenderContext } from "../render/context";
 import { useId } from "react";
 import { PluginEditorContext } from "../plugins/editor-context";
@@ -32,6 +35,7 @@ export function InspectorControls({
   onCommitControls,
   onCommitStyle,
 }: InspectorControlsProps) {
+  const t = useEditorTranslation();
   const toolbarId = useId();
   const contentControls = (definition.controls ?? []).filter((control) => control.name !== definition.inlineControl);
   const CustomInspector = definition.inspector;
@@ -52,13 +56,14 @@ export function InspectorControls({
         fallback={inherited}
         resetTo={reset.resetTo}
         showReset={reset.show}
-        resetLabel={inherited !== undefined ? "Use default" : "Reset"}
+        resetLabel={inherited !== undefined ? t("common.useDefault") : t("common.reset")}
         onChange={(value) => onCommitStyle(block.id, control.id, value)}
       />
     );
   };
   const sections: BlockInspectorSection[] = definition.inspectorSections ?? STYLE_GROUPS.map((group) => ({
-    title: group.label,
+    id: group.group,
+    title: translateMetadata(t, GROUP_KEYS[group.group], group.label),
     controlNames: group.group === "general" && !CustomInspector ? contentControls.map((control) => control.name) : [],
     styleIds: styleControls.filter((control) => control.group === group.group).map((control) => control.id),
   }));
@@ -86,7 +91,7 @@ export function InspectorControls({
         const advanced = resolveStyles(section.advancedStyleIds);
         if (!controls.length && !styles.length && !advanced.length) return null;
         return (
-          <InspectorSection key={`${block.type}-${section.title}`} title={section.title}>
+          <InspectorSection key={`${block.type}-${section.id ?? section.title}`} title={section.title}>
             {controls.map((control) => (
               <ControlRenderer
                 key={control.name}
@@ -100,7 +105,7 @@ export function InspectorControls({
             <StyleControlStack controls={styles} renderControl={renderStyle} />
             {advanced.length ? (
               <details className="ree-inspector-advanced">
-                <summary>Advanced block border</summary>
+                <summary>{t("inspector.advancedBlockBorder")}</summary>
                 <div className="ree-inspector-section-body">
                   <StyleControlStack controls={advanced} renderControl={renderStyle} />
                 </div>

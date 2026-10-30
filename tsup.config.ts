@@ -7,7 +7,7 @@ export default defineConfig({
   dts: true,
   sourcemap: false,
   clean: true,
-  splitting: false,
+  splitting: true,
   banner: { js: '"use client";' },
   external: [
     "react",

@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
-import { EditorState } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
+import { Compartment, EditorState } from "@codemirror/state";
+import { EditorView, placeholder as codePlaceholder } from "@codemirror/view";
 import { createHtmlEditorExtensions } from "./html-editor";
 
 interface HtmlCodeEditorProps {
@@ -18,6 +18,7 @@ export function HtmlCodeEditor({
   rows = 10,
   onChange,
 }: HtmlCodeEditorProps) {
+  const placeholderCompartment = useRef(new Compartment());
   const hostRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
@@ -33,9 +34,10 @@ export function HtmlCodeEditor({
       parent,
       state: EditorState.create({
         doc: value,
-        extensions: createHtmlEditorExtensions(placeholder ?? "", (next) => {
-          onChangeRef.current(next);
-        }),
+        extensions: [
+          createHtmlEditorExtensions("", (next) => { onChangeRef.current(next); }),
+          placeholderCompartment.current.of(codePlaceholder(placeholder ?? "")),
+        ],
       }),
     });
     viewRef.current = view;
@@ -47,6 +49,10 @@ export function HtmlCodeEditor({
     // The editor owns the document after mount; later value changes sync below.
     // oxlint-disable-next-line react/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    viewRef.current?.dispatch({ effects: placeholderCompartment.current.reconfigure(codePlaceholder(placeholder ?? "")) });
+  }, [placeholder]);
 
   useEffect(() => {
     const view = viewRef.current;

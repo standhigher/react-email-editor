@@ -1,0 +1,7 @@
+{
+  "hue": "Hue",
+  "invalidHex": "Enter a 3 or 6 digit HEX color.",
+  "saturation": "Saturation and brightness",
+  "picker": "{{label}} picker",
+  "keyboardHint": "Saturation {{saturation}}%, brightness {{brightness}}%. Use left/right for saturation and up/down for brightness."
+}

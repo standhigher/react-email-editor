@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import { readCssLength } from "../../../utils/css-values";
 import { LINE_HEIGHT_RANGE, PARAGRAPH_SPACING_MAX } from "../constants";
 import type { RichTextMenu } from "../types";
@@ -38,6 +39,7 @@ export function ParagraphMetricMenus({
   onSpacing,
   onLineHeight,
 }: ParagraphMetricMenusProps) {
+  const t = useEditorTranslation();
   const spacingValue = clampAmount(spacing, inheritedSpacing, 0, PARAGRAPH_SPACING_MAX);
   const lineHeightValue = clampAmount(lineHeight, inheritedLineHeight, LINE_HEIGHT_RANGE.min, LINE_HEIGHT_RANGE.max);
   const lineHeightLabel = formatStep(lineHeightValue, LINE_HEIGHT_RANGE.step);
@@ -45,7 +47,7 @@ export function ParagraphMetricMenus({
     <>
       {showSpacing ? (
         <ToolbarMenu
-          title="Space before"
+          title={t("toolbar.spaceBefore")}
           variant="icon"
           caret={false}
           open={menu === "spacing"}
@@ -53,7 +55,7 @@ export function ParagraphMetricMenus({
           label={<ToolbarIcon name="space-before" />}
         >
           <MetricSlider
-            label="Space before"
+            label={t("toolbar.spaceBefore")}
             value={spacingValue}
             min={0}
             max={PARAGRAPH_SPACING_MAX}
@@ -66,7 +68,7 @@ export function ParagraphMetricMenus({
         </ToolbarMenu>
       ) : null}
       <ToolbarMenu
-        title="Line height"
+        title={t("toolbar.lineHeight")}
         variant="icon"
         caret={false}
         open={menu === "lineHeight"}
@@ -74,7 +76,7 @@ export function ParagraphMetricMenus({
         label={<ToolbarIcon name="line-height" />}
       >
         <MetricSlider
-          label="Line height"
+          label={t("toolbar.lineHeight")}
           value={lineHeightValue}
           min={LINE_HEIGHT_RANGE.min}
           max={LINE_HEIGHT_RANGE.max}

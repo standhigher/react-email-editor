@@ -1,0 +1,9 @@
+{
+  "preparing": "正在准备预览…",
+  "html": "HTML 区块预览",
+  "timeout": "邮件预览超时，请重试。",
+  "measureFailed": "无法测量邮件预览，请重试。",
+  "invalidHeight": "邮件预览高度无效，请重试。",
+  "loadFailed": "无法加载邮件预览，请重试。",
+  "title": "邮件预览"
+}

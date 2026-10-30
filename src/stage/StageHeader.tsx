@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import type { EditorDevice, EditorViewMode } from "../types/editor";
 
 interface StageHeaderProps {
@@ -13,15 +14,16 @@ export function StageHeader({
   onViewModeChange,
   onDeviceChange,
 }: StageHeaderProps) {
+  const t = useEditorTranslation();
   return (
     <div className="ree-col-head ree-stage-head">
-      <div className="ree-segment" role="group" aria-label="Editor mode">
+      <div className="ree-segment" role="group" aria-label={t("editor.editorMode")}>
         <button
           type="button"
           className={`ree-segment-btn${viewMode === "edit" ? " is-active" : ""}`}
           aria-pressed={viewMode === "edit"}
-          aria-label="Edit"
-          title="Edit"
+          aria-label={t("common.edit")}
+          title={t("common.edit")}
           onClick={() => onViewModeChange("edit")}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -34,8 +36,8 @@ export function StageHeader({
           type="button"
           className={`ree-segment-btn ree-segment-btn-label${viewMode === "preview" ? " is-active" : ""}`}
           aria-pressed={viewMode === "preview"}
-          aria-label="Preview"
-          title="Preview"
+          aria-label={t("common.preview")}
+          title={t("common.preview")}
           onClick={() => onViewModeChange("preview")}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -44,13 +46,13 @@ export function StageHeader({
           </svg>
         </button>
       </div>
-      <div className="ree-segment" role="group" aria-label="Canvas device">
+      <div className="ree-segment" role="group" aria-label={t("editor.canvasDevice")}>
         <button
           type="button"
           className={`ree-segment-btn${device === "desktop" ? " is-active" : ""}`}
           aria-pressed={device === "desktop"}
-          aria-label="Desktop"
-          title="Desktop"
+          aria-label={t("common.desktop")}
+          title={t("common.desktop")}
           onClick={() => onDeviceChange("desktop")}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -64,8 +66,8 @@ export function StageHeader({
           type="button"
           className={`ree-segment-btn${device === "mobile" ? " is-active" : ""}`}
           aria-pressed={device === "mobile"}
-          aria-label="Mobile"
-          title="Mobile"
+          aria-label={t("common.mobile")}
+          title={t("common.mobile")}
           onClick={() => onDeviceChange("mobile")}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

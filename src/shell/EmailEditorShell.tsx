@@ -1,8 +1,12 @@
 "use client";
 
+import { EditorLocaleContext } from "../i18n/context";
+import { useEditorLocale } from "../i18n/useEditorLocale";
+import { localizeDefinition } from "../i18n/metadata";
+import { Button } from "../components/Button";
 import { EditorConfigContext, RichTextFocusContext } from "../plugins/editor-context";
 
-import { useState, type KeyboardEvent } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 import { EditorDnd } from "../editor-dnd/EditorDnd";
 import { BlockLibrary } from "../block-library/BlockLibrary";
 import { Inspector, type InspectorPanel } from "../inspector/Inspector";
@@ -16,7 +20,12 @@ import type {
 } from "../types/editor";
 
 export function EmailEditorShell({ editor, height = "100%" }: EmailEditorProps) {
-  const session = useEditorSession(editor);
+  const sourceSession = useEditorSession(editor);
+  const language = useEditorLocale(sourceSession.config.locale);
+  const { t } = language.translation;
+  const definitions = useMemo(() => sourceSession.definitions.map((definition) => localizeDefinition(definition, t)), [sourceSession.definitions, t]);
+  const library = sourceSession.config.library.map((definition) => definitions.find((item) => item.type === definition.type) ?? definition);
+  const session = { ...sourceSession, definitions, selectedDefinition: definitions.find((definition) => definition.type === sourceSession.selectedBlock?.type) };
   const [activeRichText, setActiveRichText] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<EditorViewMode>("edit");
   const [device, setDevice] = useState<EditorDevice>("desktop");
@@ -63,9 +72,11 @@ export function EmailEditorShell({ editor, height = "100%" }: EmailEditorProps) 
   const showCanvas = () => setViewMode("edit");
 
   return (
+    <EditorLocaleContext.Provider value={language.translation}>
     <EditorConfigContext.Provider value={session.config}>
     <RichTextFocusContext.Provider value={{ active: activeRichText, activate: setActiveRichText }}>
-    <div key={session.resetKey} className="ree-root" style={{ height }} onKeyDown={handleKeyDown}>
+    <div key={session.resetKey} className="ree-root" lang={language.translation.locale} style={{ height }} onKeyDown={handleKeyDown}>
+      {language.failed ? <div className="ree-plugin-error" role="alert">{t("editor.localeError")} <Button onClick={language.retry}>{t("common.retry")}</Button></div> : null}
       <SubjectBar
         subject={session.document.subject ?? ""}
         variables={session.variables}
@@ -83,7 +94,7 @@ export function EmailEditorShell({ editor, height = "100%" }: EmailEditorProps) 
           onLibraryDragStart={showCanvas}
         >
           <BlockLibrary
-            definitions={session.config.library}
+            definitions={library}
             onAdd={(type) => {
               showCanvas();
               if (session.insertBlock(type)) setInspectorPanel("block");
@@ -113,5 +124,6 @@ export function EmailEditorShell({ editor, height = "100%" }: EmailEditorProps) 
     </div>
     </RichTextFocusContext.Provider>
     </EditorConfigContext.Provider>
+    </EditorLocaleContext.Provider>
   );
 }

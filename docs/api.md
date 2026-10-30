@@ -65,6 +65,7 @@ Requires an instance from `useEmailEditor()`. Returns cached `{ document }`, a d
 
 | Parameter | Type | Default and meaning |
 | --- | --- | --- |
+| `locale` | `string` | Defaults to `en`; supports `zh-CN`, `es`, `pt-PT` and `fr`. Non-English language chunks load when the editor mounts. |
 | `plugins` | `BlockPlugin[]` | `[]`; plugins created by `defineBlock()`. |
 | `builtins` | `false \| string[]` | All by default; false hides all builtins; arrays filter and order them. Hidden blocks still render existing nodes. Custom types are appended. |
 | `pickImage` | `(context: ImagePickerContext) => Promise<string \| null>` | Resolve a URL; null cancels; throwing shows retry. Context contains `value/label/signal`. |
@@ -74,6 +75,7 @@ Declare plugins at module scope, or use `useMemo` when they depend on applicatio
 
 | Member | Arguments and meaning |
 | --- | --- |
+| `locale` | Normalized editor UI locale. |
 | `definitions` | Readonly list of all registered plugins, including hidden builtins. |
 | `library` | Readonly list of insertable blocks in display order. |
 | `pickImage` | Registered resource picker. |
@@ -83,6 +85,28 @@ Declare plugins at module scope, or use `useMemo` when they depend on applicatio
 | `validate(document)` | Document → `ValidationIssue[]`, without rendering HTML. |
 
 Duplicate custom types, duplicate builtin entries and unknown builtin names throw. Replacing a builtin requires `override: true`.
+
+### Editor UI language
+
+```tsx
+const config = useEmailEditorConfig({ locale: language });
+const editor = useEmailEditor({ config });
+return <EmailEditor editor={editor} height={720} />;
+```
+
+Supported locales are `en` (English, default), `zh-CN` (Simplified Chinese), `es` (Spanish), `pt-PT` (Portuguese, Portugal) and `fr` (French). Omitted or unsupported locales use `en`; regional variants such as `pt-BR`, `es-MX` and `fr-CA` fall back to English without automatic regional matching. Matching ignores case and surrounding whitespace and treats `_` as `-`. Existing `zh` and `zh-Hans` aliases still normalize to `zh-CN`. The host selects the locale explicitly; the library does not detect browser language.
+
+English ships with the entry point; each of the other four languages loads through a dynamic `import()` into a separate chunk. Resources and concurrent requests for the same language are cached internally. Configuration and export APIs alone do not load non-English languages. English appears until the initial load completes; subsequent switches retain the current language until the target is ready. A failed load retains the current language and shows a retry action. Stale requests cannot overwrite a newer selection or update an unmounted editor.
+
+A minimal internal function handles message lookup, English fallback and `{{name}}` interpolation without a third-party i18n dependency. Missing messages fall back to English, then the key; missing interpolation arguments preserve their tokens, and parameter values are not recursively parsed. Editors select their language independently without reading or changing the host translation library state. Switching language preserves the rich-text editor, document, selection and edit history, and does not trigger document `onChange`. Translations cover editor UI, builtin block metadata and accessibility messages. Configuration `definitions` and `library` retain the original plugin declarations.
+
+The optional `BlockInspectorSection.id` supplies a stable section identity so title changes preserve expansion and editing state.
+
+Integrators own titles, labels, options, sections and custom component text for custom blocks, including overrides of builtins. Library controls reused inside them still follow the editor UI language. Language packs, internal message keys, Providers and translation functions are not public APIs.
+
+Subjects, body content, variable names/descriptions/preview values and default content for new blocks remain unchanged. UI language does not affect `EmailDocument.version` or exported HTML. Email content language is independent; the existing exported `lang="en"` behavior is unchanged. External resource, plugin validation and template engine errors keep their original messages. Validation and export API diagnostics retain their existing behavior.
+
+The package includes dynamic locale and shared JavaScript chunks. Let the consumer bundler resolve the complete package instead of copying only `dist/index.js`.
 
 ### defineBlock(input) → BlockPlugin<Schema, Type>
 

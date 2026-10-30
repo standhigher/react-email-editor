@@ -1,0 +1,21 @@
+{
+  "insertVariable": "Inserir variável",
+  "personalization": "Personalização",
+  "editorMode": "Modo do editor",
+  "canvasDevice": "Dispositivo da área de edição",
+  "empty": "Arraste um bloco para aqui ou clique num para começar",
+  "dragToReorder": "Arrastar para reordenar",
+  "expandToolbar": "Expandir barra de ferramentas",
+  "collapseToolbar": "Recolher barra de ferramentas",
+  "blockActions": "Ações do bloco",
+  "selectBlock": "Selecionar bloco",
+  "placeholder": "Escreva algo…",
+  "loading": "A carregar o editor…",
+  "blocks": "Blocos",
+  "expandBlocks": "Expandir painel de blocos",
+  "collapseBlocks": "Recolher painel de blocos",
+  "emailSubject": "Assunto do e-mail",
+  "variableHint": "Os campos de personalização ficam em branco se não houver dados disponíveis.",
+  "missingPlugin": "Plugin do bloco em falta: {{type}}. Os dados originais são preservados.",
+  "localeError": "Não foi possível carregar o idioma pedido. O idioma atual continua disponível."
+}

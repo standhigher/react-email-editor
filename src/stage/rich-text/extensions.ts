@@ -10,7 +10,18 @@ import { ButtonDocument } from "./button-document";
 import { ListStyle, StyledLink } from "./content-attributes";
 import { ParagraphStyle } from "./paragraph-style";
 
-export function createRichTextExtensions(placeholder: string, profile: RichTextProfile = "text"): Extensions {
+interface RichTextPlaceholder {
+  read: () => string;
+  update: (value: string) => void;
+}
+
+// TipTap 的占位扩展在装饰计算时读取当前值；更新文案不替换编辑器或文档。
+export function createRichTextPlaceholder(initial: string): RichTextPlaceholder {
+  let current = initial;
+  return { read: () => current, update: (value) => { current = value; } };
+}
+
+export function createRichTextExtensions(placeholder: string | (() => string), profile: RichTextProfile = "text"): Extensions {
   const button = profile === "button";
   const text = profile === "text";
   return [

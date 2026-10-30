@@ -1,0 +1,7 @@
+{
+  "hue": "Teinte",
+  "invalidHex": "Saisissez une couleur HEX à 3 ou 6 chiffres.",
+  "saturation": "Saturation et luminosité",
+  "picker": "Sélecteur de {{label}}",
+  "keyboardHint": "Saturation {{saturation}} %, luminosité {{brightness}} %. Utilisez les flèches gauche/droite pour la saturation et haut/bas pour la luminosité."
+}

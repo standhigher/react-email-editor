@@ -1,0 +1,31 @@
+{
+  "heading": {
+    "title": "标题",
+    "description": "大号段落标题"
+  },
+  "text": {
+    "title": "文本",
+    "description": "正文段落"
+  },
+  "button": {
+    "title": "按钮",
+    "description": "可点击的行动按钮"
+  },
+  "image": {
+    "title": "图片",
+    "description": "插入图片"
+  },
+  "divider": {
+    "title": "分割线",
+    "description": "水平分割线"
+  },
+  "spacer": {
+    "title": "间隔",
+    "description": "垂直留白"
+  },
+  "html": {
+    "title": "HTML",
+    "description": "粘贴 HTML 代码",
+    "placeholder": "粘贴 HTML 代码…"
+  }
+}

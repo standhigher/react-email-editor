@@ -1,3 +1,5 @@
+import { useEditorTranslation } from "../i18n/context";
+import { dragAnnouncements } from "./announcements";
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   DndContext,
@@ -41,6 +43,7 @@ export function EditorDnd({
   onLibraryDragStart,
   children,
 }: EditorDndProps) {
+  const t = useEditorTranslation();
   const blocksRef = useRef(blocks);
   useLayoutEffect(() => {
     blocksRef.current = blocks;
@@ -120,6 +123,7 @@ export function EditorDnd({
 
   return (
     <DndContext
+      accessibility={{ announcements: dragAnnouncements(t), screenReaderInstructions: { draggable: t("dnd.instructions") } }}
       sensors={sensors}
       collisionDetection={canvasDropCollision}
       onDragStart={handleDragStart}

@@ -80,6 +80,8 @@ export type RichTextProfile = "text" | "heading" | "button";
 
 /** Inspector section displayed in declaration order. */
 export interface BlockInspectorSection {
+  /** Optional stable UI identity, independent of the translated title. */
+  id?: string;
   /** Section title. */
   title: string;
   /** Content control names in display order. */

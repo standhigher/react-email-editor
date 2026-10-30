@@ -1,0 +1,21 @@
+{
+  "insertVariable": "Insérer une variable",
+  "personalization": "Personnalisation",
+  "editorMode": "Mode de l’éditeur",
+  "canvasDevice": "Appareil du canevas",
+  "empty": "Glissez un bloc ici ou cliquez sur un bloc pour commencer",
+  "dragToReorder": "Glisser pour réorganiser",
+  "expandToolbar": "Développer la barre d’outils",
+  "collapseToolbar": "Réduire la barre d’outils",
+  "blockActions": "Actions du bloc",
+  "selectBlock": "Sélectionner le bloc",
+  "placeholder": "Saisissez du texte…",
+  "loading": "Chargement de l’éditeur…",
+  "blocks": "Blocs",
+  "expandBlocks": "Développer le panneau des blocs",
+  "collapseBlocks": "Réduire le panneau des blocs",
+  "emailSubject": "Objet de l’e-mail",
+  "variableHint": "Les champs de personnalisation restent vides si aucune donnée n’est disponible.",
+  "missingPlugin": "Plugin de bloc manquant : {{type}}. Les données d’origine sont conservées.",
+  "localeError": "Impossible de charger la langue demandée. La langue actuelle reste disponible."
+}

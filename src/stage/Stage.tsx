@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import { useMemo, useState } from "react";
 import { usePreviewBuffer } from "./preview/usePreviewBuffer";
 import { Canvas } from "./canvas/Canvas";
@@ -23,6 +24,7 @@ export function Stage({
   onDeviceChange,
   onSelectBlock,
 }: StageProps) {
+  const t = useEditorTranslation();
   const source = useMemo(() => ({ document: session.document, config: session.config, variables: session.variables, device }), [session.document, session.config, session.variables, device]);
   const requested = viewMode === "preview";
   const preview = usePreviewBuffer(source, requested);
@@ -66,7 +68,7 @@ export function Stage({
         <div className={`ree-stage-view${previewVisible ? "" : " is-buffered"}`} aria-hidden={!previewVisible} {...(!previewVisible ? { inert: "" } : {})}>
           <Preview frames={preview.frames} front={preview.front} failure={preview.displayFailure} onReady={preview.markReady} onFailed={preview.markFailed} onRetry={preview.retry} />
         </div>
-        {requested && !preview.ready && !preview.failure ? <div className="ree-preview-pending" role="status">Preparing preview…</div> : null}
+        {requested && !preview.ready && !preview.failure ? <div className="ree-preview-pending" role="status">{t("preview.preparing")}</div> : null}
       </div>
     </div>
   );

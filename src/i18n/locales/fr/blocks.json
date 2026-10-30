@@ -1,0 +1,31 @@
+{
+  "heading": {
+    "title": "Titre",
+    "description": "Grand titre de section"
+  },
+  "text": {
+    "title": "Texte",
+    "description": "Paragraphe de texte"
+  },
+  "button": {
+    "title": "Bouton",
+    "description": "Bouton d’appel à l’action"
+  },
+  "image": {
+    "title": "Image",
+    "description": "Insérer une image"
+  },
+  "divider": {
+    "title": "Séparateur",
+    "description": "Ligne de séparation horizontale"
+  },
+  "spacer": {
+    "title": "Espaceur",
+    "description": "Espace vertical vide"
+  },
+  "html": {
+    "title": "HTML",
+    "description": "Coller du HTML brut",
+    "placeholder": "Collez du HTML brut…"
+  }
+}

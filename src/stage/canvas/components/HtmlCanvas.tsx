@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import { useCallback, useEffect, useRef } from "react";
 import { extractHeadStyles } from "../../../render/head-styles";
 
@@ -14,6 +15,7 @@ function frameHtml(html: string, baseCss: string): string {
 
 /** HTML 标签内容用 iframe 隔离 CSS，纯文本直接渲染；事件交给外层区块。 */
 export function HtmlCanvas({ html, baseCss = "", onSelect }: HtmlCanvasProps) {
+  const t = useEditorTranslation();
   const hasHtmlTag = /<\/?[a-z][\w:-]*(?:\s[^>]*)?>/i.test(html);
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
@@ -86,7 +88,7 @@ export function HtmlCanvas({ html, baseCss = "", onSelect }: HtmlCanvasProps) {
       <button
         type="button"
         className="ree-html-canvas-hitbox"
-        aria-label="Select block"
+        aria-label={t("editor.selectBlock")}
         tabIndex={-1}
         onPointerDown={() => onSelect()}
         onClick={() => onSelect()}
@@ -94,7 +96,7 @@ export function HtmlCanvas({ html, baseCss = "", onSelect }: HtmlCanvasProps) {
       <iframe
         ref={frameRef}
         className="ree-html-canvas-frame"
-        title="HTML block preview"
+        title={t("preview.html")}
         srcDoc={frameHtml(html, baseCss)}
         sandbox="allow-same-origin"
         tabIndex={-1}

@@ -1,3 +1,5 @@
+import { EditorLocaleContext } from "../../i18n/context";
+import type { ContextType } from "react";
 import { Component } from "react";
 import { Button } from "../../components/Button";
 import type { ReactNode } from "react";
@@ -15,6 +17,9 @@ interface BlockErrorBoundaryState {
 }
 
 export class BlockErrorBoundary extends Component<BlockErrorBoundaryProps, BlockErrorBoundaryState> {
+  static contextType = EditorLocaleContext;
+  declare context: ContextType<typeof EditorLocaleContext>;
+
   state: BlockErrorBoundaryState = { error: null, identity: this.props.identity, resetKey: this.props.resetKey };
 
   static getDerivedStateFromError(error: Error): Partial<BlockErrorBoundaryState> {
@@ -27,6 +32,6 @@ export class BlockErrorBoundary extends Component<BlockErrorBoundaryProps, Block
 
   render() {
     if (!this.state.error) return this.props.children;
-    return <div className="ree-plugin-error" role="alert"><p>{this.state.error.message}</p><Button onClick={() => this.setState({ error: null })}>Retry</Button></div>;
+    return <div className="ree-plugin-error" role="alert"><p>{this.state.error.message}</p><Button onClick={() => this.setState({ error: null })}>{this.context.t("common.retry")}</Button></div>;
   }
 }

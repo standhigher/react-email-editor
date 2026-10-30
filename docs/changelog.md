@@ -2,6 +2,24 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.6.0 — 2026-10-30
+
+### Added and improved
+
+- Language resources are split into module JSON files with short semantic keys such as `common.save` and `preview.timeout`. Shared terms and repeated builtin style labels are reused while preserving dynamic loading per language, key typing and translation completeness checks.
+- `useEmailEditorConfig({ locale })` selects the editor UI language: supports `en` (default), `zh-CN`, `es`, `pt-PT` and `fr`, with all other locales falling back to English. Existing Chinese aliases, case and underscore normalization are retained. Minimal internal lookup, English fallback and simple interpolation require no i18next dependency; language packs and message overrides are not public APIs.
+- Translations cover the subject bar, block library, builtin inspectors, rich-text toolbars, dialogs, placeholders, preview and accessibility messages. Integrators retain ownership of custom block and builtin override metadata. Email content, default content, document version and HTML export behavior remain unchanged.
+- Locale loading caches resources, deduplicates concurrent requests, supports failure recovery and retry, and ignores stale or unmounted results. Instances select languages independently. Switching preserves documents, selection and undo history without document `onChange`. Inspector sections gain an optional stable `id`.
+- ESM code splitting publishes four non-English language chunks and shared JavaScript chunks; consumers must retain dynamically emitted files. The playground includes a five-language selector and both API documents are updated. Bump the npm package from `0.5.2` to `0.6.0` for the backward-compatible UI language capability; the document format remains `4`.
+- Fix builtin image errors remaining in the previous language by storing translation keys and translating during rendering, including switches after an error and during an image request. Preserve external picker `Error.message` text, reject invalid URLs without changing the document, and clear errors after a successful retry.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build and all 155 Node tests covering five-language key and interpolation completeness, minimal translation fallback and argument boundaries, locale normalization, loading, retry, deduplication, races, unmounting, instance isolation, metadata ownership, section state, snapshots and actual consumer bundling, plus language switches after image errors and during requests, external error preservation and successful retries.
+- Reused Chrome and the local preview service to verify no Chinese requests with default English, failure fallback and retry recovery, unchanged JSON after switching, undo history, dynamic placeholders, translated toolbars, link dialogs and errors, color panels, and desktop/mobile previews. Temporary network blocking was removed.
+- In this update, reused Chrome and the original preview service to verify all five languages, French rich-text tools and the link dialog, and 600px desktop/360px mobile previews. Exported JSON/HTML are identical before and after switching. Restored English desktop editing and retained no temporary files. `git diff --check` passes.
+- Reused the existing service on port 5173 to verify the image fix in Chrome: displayed errors switch between English and Chinese, pending requests use the current Chinese fallback, external errors retain their original text, and successful retries clear errors and commit valid URLs. Removed the temporary verification page and tab.
+
 ## 0.5.2 — 2026-10-29
 
 ### Fixes and improvements

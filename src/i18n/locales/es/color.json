@@ -1,0 +1,7 @@
+{
+  "hue": "Tono",
+  "invalidHex": "Introduce un color HEX de 3 o 6 dígitos.",
+  "saturation": "Saturación y brillo",
+  "picker": "Selector de {{label}}",
+  "keyboardHint": "Saturación {{saturation}}%, brillo {{brightness}}%. Usa las flechas izquierda/derecha para la saturación y arriba/abajo para el brillo."
+}

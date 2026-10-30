@@ -1,0 +1,21 @@
+{
+  "insertVariable": "插入变量",
+  "personalization": "个性化变量",
+  "editorMode": "编辑模式",
+  "canvasDevice": "画布设备",
+  "empty": "拖动区块到此处，或点击区块开始编辑",
+  "dragToReorder": "拖动排序",
+  "expandToolbar": "展开工具栏",
+  "collapseToolbar": "收起工具栏",
+  "blockActions": "区块操作",
+  "selectBlock": "选择区块",
+  "placeholder": "请输入内容…",
+  "loading": "正在加载编辑器…",
+  "blocks": "区块",
+  "expandBlocks": "展开区块侧栏",
+  "collapseBlocks": "收起区块侧栏",
+  "emailSubject": "邮件主题",
+  "variableHint": "没有可用数据时，个性化字段将显示为空。",
+  "missingPlugin": "缺少区块插件：{{type}}。原始数据已保留。",
+  "localeError": "无法加载所选语言，当前语言仍可使用。"
+}

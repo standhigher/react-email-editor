@@ -1,0 +1,9 @@
+{
+  "preparing": "Préparation de l’aperçu…",
+  "html": "Aperçu du bloc HTML",
+  "timeout": "Le délai de l’aperçu de l’e-mail a expiré. Réessayez.",
+  "measureFailed": "Impossible de mesurer l’aperçu de l’e-mail. Réessayez.",
+  "invalidHeight": "L’aperçu de l’e-mail a renvoyé une hauteur incorrecte. Réessayez.",
+  "loadFailed": "Impossible de charger l’aperçu de l’e-mail. Réessayez.",
+  "title": "Aperçu de l’e-mail"
+}

@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import { useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Variable } from "../types/block";
@@ -14,6 +15,7 @@ export function PersonalizationMenu({
   onInsert,
   suffix = false,
 }: PersonalizationMenuProps) {
+  const t = useEditorTranslation();
   const [open, setOpen] = useState(false);
   const [host, setHost] = useState<HTMLElement | null>(null);
   const id = useId();
@@ -29,8 +31,8 @@ export function PersonalizationMenu({
       <button
         type="button"
         className={suffix ? "ree-personalization-suffix-btn" : "ree-personalization-btn"}
-        aria-label={suffix ? "Insert variable" : undefined}
-        title={suffix ? "Personalization" : undefined}
+        aria-label={suffix ? t("editor.insertVariable") : undefined}
+        title={suffix ? t("editor.personalization") : undefined}
         aria-expanded={open}
         aria-controls={open ? id : undefined}
         onClick={(event) => {
@@ -46,7 +48,7 @@ export function PersonalizationMenu({
           }
         }}
       >
-        {suffix ? "{ }" : "Personalization"}
+        {suffix ? "{ }" : t("editor.personalization")}
         {suffix ? null : <svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true">
           <path d="M5.2 7.5 10 12.3l4.8-4.8 1.2 1.2L10 14.7 4 8.7l1.2-1.2Z" />
         </svg>}

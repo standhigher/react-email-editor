@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import { useState } from "react";
 import { readCssLength, spacingSides } from "../../utils/css-values";
 import { SPACING_MAX, SPACING_SIDES } from "../constants";
@@ -23,19 +24,21 @@ export function SpacingControl({
   label,
   value,
   max = SPACING_MAX,
-  sides: sideLabels = SPACING_SIDES,
-  linkLabel = "Link sides",
+  sides: customSides,
+  linkLabel,
   uniformLabel,
   expand = spacingSides,
   onChange,
 }: SpacingControlProps) {
+  const t = useEditorTranslation();
+  const sideLabels = customSides ?? SPACING_SIDES.map((key) => t(key));
   const sides = expand(value);
   const equal = sides.every((side) => sideAmount(side, max) === sideAmount(sides[0], max));
   const [independent, setIndependent] = useState(!equal);
   const slider = (sideLabel: string, sideValue: string, commit: (next: string) => void) => {
     const amount = sideAmount(sideValue, max);
     return (
-      <div className="ree-field" key={sideLabel}>
+      <div className="ree-field" key={sideLabels.indexOf(sideLabel)}>
         <div className="ree-field-label">
           <span>{sideLabel}</span>
           <span className="ree-field-value">{amount}px</span>
@@ -48,7 +51,7 @@ export function SpacingControl({
     <div className="ree-spacing-control">
       <CheckboxControl
         className="ree-spacing-link"
-        label={linkLabel}
+        label={linkLabel ?? t("inspector.linkSides")}
         checked={!independent && equal}
         onChange={(checked) => {
           setIndependent(!checked);
@@ -56,7 +59,7 @@ export function SpacingControl({
         }}
       />
       {!independent && equal
-        ? slider(uniformLabel ?? `${label} all sides`, sides[0] ?? "0px", onChange)
+        ? slider(uniformLabel ?? t("inspector.allSides", { label }), sides[0] ?? "0px", onChange)
         : (
           <div className="ree-spacing-grid">
             {sideLabels.map((side, index) => slider(side, sides[index] ?? "0px", (next) => {

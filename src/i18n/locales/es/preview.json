@@ -1,0 +1,9 @@
+{
+  "preparing": "Preparando vista previa…",
+  "html": "Vista previa del bloque HTML",
+  "timeout": "La vista previa del correo ha tardado demasiado. Vuelve a intentarlo.",
+  "measureFailed": "No se puede medir la vista previa del correo. Vuelve a intentarlo.",
+  "invalidHeight": "La vista previa del correo ha devuelto una altura no válida. Vuelve a intentarlo.",
+  "loadFailed": "No se puede cargar la vista previa del correo. Vuelve a intentarlo.",
+  "title": "Vista previa del correo"
+}

@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import { formatCssLength } from "../../utils/css-values";
 import { RangeControl } from "../../components/RangeControl";
 import { SelectControl } from "../../components/SelectControl";
@@ -41,6 +42,7 @@ export function LengthControl({
   step = 1,
   onChange,
 }: LengthControlProps) {
+  const t = useEditorTranslation();
   const range = bounds(unit, min, max, step);
   const shown = Math.min(range.max, Math.max(range.min, amount));
   const commit = (nextAmount: number, nextUnit: string) => {
@@ -60,7 +62,7 @@ export function LengthControl({
       {units.length > 1 ? (
         <SelectControl
           compact
-          label={`${label} unit`}
+          label={t("common.unit", { label })}
           value={unit}
           options={units.map((option) => ({ value: option, label: option }))}
           onChange={(nextUnit) => {

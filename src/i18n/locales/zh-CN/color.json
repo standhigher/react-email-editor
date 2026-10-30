@@ -1,0 +1,7 @@
+{
+  "hue": "色相",
+  "invalidHex": "请输入 3 位或 6 位 HEX 颜色值。",
+  "saturation": "饱和度与亮度",
+  "picker": "{{label}}选择器",
+  "keyboardHint": "饱和度 {{saturation}}%，亮度 {{brightness}}%。使用左右方向键调整饱和度，上下方向键调整亮度。"
+}

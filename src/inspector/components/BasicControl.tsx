@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import { useRef, useId } from "react";
 import { ColorControl } from "../../components/ColorControl";
 import { CheckboxControl } from "../../components/CheckboxControl";
@@ -9,6 +10,7 @@ import { safeEmailUrl } from "../../plugins/email-tools";
 import type { ControlRendererProps } from "../ControlRenderer";
 
 export function BasicControl({ control, value, variables, onChange }: ControlRendererProps) {
+  const t = useEditorTranslation();
   const ref = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const id = useId();
   const shown = value == null || (typeof value === "number" && !Number.isFinite(value)) ? "" : String(value);
@@ -28,7 +30,7 @@ export function BasicControl({ control, value, variables, onChange }: ControlRen
   const textual = control.kind === "text" || control.kind === "textarea" || control.kind === "url";
   const hasVariables = textual && variables.length > 0;
   const invalidUrl = control.kind === "url" && shown.trim() && !safeEmailUrl(shown);
-  const input = control.kind === "select" ? <SelectControl id={id} label={control.label} value={shown} options={control.options ?? []} emptyLabel={control.placeholder ?? "None"} onChange={onChange} />
+  const input = control.kind === "select" ? <SelectControl id={id} label={control.label} value={shown} options={control.options ?? []} emptyLabel={control.placeholder ?? t("common.none")} onChange={onChange} />
     : control.kind === "textarea" ? <textarea id={id} ref={(element) => { ref.current = element; }} className="ree-input ree-textarea" value={shown} placeholder={control.placeholder} rows={control.rows ?? 4} onChange={(event) => onChange(event.target.value)} />
       : <TextInput id={id} ref={(element) => { ref.current = element; }} type={control.kind === "number" ? "number" : "text"} value={shown} min={control.min} max={control.max} step={control.step} placeholder={control.placeholder} aria-invalid={Boolean(invalidUrl) || Boolean(control.validateValue?.(value))} onChange={(event) => onChange(control.kind === "number" && event.target.value !== "" ? Number(event.target.value) : event.target.value)} />;
   return (

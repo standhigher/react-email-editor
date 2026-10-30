@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import { useEffect, useId, useRef, useState } from "react";
 import { isAllowedUri } from "@tiptap/extension-link";
 import { ColorControl } from "../../../components/ColorControl";
@@ -39,6 +40,7 @@ export function LinkPopover({
   onApply,
   onClose,
 }: LinkPopoverProps) {
+  const t = useEditorTranslation();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const errorId = useId();
@@ -76,10 +78,10 @@ export function LinkPopover({
         if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) onClose();
       }}
     >
-      <h2 id={titleId} className="ree-rte-link-title">Edit link</h2>
+      <h2 id={titleId} className="ree-rte-link-title">{t("toolbar.editLink")}</h2>
       <div className="ree-rte-link-fields">
         <label className="ree-field">
-          <span className="ree-field-label">Link URL</span>
+          <span className="ree-field-label">{t("common.linkUrl")}</span>
           <TextInput
             value={url}
             placeholder="https://"
@@ -95,20 +97,20 @@ export function LinkPopover({
             }}
           />
         </label>
-        {submitted && invalidUrl ? <p id={errorId} className="ree-rte-link-error" role="alert">Enter a valid link using an allowed protocol, such as https://.</p> : null}
-        <ColorControl value={color} fallback={defaultColor} label="Link color" resetTo="" onChange={onColorChange} />
+        {submitted && invalidUrl ? <p id={errorId} className="ree-rte-link-error" role="alert">{t("toolbar.invalidLink")}</p> : null}
+        <ColorControl value={color} fallback={defaultColor} label={t("common.linkColor")} resetTo="" onChange={onColorChange} />
         <div className="ree-field-label">
-          <CheckboxControl label="Underline" checked={(decoration || defaultDecoration) === "underline"} onChange={(checked) => onDecorationChange(checked ? "underline" : "none")} />
-          <ResetButton label="Reset link underline" disabled={!decoration} onClick={() => onDecorationChange("")} />
+          <CheckboxControl label={t("common.underline")} checked={(decoration || defaultDecoration) === "underline"} onChange={(checked) => onDecorationChange(checked ? "underline" : "none")} />
+          <ResetButton label={t("toolbar.resetLinkUnderline")} disabled={!decoration} onClick={() => onDecorationChange("")} />
         </div>
         <label className="ree-field">
-          <span className="ree-field-label">Target</span>
-          <SelectControl label="Target" value={target} options={LINK_TARGETS} onChange={onTargetChange} />
+          <span className="ree-field-label">{t("toolbar.target")}</span>
+          <SelectControl label={t("toolbar.target")} value={target} options={LINK_TARGETS.map((option) => ({ value: option.value, label: t(option.labelKey) }))} onChange={onTargetChange} />
         </label>
       </div>
       <div className="ree-rte-link-actions">
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="solid" disabled={!url.trim() && !canUnlink} onClick={save}>Save</Button>
+        <Button onClick={onClose}>{t("common.cancel")}</Button>
+        <Button variant="solid" disabled={!url.trim() && !canUnlink} onClick={save}>{t("common.save")}</Button>
       </div>
     </dialog>
   );

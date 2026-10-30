@@ -1,0 +1,31 @@
+{
+  "heading": {
+    "title": "Heading",
+    "description": "Large section heading"
+  },
+  "text": {
+    "title": "Text",
+    "description": "Paragraph of body text"
+  },
+  "button": {
+    "title": "Button",
+    "description": "Clickable CTA button"
+  },
+  "image": {
+    "title": "Image",
+    "description": "Insert an image"
+  },
+  "divider": {
+    "title": "Divider",
+    "description": "Horizontal divider line"
+  },
+  "spacer": {
+    "title": "Spacer",
+    "description": "Vertical whitespace"
+  },
+  "html": {
+    "title": "HTML",
+    "description": "Paste raw HTML",
+    "placeholder": "Paste raw HTML…"
+  }
+}

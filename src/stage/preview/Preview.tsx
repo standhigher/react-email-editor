@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import { useRef } from "react";
 import { Button } from "../../components/Button";
 import { PREVIEW_BUFFER_SLOTS } from "./constants";
@@ -11,6 +12,7 @@ interface PreviewProps extends PreviewBufferState {
 }
 
 export function Preview({ frames, front, failure, onReady, onFailed, onRetry }: PreviewProps) {
+  const t = useEditorTranslation();
   const scrollRef = useRef({ top: 0, left: 0 });
   return (
     <div className="ree-preview-buffer">
@@ -39,7 +41,7 @@ export function Preview({ frames, front, failure, onReady, onFailed, onRetry }: 
           </div>
         );
       })}
-      {failure ? <div className="ree-plugin-error ree-preview-error" role="alert"><p>{failure.message}</p><Button onClick={onRetry}>Retry</Button></div> : null}
+      {failure ? <div className="ree-plugin-error ree-preview-error" role="alert"><p>{failure.message}</p><Button onClick={onRetry}>{t("common.retry")}</Button></div> : null}
     </div>
   );
 }

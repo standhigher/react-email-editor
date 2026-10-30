@@ -65,6 +65,7 @@ export function EmailPage() {
 
 | 参数 | 类型 | 默认与说明 |
 | --- | --- | --- |
+| `locale` | `string` | 默认 `en`。支持 `zh-CN`、`es`、`pt-PT`、`fr`；非英文语言包在挂载编辑器后按需加载。 |
 | `plugins` | `BlockPlugin[]` | `[]`，由 `defineBlock()` 创建。 |
 | `builtins` | `false \| string[]` | 省略显示全部；`false` 隐藏全部内置区块；数组筛选并排序。隐藏不影响已有节点渲染。自定义类型追加到后面。 |
 | `pickImage` | `(context: ImagePickerContext) => Promise<string \| null>` | 图片资源选择器；返回 URL，`null` 取消，抛错显示重试；`context` 提供 `value/label/signal`。 |
@@ -74,6 +75,7 @@ export function EmailPage() {
 
 | 成员 | 参数与含义 |
 | --- | --- |
+| `locale` | 归一化后的编辑器界面语言。 |
 | `definitions` | 全部注册插件的只读列表，包含隐藏的内置区块。 |
 | `library` | 按展示顺序排列的可插入区块只读列表。 |
 | `pickImage` | 注册的资源选择器。 |
@@ -83,6 +85,28 @@ export function EmailPage() {
 | `validate(document)` | 文档 → `ValidationIssue[]`，不渲染 HTML。 |
 
 重复自定义类型、重复或未知的 `builtins` 条目会抛错。覆盖内置区块必须声明 `override: true`。
+
+### 编辑器界面语言
+
+```tsx
+const config = useEmailEditorConfig({ locale: language });
+const editor = useEmailEditor({ config });
+return <EmailEditor editor={editor} height={720} />;
+```
+
+支持 `en`（英语，默认）、`zh-CN`（简体中文）、`es`（西班牙语）、`pt-PT`（葡萄牙语，葡萄牙）和 `fr`（法语）。不传 `locale` 或传入未支持的值时使用 `en`，例如 `pt-BR`、`es-MX`、`fr-CA` 均回退英文，不自动匹配地区变体。匹配忽略大小写和首尾空格，并将 `_` 视为 `-`；保留 `zh`、`zh-Hans` 到 `zh-CN` 的别名。语言由宿主明确传入，不检测浏览器语言。
+
+英文随主入口提供，其余四种语言各自通过动态 `import()` 加载独立文件。同一语言的资源和加载请求在库内部缓存；仅调用配置或导出 API 不会加载非英文语言包。首次加载完成前使用英文，后续切换保留当前语言直到目标语言可用。加载失败显示提示及重试按钮，继续保留当前语言；快速切换与卸载不会让过期加载结果覆盖当前选择。
+
+翻译由库内部的最小函数处理文案查找、英文回退与 `{{name}}` 插值，不依赖第三方多语言库。缺失文案回退英文，英文也缺失时返回 key；缺失插值参数保留占位符，参数值不递归解析。每个编辑器实例独立选择语言，不读取或修改宿主多语言库的状态。切换语言不重建富文本编辑器，不清空文档、选择状态或编辑历史，也不触发文档 `onChange`。翻译覆盖编辑器自有界面、内置区块元数据及无障碍提示；配置中的 `definitions` 和 `library` 保留原始插件声明。
+
+检查器分组可通过可选的 `BlockInspectorSection.id` 提供稳定标识；分组标题改变时保留内部展开与编辑状态。
+
+自定义区块及覆盖内置区块的标题、标签、选项、分组和自定义组件文案由集成者管理，库不自动翻译。其内部复用的库控件仍使用编辑器界面语言。语言包、内部文案 key、Provider 和翻译函数均不作为公共 API 暴露。
+
+邮件主题、正文、变量名称/说明/预览值以及新建区块的默认内容保持原样；`EmailDocument.version` 和导出 HTML 不受界面语言影响。邮件内容语言与界面语言是独立概念，当前导出的 `lang="en"` 行为保持不变。接口返回、插件校验、模板引擎等外部错误保持原始信息；校验与导出 API 的诊断保持现有行为。
+
+发布包包含动态语言文件和共享 JavaScript 文件，部署时应由消费方打包工具解析整个包，不要只复制 `dist/index.js`。
 
 ### defineBlock(input) → BlockPlugin<Schema, Type>
 

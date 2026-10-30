@@ -1,0 +1,8 @@
+{
+  "instructions": "Para recoger un elemento arrastrable, pulsa la barra espaciadora. Mientras lo arrastras, usa las flechas para moverlo. Pulsa de nuevo la barra espaciadora para soltarlo o Escape para cancelar.",
+  "start": "Se ha recogido el elemento arrastrable {{id}}.",
+  "over": "El elemento arrastrable {{id}} se ha movido sobre la zona de destino {{over}}.",
+  "outside": "El elemento arrastrable {{id}} ya no está sobre una zona de destino.",
+  "end": "El elemento arrastrable {{id}} se ha soltado en la zona de destino {{over}}.",
+  "cancel": "Se ha cancelado el arrastre. Se ha soltado el elemento {{id}}."
+}

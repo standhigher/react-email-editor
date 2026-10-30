@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import type { CSSProperties } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import {
@@ -51,6 +52,7 @@ export function Canvas({
   onDuplicate,
   onRemove,
 }: CanvasProps) {
+  const t = useEditorTranslation();
   const { setNodeRef, isOver } = useDroppable({
     id: CANVAS_DROP_ID,
     disabled: !active,
@@ -97,7 +99,7 @@ export function Canvas({
           >
             {blocks.length === 0 ? (
               <div className="ree-canvas-empty">
-                Drag a block here or click one to get started
+                {t("editor.empty")}
               </div>
             ) : (
               <SortableContext

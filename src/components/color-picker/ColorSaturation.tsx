@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import type { CSSProperties, PointerEvent } from "react";
 import type { HsvColor } from "./colors";
 
@@ -7,6 +8,7 @@ interface ColorSaturationProps {
 }
 
 export function ColorSaturation({ color, onChange }: ColorSaturationProps) {
+  const t = useEditorTranslation();
   const update = (event: PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
@@ -22,11 +24,11 @@ export function ColorSaturation({ color, onChange }: ColorSaturationProps) {
       className="ree-color-saturation"
       role="slider"
       tabIndex={0}
-      aria-label="Saturation and brightness"
+      aria-label={t("color.saturation")}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={Math.round(color.saturation)}
-      aria-valuetext={`Saturation ${Math.round(color.saturation)}%, brightness ${Math.round(color.brightness)}%. Use left/right for saturation and up/down for brightness.`}
+      aria-valuetext={t("color.keyboardHint", { saturation: Math.round(color.saturation), brightness: Math.round(color.brightness) })}
       style={{ "--ree-color-hue": `hsl(${color.hue} 100% 50%)` } as CSSProperties}
       onPointerDown={(event) => {
         if (event.button !== 0) return;

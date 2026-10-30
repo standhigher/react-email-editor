@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import type { ReactNode } from "react";
 import type { Editor } from "@tiptap/react";
 import type { RichTextProfile } from "../../../types/block";
@@ -22,13 +23,14 @@ interface TextFormatControlsProps {
 }
 
 export function TextFormatControls({ editor, profile, state, inherited, menu, range, bold, toggleMenu, run, children }: TextFormatControlsProps) {
+  const t = useEditorTranslation();
   const fontFamily = state.fontFamily || inherited.fontFamily;
   const fontSize = state.fontSize || inherited.fontSize;
   return (
     <>
-      <div className="ree-rte-group" role="group" aria-label="Font">
+      <div className="ree-rte-group" role="group" aria-label={t("common.font")}>
         <ToolbarMenu
-          title="Font"
+          title={t("common.font")}
           open={menu === "font"}
           onToggle={() => toggleMenu("font")}
           label={fontFamilyLabel(fontFamily)}
@@ -48,7 +50,7 @@ export function TextFormatControls({ editor, profile, state, inherited, menu, ra
           ))}
         </ToolbarMenu>
         <ToolbarMenu
-          title="Font size"
+          title={t("common.fontSize")}
           open={menu === "size"}
           onToggle={() => toggleMenu("size")}
           label={fontSize || "15px"}
@@ -65,23 +67,23 @@ export function TextFormatControls({ editor, profile, state, inherited, menu, ra
           ))}
         </ToolbarMenu>
       </div>
-      <div className="ree-rte-group" role="group" aria-label="Text style">
+      <div className="ree-rte-group" role="group" aria-label={t("toolbar.textStyle")}>
         <ToolbarButton
-          title="Bold"
+          title={t("common.bold")}
           active={bold}
           onClick={() => toggleVisualBold(editor, inherited.fontWeight)}
         >
           <span className="ree-tool-bold">B</span>
         </ToolbarButton>
         <ToolbarButton
-          title="Italic"
+          title={t("common.italic")}
           active={state.italic}
           onClick={() => formatText(editor, (chain) => chain.toggleItalic())}
         >
           <span className="ree-tool-italic">I</span>
         </ToolbarButton>
         <ToolbarButton
-          title="Underline"
+          title={t("common.underline")}
           active={state.underline}
           onClick={() => formatText(editor, (chain) => chain.toggleUnderline())}
         >
@@ -89,7 +91,7 @@ export function TextFormatControls({ editor, profile, state, inherited, menu, ra
         </ToolbarButton>
         {profile === "text" ? (
           <ToolbarButton
-            title="Strikethrough"
+            title={t("toolbar.strikethrough")}
             active={state.strike}
             onClick={() => formatText(editor, (chain) => chain.toggleStrike())}
           >

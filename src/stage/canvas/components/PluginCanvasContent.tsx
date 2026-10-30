@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import { typographyCss } from "../../../utils/style";
 import { useMemo } from "react";
 import { buildRenderContext } from "../../../render/context";
@@ -25,12 +26,13 @@ interface PluginCanvasContentProps {
 }
 
 export function PluginCanvasContent({ block, body, definition, variables, templateEngine, selected, toolbarId, toolbarCollapsed, select, onCommitControl, onCommitControls, onCommitStyle }: PluginCanvasContentProps) {
+  const t = useEditorTranslation();
   const variableSnapshot = useMemo(() => structuredClone(variables), [variables]);
   const context = useMemo(() => definition ? buildRenderContext(block, "canvas", body, definition) : null, [block, body, definition]);
   const renderedHtml = useMemo(() => definition && context ? renderBlockContentFromContext(context, definition, {
     resolveHtmlTemplate: true, templateEngine, variables, templateData: mergeTemplateData(variables, block.defaultData), body,
   }) : "", [block.defaultData, body, context, definition, variables, templateEngine]);
-  if (!definition || !context) return <div className="ree-plugin-error" role="alert">Missing block plugin: {block.type}. Original data is preserved.</div>;
+  if (!definition || !context) return <div className="ree-plugin-error" role="alert">{t("editor.missingPlugin", { type: block.type })}</div>;
   const props = {
     ...context, variables: variableSnapshot, selected, renderedHtml, select,
     setControl: (name: string, value: unknown) => onCommitControl(block.id, name, value), setControls: (patch: Record<string, unknown>) => onCommitControls(block.id, patch),

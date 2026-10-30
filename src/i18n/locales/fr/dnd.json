@@ -1,0 +1,8 @@
+{
+  "instructions": "Pour saisir un élément déplaçable, appuyez sur la barre d’espace. Pendant le déplacement, utilisez les flèches pour déplacer l’élément. Appuyez à nouveau sur la barre d’espace pour le déposer ou sur Échap pour annuler.",
+  "start": "L’élément déplaçable {{id}} a été saisi.",
+  "over": "L’élément déplaçable {{id}} a été déplacé au-dessus de la zone de dépôt {{over}}.",
+  "outside": "L’élément déplaçable {{id}} n’est plus au-dessus d’une zone de dépôt.",
+  "end": "L’élément déplaçable {{id}} a été déposé dans la zone de dépôt {{over}}.",
+  "cancel": "Le déplacement a été annulé. L’élément {{id}} a été déposé."
+}

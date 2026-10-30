@@ -1,0 +1,31 @@
+{
+  "heading": {
+    "title": "Encabezado",
+    "description": "Encabezado grande de sección"
+  },
+  "text": {
+    "title": "Texto",
+    "description": "Párrafo de texto"
+  },
+  "button": {
+    "title": "Botón",
+    "description": "Botón de llamada a la acción"
+  },
+  "image": {
+    "title": "Imagen",
+    "description": "Insertar una imagen"
+  },
+  "divider": {
+    "title": "Separador",
+    "description": "Línea divisoria horizontal"
+  },
+  "spacer": {
+    "title": "Espaciador",
+    "description": "Espacio vertical en blanco"
+  },
+  "html": {
+    "title": "HTML",
+    "description": "Pegar HTML sin procesar",
+    "placeholder": "Pega HTML sin procesar…"
+  }
+}

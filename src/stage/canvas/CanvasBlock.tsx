@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../i18n/context";
 import { useId, useMemo, useState, type SyntheticEvent } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -46,6 +47,7 @@ export function CanvasBlock({
   onDuplicate,
   onRemove,
 }: CanvasBlockProps) {
+  const t = useEditorTranslation();
   const block = useMemo(() => ({ ...sourceBlock, style: resolveBlockStyle(sourceBlock.style, definition) }), [sourceBlock, definition]);
   const renderKey = useMemo(() => ({ definition, templateEngine, variables }), [definition, templateEngine, variables]);
   const toolbarId = useId();
@@ -84,7 +86,7 @@ export function CanvasBlock({
         {...attributes}
         {...listeners}
         onClick={select}
-        title="Drag to reorder"
+        title={t("editor.dragToReorder")}
       >
         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
           <circle cx="9" cy="5" r="1.6" />

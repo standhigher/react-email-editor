@@ -344,3 +344,28 @@ test("被 Suspense 中断的并发 render 不泄漏配置、变量、主体或�
   assert.equal(editor.getDocument().subject, "Still current");
   assert.deepEqual(callbacks, [1, 2]);
 });
+
+test("locale 配置更新保持实例、文档订阅快照和导出，多实例各自选择语言", (t) => {
+  const changes = [];
+  const first = fixture(t, { onChange: (document) => changes.push(document) });
+  const { editor, config } = first.current();
+  assert.equal(config.locale, "en");
+  const original = createEmailDocument([config.createBlock("button")]);
+  act(() => editor.setDocument(original));
+  const state = first.state();
+  const html = editor.getHtml();
+  const second = fixture(t, { configOptions: { locale: "en" }, initialDocument: original });
+  first.update({ configOptions: { locale: "zh-CN" }, onChange: (document) => changes.push(document) });
+  assert.equal(first.current().config.locale, "zh-CN");
+  assert.equal(second.current().config.locale, "en");
+  assert.equal(first.current().editor, editor);
+  assert.equal(first.state(), state);
+  assert.deepEqual(editor.getDocument(), original);
+  assert.equal(editor.getHtml(), html);
+  assert.equal(editor.getRenderedHtml(), html);
+  assert.equal(changes.length, 1);
+  assert.equal(first.current().config.library.find((block) => block.type === "button").title, "Button");
+  first.update({ configOptions: { locale: "fr-FR" } });
+  assert.equal(first.current().config.locale, "en");
+  assert.equal(first.state(), state);
+});

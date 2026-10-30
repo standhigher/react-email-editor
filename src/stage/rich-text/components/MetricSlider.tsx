@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../../../i18n/context";
 import { RangeControl } from "../../../components/RangeControl";
 import { ResetButton } from "../../../components/ResetButton";
 
@@ -24,13 +25,14 @@ export function MetricSlider({
   onChange,
   onReset,
 }: MetricSliderProps) {
+  const t = useEditorTranslation();
   return (
     <div className="ree-rte-metric">
       <div className="ree-rte-metric-label">
         <span>{label}</span>
         <span className="ree-rte-metric-meta">
           <span>{display}</span>
-          <ResetButton label={`Reset ${label.toLowerCase()}`} disabled={!overridden} onClick={onReset} />
+          <ResetButton label={t("common.resetLabel", { label: label.toLowerCase() })} disabled={!overridden} onClick={onReset} />
         </span>
       </div>
       <RangeControl

@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import { useState, type RefObject } from "react";
 import { RangeControl } from "./RangeControl";
 import { TextInput } from "./TextInput";
@@ -17,6 +18,7 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ id, label, value, fallback = "#000000", panelRef, onChange, onReset, onClose }: ColorPickerProps) {
+  const t = useEditorTranslation();
   const initial = colorToHex(value) ?? colorToHex(fallback) ?? "#000000";
   const [color, setColor] = useState(() => hexToHsv(initial));
   const [draft, setDraft] = useState(initial);
@@ -39,7 +41,7 @@ export function ColorPicker({ id, label, value, fallback = "#000000", panelRef, 
       id={id}
       className="ree-color-picker"
       role="dialog"
-      aria-label={`${label} picker`}
+      aria-label={t("color.picker", { label })}
       onMouseDown={(event) => event.stopPropagation()}
       onPointerDown={(event) => event.stopPropagation()}
       onKeyDown={(event) => {
@@ -52,7 +54,7 @@ export function ColorPicker({ id, label, value, fallback = "#000000", panelRef, 
     >
       <ColorSaturation color={color} onChange={selectColor} />
       <div className="ree-color-hue">
-        <RangeControl label="Hue" value={color.hue} min={0} max={360} onChange={(hue) => selectColor({ ...color, hue })} />
+        <RangeControl label={t("color.hue")} value={color.hue} min={0} max={360} onChange={(hue) => selectColor({ ...color, hue })} />
       </div>
       <div className="ree-color-hex-row">
         <span className="ree-color-preview" style={{ backgroundColor: hsvToHex(color) }} />
@@ -83,12 +85,12 @@ export function ColorPicker({ id, label, value, fallback = "#000000", panelRef, 
             }}
           />
         </label>
-        <ResetButton label={`Reset ${label.toLowerCase()}`} onClick={() => {
+        <ResetButton label={t("common.resetLabel", { label: label.toLowerCase() })} onClick={() => {
           onReset();
           onClose();
         }} />
       </div>
-      {invalid ? <p id={`${id}-error`} className="ree-color-error" role="status">Enter a 3 or 6 digit HEX color.</p> : null}
+      {invalid ? <p id={`${id}-error`} className="ree-color-error" role="status">{t("color.invalidHex")}</p> : null}
     </div>
   );
 }

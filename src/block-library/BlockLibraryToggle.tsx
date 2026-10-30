@@ -1,3 +1,4 @@
+import { useEditorTranslation } from "../i18n/context";
 import { Button } from "../components/Button";
 
 interface BlockLibraryToggleProps {
@@ -7,7 +8,8 @@ interface BlockLibraryToggleProps {
 }
 
 export function BlockLibraryToggle({ collapsed, libraryId, onToggle }: BlockLibraryToggleProps) {
-  const label = collapsed ? "Expand blocks sidebar" : "Collapse blocks sidebar";
+  const t = useEditorTranslation();
+  const label = collapsed ? t("editor.expandBlocks") : t("editor.collapseBlocks");
 
   return (
     <Button
