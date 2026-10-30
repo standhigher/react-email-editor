@@ -21,6 +21,7 @@ export function EmailPage() {
 | 参数 | 类型 | 含义与默认值 |
 | --- | --- | --- |
 | `editor` | `EmailEditorInstance` | 必填，来自 `useEmailEditor()`。 |
+| `locale` | `string` | 界面语言；优先于 `config.locale`，省略时沿用配置，最终默认 `en`。 |
 | `height` | `number \| string` | 默认 `"100%"`；数字单位 px，百分比要求父容器有明确高度。 |
 
 组件只负责 UI；实例独立于 UI 挂载。不支持组件 ref、旧配置工厂或旧文档 Props。
@@ -65,7 +66,7 @@ export function EmailPage() {
 
 | 参数 | 类型 | 默认与说明 |
 | --- | --- | --- |
-| `locale` | `string` | 默认 `en`。支持 `zh-CN`、`es`、`pt-PT`、`fr`；非英文语言包在挂载编辑器后按需加载。 |
+| `locale` | `string` | 默认界面语言，默认 `en`；组件的 `locale` 优先。支持 `zh-CN`、`es`、`pt-PT`、`fr`；非英文语言包在挂载编辑器后按需加载。 |
 | `plugins` | `BlockPlugin[]` | `[]`，由 `defineBlock()` 创建。 |
 | `builtins` | `false \| string[]` | 省略显示全部；`false` 隐藏全部内置区块；数组筛选并排序。隐藏不影响已有节点渲染。自定义类型追加到后面。 |
 | `pickImage` | `(context: ImagePickerContext) => Promise<string \| null>` | 图片资源选择器；返回 URL，`null` 取消，抛错显示重试；`context` 提供 `value/label/signal`。 |
@@ -75,7 +76,7 @@ export function EmailPage() {
 
 | 成员 | 参数与含义 |
 | --- | --- |
-| `locale` | 归一化后的编辑器界面语言。 |
+| `locale` | 归一化后的默认界面语言，组件的 `locale` 优先。 |
 | `definitions` | 全部注册插件的只读列表，包含隐藏的内置区块。 |
 | `library` | 按展示顺序排列的可插入区块只读列表。 |
 | `pickImage` | 注册的资源选择器。 |
@@ -89,12 +90,11 @@ export function EmailPage() {
 ### 编辑器界面语言
 
 ```tsx
-const config = useEmailEditorConfig({ locale: language });
-const editor = useEmailEditor({ config });
-return <EmailEditor editor={editor} height={720} />;
+const editor = useEmailEditor();
+return <EmailEditor editor={editor} locale={language} height={720} />;
 ```
 
-支持 `en`（英语，默认）、`zh-CN`（简体中文）、`es`（西班牙语）、`pt-PT`（葡萄牙语，葡萄牙）和 `fr`（法语）。不传 `locale` 或传入未支持的值时使用 `en`，例如 `pt-BR`、`es-MX`、`fr-CA` 均回退英文，不自动匹配地区变体。匹配忽略大小写和首尾空格，并将 `_` 视为 `-`；保留 `zh`、`zh-Hans` 到 `zh-CN` 的别名。语言由宿主明确传入，不检测浏览器语言。
+支持 `en`（英语，默认）、`zh-CN`（简体中文）、`es`（西班牙语）、`pt-PT`（葡萄牙语，葡萄牙）和 `fr`（法语）。组件的 `locale` 优先于 `useEmailEditorConfig({ locale })`；省略或设为 `undefined` 时沿用配置，均未指定时使用 `en`。只设置界面语言无需调用 `useEmailEditorConfig()`，修改组件语言不会写回配置。显式传入空字符串或未支持的值时使用 `en`，例如 `pt-BR`、`es-MX`、`fr-CA` 均回退英文，不自动匹配地区变体。匹配忽略大小写和首尾空格，并将 `_` 视为 `-`；保留 `zh`、`zh-Hans` 到 `zh-CN` 的别名。语言由宿主明确传入，不检测浏览器语言。
 
 英文随主入口提供，其余四种语言各自通过动态 `import()` 加载独立文件。同一语言的资源和加载请求在库内部缓存；仅调用配置或导出 API 不会加载非英文语言包。首次加载完成前仅保留编辑器高度的空容器（`aria-busy="true"`），加载完成后直接显示目标语言；英文和已缓存语言立即显示。后续切换保留当前语言直到目标语言可用。首次加载失败仅显示提示及重试按钮；后续切换失败继续保留当前界面并提供重试。快速切换与卸载不会让过期加载结果覆盖当前选择。
 

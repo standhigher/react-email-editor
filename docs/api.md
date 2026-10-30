@@ -21,6 +21,7 @@ export function EmailPage() {
 | Parameter | Type | Meaning and default |
 | --- | --- | --- |
 | `editor` | `EmailEditorInstance` | Required instance returned by `useEmailEditor()`. |
+| `locale` | `string` | UI language; overrides `config.locale`. When omitted, uses the configuration, ultimately defaulting to `en`. |
 | `height` | `number \| string` | Default `"100%"`; numbers use px; percentages require a parent with an explicit height. |
 
 The component provides UI; the instance works independently of mounting it. Component refs, legacy configuration factories and document props are unsupported.
@@ -65,7 +66,7 @@ Requires an instance from `useEmailEditor()`. Returns cached `{ document }`, a d
 
 | Parameter | Type | Default and meaning |
 | --- | --- | --- |
-| `locale` | `string` | Defaults to `en`; supports `zh-CN`, `es`, `pt-PT` and `fr`. Non-English language chunks load when the editor mounts. |
+| `locale` | `string` | Default UI language, defaulting to `en`; the component locale takes precedence. Supports `zh-CN`, `es`, `pt-PT` and `fr`. Non-English language chunks load when the editor mounts. |
 | `plugins` | `BlockPlugin[]` | `[]`; plugins created by `defineBlock()`. |
 | `builtins` | `false \| string[]` | All by default; false hides all builtins; arrays filter and order them. Hidden blocks still render existing nodes. Custom types are appended. |
 | `pickImage` | `(context: ImagePickerContext) => Promise<string \| null>` | Resolve a URL; null cancels; throwing shows retry. Context contains `value/label/signal`. |
@@ -75,7 +76,7 @@ Declare plugins at module scope, or use `useMemo` when they depend on applicatio
 
 | Member | Arguments and meaning |
 | --- | --- |
-| `locale` | Normalized editor UI locale. |
+| `locale` | Normalized default UI locale; the component locale takes precedence. |
 | `definitions` | Readonly list of all registered plugins, including hidden builtins. |
 | `library` | Readonly list of insertable blocks in display order. |
 | `pickImage` | Registered resource picker. |
@@ -89,12 +90,11 @@ Duplicate custom types, duplicate builtin entries and unknown builtin names thro
 ### Editor UI language
 
 ```tsx
-const config = useEmailEditorConfig({ locale: language });
-const editor = useEmailEditor({ config });
-return <EmailEditor editor={editor} height={720} />;
+const editor = useEmailEditor();
+return <EmailEditor editor={editor} locale={language} height={720} />;
 ```
 
-Supported locales are `en` (English, default), `zh-CN` (Simplified Chinese), `es` (Spanish), `pt-PT` (Portuguese, Portugal) and `fr` (French). Omitted or unsupported locales use `en`; regional variants such as `pt-BR`, `es-MX` and `fr-CA` fall back to English without automatic regional matching. Matching ignores case and surrounding whitespace and treats `_` as `-`. Existing `zh` and `zh-Hans` aliases still normalize to `zh-CN`. The host selects the locale explicitly; the library does not detect browser language.
+Supported locales are `en` (English, default), `zh-CN` (Simplified Chinese), `es` (Spanish), `pt-PT` (Portuguese, Portugal) and `fr` (French). The component `locale` overrides `useEmailEditorConfig({ locale })`; omitting it or passing `undefined` uses the configuration, ultimately defaulting to `en`. Setting the UI language alone does not require `useEmailEditorConfig()`, and component locale changes do not modify the configuration. An explicit empty string or unsupported locale uses `en`; regional variants such as `pt-BR`, `es-MX` and `fr-CA` fall back to English without automatic regional matching. Matching ignores case and surrounding whitespace and treats `_` as `-`. Existing `zh` and `zh-Hans` aliases still normalize to `zh-CN`. The host selects the locale explicitly; the library does not detect browser language.
 
 English ships with the entry point; each of the other four languages loads through a dynamic `import()` into a separate chunk. Resources and concurrent requests for the same language are cached internally. Configuration and export APIs alone do not load non-English languages. The initial load shows an empty container preserving the editor height with `aria-busy="true"`, then displays the target language directly; English and cached languages display immediately. Subsequent switches retain the current language until the target is ready. An initial load failure shows only an error and retry action; a failed subsequent switch retains the current UI with a retry action. Stale requests cannot overwrite a newer selection or update an unmounted editor.
 

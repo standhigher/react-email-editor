@@ -19,9 +19,9 @@ import type {
   EmailEditorProps,
 } from "../types/editor";
 
-export function EmailEditorShell({ editor, height = "100%" }: EmailEditorProps) {
+export function EmailEditorShell({ editor, height = "100%", locale }: EmailEditorProps) {
   const sourceSession = useEditorSession(editor);
-  const language = useEditorLocale(sourceSession.config.locale);
+  const language = useEditorLocale(locale ?? sourceSession.config.locale);
   const { t } = language.translation;
   const definitions = useMemo(() => sourceSession.definitions.map((definition) => localizeDefinition(definition, t)), [sourceSession.definitions, t]);
   const library = sourceSession.config.library.map((definition) => definitions.find((item) => item.type === definition.type) ?? definition);

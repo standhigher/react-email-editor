@@ -60,6 +60,10 @@ function useTypeContract() {
   config.toHtml(editor.getDocument(), { resolveHtmlTemplates: true, templateEngine: defaultTemplateEngine });
   const state = useEmailEditorState(editor);
   const props: import("../src/index").EmailEditorProps = { editor, height: 720 };
+  const localizedProps: import("../src/index").EmailEditorProps = { editor, locale: "zh-CN" };
+  // @ts-expect-error 界面语言只接受字符串。
+  const invalidLocaleProps: import("../src/index").EmailEditorProps = { editor, locale: 1 };
+  void localizedProps; void invalidLocaleProps;
   editor.setDocument(editor.getDocument());
   // 文档版本是数字标识，不再限定为字面量 4。
   editor.setDocument({ ...editor.getDocument(), version: 5 });

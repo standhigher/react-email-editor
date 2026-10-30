@@ -55,6 +55,8 @@ export interface EmailEditorProps {
   editor: EmailEditorInstance;
   /** Height, default 100%; numbers are px; percentages need a sized parent. */
   height?: number | string;
+  /** UI language; overrides config.locale, which defaults to English. */
+  locale?: string;
 }
 
 type ReadonlyData<T> = T extends object ? { readonly [Key in keyof T]: ReadonlyData<T[Key]> } : T;

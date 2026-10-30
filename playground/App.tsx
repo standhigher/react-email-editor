@@ -8,7 +8,7 @@ import "./styles.css";
 
 export function App() {
   const [locale, setLocale] = useState("en");
-  const config = usePlaygroundConfig(locale);
+  const config = usePlaygroundConfig();
   const editor = useEmailEditor({
     config,
     initialDocument: sampleDocument,
@@ -16,6 +16,6 @@ export function App() {
   });
   return <div className="ree-demo-app">
     <EditorActions editor={editor} locale={locale} onLocaleChange={setLocale} />
-    <div className="ree-demo-editor"><EmailEditor editor={editor} height="100%" /></div>
+    <div className="ree-demo-editor"><EmailEditor editor={editor} height="100%" locale={locale} /></div>
   </div>;
 }

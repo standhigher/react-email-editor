@@ -14,7 +14,6 @@ const { DEFAULT_TRANSLATION, getLoadedTranslation, loadTranslation, normalizeLoc
 const { useEditorLocale } = await import("../src/i18n/useEditorLocale.ts");
 const { EmailEditorShell } = await import("../src/shell/EmailEditorShell.tsx");
 const { createEditorStore } = await import("../src/shell/editor-store.ts");
-const { buildEmailEditorConfig } = await import("../src/plugins/config.ts");
 const { EditorLocaleContext } = await import("../src/i18n/context.ts");
 const { localizeDefinition } = await import("../src/i18n/metadata.ts");
 const { BodyControls } = await import("../src/inspector/BodyControls.tsx");
@@ -98,10 +97,10 @@ test("首次语言加载完成前不挂载编辑界面，失败仅显示重试�
     return new Promise((done, fail) => { resolve = done; reject = fail; });
   });
   const changes = [];
-  const store = createEditorStore({ config: buildEmailEditorConfig({ locale: "fr" }), onChange: (document) => changes.push(document) });
+  const store = createEditorStore({ onChange: (document) => changes.push(document) });
   const original = store.editor.getData();
   let view;
-  act(() => { view = create(createElement(EmailEditorShell, { editor: store.editor, height: 720 })); });
+  act(() => { view = create(createElement(EmailEditorShell, { editor: store.editor, height: 720, locale: "fr" })); });
   t.after(() => act(() => view.unmount()));
   const root = () => view.root.findByProps({ className: "ree-root" });
   assert.equal(root().props.style.height, 720);
@@ -122,8 +121,7 @@ test("首次语言加载完成前不挂载编辑界面，失败仅显示重试�
   const body = view.root.findByProps({ className: "ree-body" });
   t.mock.method(LOCALE_LOADERS, "es", () => Promise.reject(new Error("Network unavailable")));
   await act(async () => {
-    store.updateOptions({ config: buildEmailEditorConfig({ locale: "es" }) });
-    store.flushOptions();
+    view.update(createElement(EmailEditorShell, { editor: store.editor, height: 720, locale: "es" }));
   });
   assert.equal(root().props.lang, "fr");
   assert.equal(view.root.findByProps({ className: "ree-body" }), body);

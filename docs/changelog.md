@@ -2,6 +2,18 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## Unreleased
+
+### Added and improved
+
+- `EmailEditor` accepts an optional `locale` directly, so selecting the UI language alone does not require `useEmailEditorConfig()`. The component prop overrides `config.locale`; omitting it uses the configuration, ultimately defaulting to `en`. Existing configuration-based selection remains supported.
+- Update the playground, bilingual API documentation and project rules. Language changes preserve the instance, document subscription snapshot and UI state without modifying configuration or triggering document changes. Email export and the document format remain unchanged. The npm package version stays at `0.7.2` pending release version assignment.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build and all 164 Node tests, including direct component locale selection, precedence and fallback, five-language switching, instance isolation, loading failures and retries, snapshots and export preservation; `git diff --check` passes.
+- Reuse the existing Chrome tab and restore the playground service after confirming port 5173 was no longer served. Verify Chinese and French switching, inspector expansion state, preview mode and iframe content preservation, and identical exported HTML before and after switching.
+
 ## 0.7.2 — 2026-10-30
 
 ### Fixes and improvements

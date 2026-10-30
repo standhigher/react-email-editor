@@ -178,7 +178,7 @@ export interface ValidationIssue {
 
 /** Block registration and image resource adapter options. */
 export interface UseEmailEditorConfigOptions {
-  /** Editor UI language; defaults to English. Supported languages load on demand. */
+  /** Default UI language when EmailEditor.locale is omitted; defaults to English. */
   locale?: string;
   /** Shared synchronous template adapter; defaults to the basic engine. */
   templateEngine?: TemplateEngine;
@@ -192,7 +192,7 @@ export interface UseEmailEditorConfigOptions {
 
 /** Shared configuration for editing, creation and standalone export. */
 export interface EmailEditorConfig {
-  /** Normalized editor UI locale, independent of email content. */
+  /** Normalized default UI locale; EmailEditor.locale takes precedence. */
   readonly locale: string;
   /** Normalized engine used by canvas, preview and resolved HTML export. */
   readonly templateEngine: TemplateEngine;
