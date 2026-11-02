@@ -286,6 +286,8 @@ Use these in business inspectors. They provide UI without automatically binding 
 
 Props and `RichText.inherited` fields are documented in the published `.d.ts`; use IDE hover information or go to definition. Native attributes follow React types; props interfaces are not added as named package exports.
 
+The canvas rich-text toolbar prefers the space above its block. When that visible space is insufficient, it appears below the Action bar at the block's lower left. If the space below is also insufficient, extra canvas scroll space is reserved and scrolled into view without covering the Action bar; short containers allow scrolling within the toolbar. The toolbar and its font, size, paragraph and Emoji menus respect the visible canvas and clipping ancestors, wrapping at narrower widths and updating position on scrolling or container resizing. The toolbar hides when it or its block moves out of view. Positioning only affects the editing UI, leaving the document and email export unchanged; closing the toolbar removes the extra scroll space.
+
 ## Constants and public types
 
 | Export | Purpose |
@@ -313,6 +315,8 @@ node --test tests/*.test.mjs tests/*.test.ts
 ```
 
 Use `npm run check` to run all four checks in order, or `npm test` after building to run only the Node tests. Node 24 LTS and npm 11.13.0 are the repository defaults. See the [release guide](./release.md) for package verification and publishing.
+
+After building, reuse the existing development service and open `/regressions/toolbar-boundaries.html` to verify toolbar flipping, Action bar clearance, a final long block, short containers, scroll-space cleanup, container narrowing, scroll visibility, Emoji and font menu bounds and clicks, collapse/expand, and iframe behavior. The page should report that all checks passed.
 
 Build before tests that depend on dist. Internal TypeScript tests require Node 22.18+. The package ships ESM, declarations and flattened CSS. React/React DOM are peer dependencies; TipTap, dnd-kit, CodeMirror and Lezer are dependencies, externalized during builds rather than bundled.
 

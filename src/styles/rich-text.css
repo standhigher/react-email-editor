@@ -20,6 +20,7 @@
   width: auto;
   margin: 0;
   padding: 4px;
+  overflow: auto;
   background: var(--ree-panel, #ffffff);
   border: 1px solid var(--ree-border, #e3e3e5);
   border-radius: var(--ree-radius, 8px);
@@ -146,11 +147,11 @@
 }
 
 .ree-rte-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
+  position: fixed;
   z-index: 30;
-  min-width: 180px;
+  width: max-content;
+  min-width: min(180px, var(--ree-menu-width, 180px));
+  max-width: var(--ree-menu-width, none);
   max-height: 280px;
   overflow: auto;
   padding: 6px;
@@ -160,16 +161,6 @@
   box-shadow: var(--ree-shadow-lg, 0 6px 32px rgba(31, 33, 36, 0.16));
   color: var(--ree-text, #202223);
   font-size: 14px;
-}
-
-.ree-rte-menu.is-end {
-  left: auto;
-  right: 0;
-}
-
-.ree-rte-pop.is-up .ree-rte-menu {
-  top: auto;
-  bottom: calc(100% + 6px);
 }
 
 .ree-rte-option {

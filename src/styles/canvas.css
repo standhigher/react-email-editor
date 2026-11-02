@@ -67,6 +67,11 @@
   outline-offset: -12px;
 }
 
+.ree-canvas::after {
+  content: "";
+  flex: 0 0 var(--ree-toolbar-space, 0px);
+}
+
 .ree-email-surface {
   box-sizing: border-box;
   margin: 0 auto;

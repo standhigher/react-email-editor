@@ -286,6 +286,8 @@ export const coupon = defineBlock({
 
 Props 及 `RichText.inherited` 的字段说明包含在发布包的 `.d.ts` 注释中，可通过 IDE 悬停或跳转到定义查看。原生属性按 React 类型定义，不新增同名导出类型。
 
+画布富文本工具栏优先显示在区块上方；上方可见空间不足时，显示在区块左下角 Action 栏下方。下方也不足时补足画布底部滚动空间并滚动露出工具栏，不覆盖 Action；低高度容器中工具栏内部可滚动。工具栏及字体、字号、段落与 Emoji 菜单按画布与宿主裁切容器的可见边界定位，收窄时换行，滚动或容器尺寸变化时更新位置；区块或工具栏移出可见区域时隐藏工具栏。此定位仅影响编辑界面，不改变文档或邮件导出，关闭工具栏会清理额外留白。
+
 ## 常量与公共类型
 
 | 导出 | 用途 |
@@ -313,6 +315,8 @@ node --test tests/*.test.mjs tests/*.test.ts
 ```
 
 `npm run check` 按上述顺序执行全部检查；只运行 Node 测试时，构建后执行 `npm test`。本仓库默认使用 Node 24 LTS 和 npm 11.13.0。打包检查与发布流程见[发布指南](./release.zh-CN.md)。
+
+构建后复用已有开发服务，打开 `/regressions/toolbar-boundaries.html` 可验证富文本工具栏的上下翻转、Action 栏避让、最后一个长区块与低高度容器、滚动留白清理、容器缩窄、滚动隐藏、Emoji 与字体菜单边界及点击、收起/展开与 iframe；页面应显示“全部通过”。
 
 先构建再运行依赖 dist 的测试；TypeScript 内部测试需要 Node 22.18+。包提供 ESM、类型与展开后的 CSS。React/React DOM 为 peer dependencies；TipTap、dnd-kit、CodeMirror、Lezer 等为 dependencies，构建时 external，不内联到发布包。
 

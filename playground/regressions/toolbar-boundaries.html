@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>富文本工具栏边界回归</title>
+    <style>
+      body { margin: 0; }
+      #root { width: 1030px; }
+      #root .ree-col-left { width: 52px; }
+      #result { white-space: pre-wrap; height: 80px; overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <h1>富文本工具栏边界回归</h1>
+    <p>运行对象：构建后的 dist；覆盖 Action 栏避让、画布边界、尺寸变化、滚动、菜单与 iframe。</p>
+    <pre id="result" role="status">运行中…</pre>
+    <div id="root"></div>
+    <script type="module" src="./toolbar-boundaries.ts"></script>
+  </body>
+</html>

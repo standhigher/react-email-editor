@@ -7,6 +7,7 @@ import type { RichTextProfile, Variable } from "../../../types/block";
 import { DEFAULT_LINK_TARGET, TEXT_ALIGNS } from "../constants";
 import type { EditorTextRange, RichTextInheritedStyle, RichTextMenu } from "../types";
 import { useAnchoredToolbar } from "../useAnchoredToolbar";
+import { ToolbarBoundaryContext } from "../toolbar-boundary-context";
 import { readToolbarState } from "../utils";
 import { currentSelection, focusSelection, formatText, isVisuallyBold } from "../formatting";
 import { EmojiMenu } from "./EmojiMenu";
@@ -137,6 +138,7 @@ export function RichTextToolbar({
   };
 
   return (
+    <ToolbarBoundaryContext.Provider value={anchorRef}>
     <div
       id={id}
       className="ree-rte-toolbar"
@@ -278,5 +280,6 @@ export function RichTextToolbar({
         />
       </div>
     </div>
+    </ToolbarBoundaryContext.Provider>
   );
 }

@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { ToolbarIcon } from "./ToolbarIcon";
+import { useToolbarMenuPosition } from "../useToolbarMenuPosition";
 
 interface ToolbarMenuProps {
   label: ReactNode;
@@ -27,15 +28,7 @@ export function ToolbarMenu({
   children,
 }: ToolbarMenuProps) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [up, setUp] = useState(false);
-
-  useLayoutEffect(() => {
-    if (!open || !rootRef.current) return;
-    const ownerWindow = rootRef.current.ownerDocument.defaultView;
-    if (!ownerWindow) return;
-    const rect = rootRef.current.getBoundingClientRect();
-    setUp(rect.bottom + 260 > ownerWindow.innerHeight && rect.top > 260);
-  }, [open]);
+  const menuRef = useToolbarMenuPosition(rootRef, open, align);
 
   const buttonClass =
     variant === "icon"
@@ -43,7 +36,7 @@ export function ToolbarMenu({
       : `ree-rte-select${open ? " is-open" : ""}`;
 
   return (
-    <div className={`ree-rte-pop${up ? " is-up" : ""}`} ref={rootRef}>
+    <div className="ree-rte-pop" ref={rootRef}>
       <button
         type="button"
         className={buttonClass}
@@ -57,9 +50,9 @@ export function ToolbarMenu({
       </button>
       {open ? (
         <div
+          ref={menuRef}
           className={[
             "ree-rte-menu",
-            align === "end" ? "is-end" : "",
             panelClassName ?? "",
           ]
             .filter(Boolean)

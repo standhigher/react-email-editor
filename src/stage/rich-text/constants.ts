@@ -9,6 +9,10 @@ export interface TextAlignOption {
 
 export const PARAGRAPH_SPACING_MAX = 48;
 
+export const TOOLBAR_BOUNDARY_PADDING = 8;
+export const TOOLBAR_ANCHOR_GAP = 4;
+export const TOOLBAR_VISIBLE_ANCHOR_HEIGHT = 28;
+
 export const DEFAULT_LINK_TARGET = "_blank";
 
 interface LinkTargetOption {
