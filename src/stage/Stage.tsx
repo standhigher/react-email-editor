@@ -66,7 +66,7 @@ export function Stage({
           />
         </div>
         <div className={`ree-stage-view${previewVisible ? "" : " is-buffered"}`} aria-hidden={!previewVisible} {...(!previewVisible ? { inert: "" } : {})}>
-          <Preview frames={preview.frames} front={preview.front} failure={preview.displayFailure} onReady={preview.markReady} onFailed={preview.markFailed} onRetry={preview.retry} />
+          <Preview active={requested} source={source} frames={preview.frames} front={preview.front} failure={preview.displayFailure} onReady={preview.markReady} onFailed={preview.markFailed} onRetry={preview.retry} />
         </div>
         {requested && !preview.ready && !preview.failure ? <div className="ree-preview-pending" role="status">{t("preview.preparing")}</div> : null}
       </div>

@@ -186,6 +186,39 @@ test("Stage 等最新 iframe 测量完成才显示预览，切换保留画布和
   assert.equal(renderer.root.findByProps({ className: "ree-stage-content" }).props["aria-busy"], false);
 });
 
+test("编辑期间后台只生成 HTML，进入预览才挂载新 iframe，返回编辑保留已加载帧", (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout", "Date"] });
+  const config = buildEmailEditorConfig();
+  const block = config.createBlock("image");
+  let session = { document: createEmailDocument([block]), config, variables: [], definitions: config.definitions, selectedId: block.id };
+  const tree = (viewMode) => createElement(Stage, { session, viewMode, device: "desktop" });
+  let renderer;
+  act(() => { renderer = create(tree("edit")); });
+  t.after(() => act(() => renderer.unmount()));
+  const frames = () => renderer.root.findAllByType(PreviewFrame);
+  act(() => t.mock.timers.tick(2500));
+  assert.equal(frames().length, 0);
+  act(() => renderer.update(tree("preview")));
+  act(() => t.mock.timers.tick(0));
+  const first = frames()[0];
+  assert.match(first.props.snapshot.html, /alt="Image"/);
+  act(() => first.props.onReady(first.props.snapshot.id));
+  act(() => renderer.update(tree("edit")));
+  assert.equal(frames()[0], first);
+  session = { ...session, document: { ...session.document, blocks: [{ ...block, controls: { ...block.controls, alt: "Updated" } }] } };
+  act(() => renderer.update(tree("edit")));
+  act(() => t.mock.timers.tick(2500));
+  assert.equal(frames().length, 1);
+  assert.equal(frames()[0], first);
+  assert.match(first.props.snapshot.html, /alt="Image"/);
+  act(() => renderer.update(tree("preview")));
+  act(() => t.mock.timers.tick(0));
+  const second = frames().find((frame) => frame !== first);
+  assert.match(second.props.snapshot.html, /alt="Updated"/);
+  act(() => second.props.onReady(second.props.snapshot.id));
+  assert.equal(renderer.root.findByProps({ className: "ree-stage-content" }).props["aria-busy"], false);
+});
+
 test("首次失败后换配置，保留错误画面直到新缓冲就绪", (t) => {
   const view = bufferFixture(t, sourceFixture(() => { throw new Error("Unavailable"); }));
   view.tick(400);

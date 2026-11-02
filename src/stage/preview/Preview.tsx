@@ -3,15 +3,17 @@ import { useRef } from "react";
 import { Button } from "../../components/Button";
 import { PREVIEW_BUFFER_SLOTS } from "./constants";
 import { PreviewFrame } from "./PreviewFrame";
-import type { PreviewBufferState } from "./types";
+import type { PreviewBufferState, PreviewSource } from "./types";
 
 interface PreviewProps extends PreviewBufferState {
+  active: boolean;
+  source: PreviewSource;
   onReady: (id: number) => void;
   onFailed: (id: number, message: string) => void;
   onRetry: () => void;
 }
 
-export function Preview({ frames, front, failure, onReady, onFailed, onRetry }: PreviewProps) {
+export function Preview({ active, source, frames, front, failure, onReady, onFailed, onRetry }: PreviewProps) {
   const t = useEditorTranslation();
   const scrollRef = useRef({ top: 0, left: 0 });
   return (
@@ -19,6 +21,8 @@ export function Preview({ frames, front, failure, onReady, onFailed, onRetry }: 
       {PREVIEW_BUFFER_SLOTS.map((index) => {
         const snapshot = frames[index];
         const visible = front === index;
+        const shouldMount = snapshot?.status === "ready"
+          || (active && snapshot?.status === "loading" && snapshot.source === source);
         return (
           <div
             key={index}
@@ -36,7 +40,7 @@ export function Preview({ frames, front, failure, onReady, onFailed, onRetry }: 
             }}
           >
             <div className="ree-email-viewport" style={{ width: snapshot?.width, marginLeft: "auto", marginRight: "auto" }}>
-              {snapshot ? <PreviewFrame key={snapshot.id} snapshot={snapshot} onReady={onReady} onFailed={onFailed} /> : null}
+              {snapshot && shouldMount ? <PreviewFrame key={snapshot.id} snapshot={snapshot} onReady={onReady} onFailed={onFailed} /> : null}
             </div>
           </div>
         );

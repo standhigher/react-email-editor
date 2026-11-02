@@ -1,6 +1,7 @@
 import { useEditorTranslation } from "../../../i18n/context";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { extractHeadStyles } from "../../../render/head-styles";
+import { updateCanvasDocument } from "../html-document";
 
 interface HtmlCanvasProps {
   html: string;
@@ -19,6 +20,7 @@ export function HtmlCanvas({ html, baseCss = "", onSelect }: HtmlCanvasProps) {
   const hasHtmlTag = /<\/?[a-z][\w:-]*(?:\s[^>]*)?>/i.test(html);
   const containerRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const loadedFrameRef = useRef<HTMLIFrameElement | null>(null);
   const cleanupRef = useRef<() => void>();
 
   const observeContent = useCallback(() => {
@@ -67,7 +69,20 @@ export function HtmlCanvas({ html, baseCss = "", onSelect }: HtmlCanvasProps) {
     };
   }, []);
 
-  useEffect(() => () => cleanupRef.current?.(), [hasHtmlTag, html]);
+  const updateContent = useCallback(() => {
+    const frame = frameRef.current;
+    if (!frame || loadedFrameRef.current !== frame) return;
+    const document = frame.contentDocument;
+    if (!document?.body) return;
+    updateCanvasDocument(document, frameHtml(html, baseCss));
+    observeContent();
+  }, [html, baseCss, observeContent]);
+
+  useLayoutEffect(() => {
+    if (hasHtmlTag) updateContent();
+  }, [hasHtmlTag, updateContent]);
+
+  useEffect(() => () => cleanupRef.current?.(), [hasHtmlTag]);
 
   if (!hasHtmlTag) {
     return (
@@ -97,10 +112,13 @@ export function HtmlCanvas({ html, baseCss = "", onSelect }: HtmlCanvasProps) {
         ref={frameRef}
         className="ree-html-canvas-frame"
         title={t("preview.html")}
-        srcDoc={frameHtml(html, baseCss)}
+        srcDoc="<!DOCTYPE html><html><head></head><body></body></html>"
         sandbox="allow-same-origin"
         tabIndex={-1}
-        onLoad={observeContent}
+        onLoad={() => {
+          loadedFrameRef.current = frameRef.current;
+          updateContent();
+        }}
       />
     </div>
   );

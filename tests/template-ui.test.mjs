@@ -5,6 +5,7 @@ import { createElement } from "react";
 import { act, create } from "react-test-renderer";
 
 const { PreviewFrame } = await import("../src/stage/preview/PreviewFrame.tsx");
+const { HtmlCanvas } = await import("../src/stage/canvas/components/HtmlCanvas.tsx");
 const { Stage } = await import("../src/stage/Stage.tsx");
 const { buildEmailEditorConfig } = await import("../src/plugins/config.ts");
 const { createEmailDocument } = await import("../src/document/create-document.ts");
@@ -23,6 +24,7 @@ function fixture(t, templateEngine, { variables = [], template, defaultData } = 
   return {
     renderer,
     document,
+    canvasHtml() { return renderer.root.findByType(HtmlCanvas).props.html; },
     frame(title = "Email preview") {
       if (title !== "Email preview") return renderer.root.findByProps({ title });
       const frames = renderer.root.findAllByType(PreviewFrame);
@@ -47,7 +49,7 @@ test("画布和预览 iframe 共用配置引擎，切换引擎刷新展示并保
   const view = fixture(t, makeEngine("First"));
   let frame = view.frame("HTML block preview");
   assert.equal(frame.props.title, "HTML block preview");
-  assert.match(frame.props.srcDoc, /First:YES &amp; done/);
+  assert.match(view.canvasHtml(), /First:YES &amp; done/);
   assert.deepEqual(calls[0].data, { status: "ready" });
   assert.ok(calls[0].template.includes('{{if eq .status "ready"}}'));
   await view.update("preview");
@@ -58,7 +60,7 @@ test("画布和预览 iframe 共用配置引擎，切换引擎刷新展示并保
   await view.update("preview", second);
   assert.match(view.frame().props.srcDoc, /Second:YES &amp; done/);
   await view.update("edit");
-  assert.match(view.frame("HTML block preview").props.srcDoc, /Second:YES &amp; done/);
+  assert.match(view.canvasHtml(), /Second:YES &amp; done/);
   assert.equal(view.document.blocks[0].controls.html, '{{if eq .status "ready"}}YES{{else}}NO{{end}}');
 });
 
@@ -73,7 +75,7 @@ test("画布与预览交给外部引擎的变量 token 和发送 HTML 一致", a
     assert.deepEqual(values, { store_name: "Shop", 客户名: "张三" });
     return "<p>Shop|张三</p>";
   } }, { variables, template, defaultData: {} });
-  assert.match(view.frame("HTML block preview").props.srcDoc, /Shop\|张三/);
+  assert.match(view.canvasHtml(), /Shop\|张三/);
   await view.update("preview");
   assert.match(view.frame().props.srcDoc, /Shop\|张三/);
   assert.equal(sources.length, 3); // 画布常驻，配置更新同时刷新画布和预览。
@@ -91,7 +93,7 @@ test("非 Error 异常显示有效错误消息，Retry 和更换引擎可以恢�
     failing = false;
     const retry = view.renderer.root.findAllByType("button").find((button) => button.children.includes("Retry"));
     act(() => retry.props.onClick());
-    assert.match(view.frame("HTML block preview").props.srcDoc, /Recovered/);
+    assert.match(view.canvasHtml(), /Recovered/);
     failing = true;
     await view.update("preview");
     assert.ok(view.renderer.root.findAllByProps({ role: "alert" })[0].findByType("p").children.join("").length > 0);
@@ -111,7 +113,7 @@ test("外部引擎失败显示现有错误与重试，替换引擎后画布和�
   assert.equal(view.renderer.root.findAllByType("iframe").length, 0);
   assert.ok(view.renderer.root.findAllByType("button").some((button) => button.children.includes("Retry")));
   await view.update("edit", recovered);
-  assert.match(view.frame("HTML block preview").props.srcDoc, /Recovered/);
+  assert.match(view.canvasHtml(), /Recovered/);
   await view.update("preview", failed);
   assert.ok(view.renderer.root.findAllByProps({ role: "alert" })[0]);
   await view.update("preview", recovered);
