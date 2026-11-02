@@ -22,7 +22,7 @@
 }
 
 .ree-block:hover {
-  z-index: 1;
+  /* 不建立层叠上下文，让类型标签可以高于相邻区块的选中框。 */
   background: var(--ree-accent-bg);
 }
 
@@ -116,7 +116,7 @@
   position: absolute;
   right: 8px;
   bottom: -11px;
-  z-index: 6;
+  z-index: 9;
   padding: 2px 9px;
   font-size: 11px;
   font-weight: 600;
@@ -132,8 +132,7 @@
   transition: opacity 0.12s ease;
 }
 
-.ree-block:hover .ree-block-badge,
-.ree-block.is-selected .ree-block-badge {
+.ree-block:not(.is-selected):hover > .ree-block-badge {
   opacity: 1;
 }
 

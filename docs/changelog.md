@@ -9,10 +9,16 @@ English | [简体中文](./changelog.zh-CN.md)
 - `EmailEditor` accepts an optional `locale` directly, so selecting the UI language alone does not require `useEmailEditorConfig()`. The component prop overrides `config.locale`; omitting it uses the configuration, ultimately defaulting to `en`. Existing configuration-based selection remains supported.
 - Update the playground, bilingual API documentation and project rules. Language changes preserve the instance, document subscription snapshot and UI state without modifying configuration or triggering document changes. Email export and the document format remain unchanged. The npm package version stays at `0.7.2` pending release version assignment.
 
+### Fixes
+
+- Fix overlapping type badges on adjacent short blocks: show the bottom-right badge only while hovering an unselected block, and keep it hidden when a selected block is hovered. Remove the hovered block's stacking context and raise the badge above adjacent selection outlines.
+- This change affects editor canvas CSS only; public APIs, document format `4` and email export remain unchanged. The fix has patch-level impact and is recorded under `Unreleased` alongside the existing pending changes. The npm package version stays at `0.7.2` until a release version is assigned.
+
 ### Validation
 
 - `npm run check` passes type checking, Oxlint, the build and all 164 Node tests, including direct component locale selection, precedence and fallback, five-language switching, instance isolation, loading failures and retries, snapshots and export preservation; `git diff --check` passes.
 - Reuse the existing Chrome tab and restore the playground service after confirming port 5173 was no longer served. Verify Chinese and French switching, inspector expansion state, preview mode and iframe content preservation, and identical exported HTML before and after switching.
+- For the badge fix, reuse Chrome and the existing service on port 5173 to verify selection and hover in both directions between an adjacent divider and 16px spacer, hidden badges when hovering selected blocks, and fully visible badge text across adjacent selection outlines. Remove the verification blocks afterward. Before committing, rerun `npm run check`: type checking, Oxlint, the build and all 164 Node tests pass; `git diff --check` passes.
 
 ## 0.7.2 — 2026-10-30
 
