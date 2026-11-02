@@ -15,7 +15,7 @@ Core behavior:
 - Email documents are JSON data. `EmailDocument` is the single source of truth for editor state. `useEmailEditor()` owns reference-stable, isolated instances; `useEmailEditorState(editor)` subscribes to read-only document snapshots as needed. `<EmailEditor>` accepts `editor`, `height`, and an optional UI `locale` that overrides `config.locale` (English by default). Instances exist independently of UI mounting. Replace documents with `setDocument()`; reset restores the document captured after initialization. Both clear interaction state belonging to the old document.
 - Create configuration with `useEmailEditorConfig()`. Pure configuration builders are internal only; do not expose legacy configuration factories, component refs, or old Props, or provide a compatibility layer. Configuration/variable updates must not reset documents. New instance capabilities must cover configuration updates, multiple instances, snapshot isolation, and subscriptions.
 - The editor consists of the block library, canvas/preview, inspector, and shell.
-- Declare blocks with `defineBlock()` and register them through `useEmailEditorConfig({ plugins })`. Create controls with `EmailControls`. Block declarations, runtime contexts, and persisted nodes consistently use `controls`; control declarations are the sole source of types and defaults. `renderEmail(ctx)` returns an HTML string or `EmailMarkup`. Builtin blocks use the same registration pipeline. Do not retain legacy control names or data compatibility for `field/fields`, `Field*`, or `setField/setFields`, nor compatibility for the old `blocks` Prop, `defaultFields`, `inlineEdit`, or `render`. Internal `BlockDefinition` represents normalized runtime definitions only and is not publicly exported.
+- Declare blocks with `defineBlock()` and register them through `useEmailEditorConfig({ plugins })`. Create controls with `EmailControls`. Block declarations, runtime contexts, and persisted nodes consistently use `controls`; control declarations are the sole source of types and defaults. `renderEmail(ctx)` returns an HTML string or `EmailMarkup`. Builtin declarations and public `defineBlock()` share the internal `createBlockPlugin()` normalization and registration pipeline; the public entry removes internal translation keys from integrator-owned explicit styles, while library-owned declarations retain them. Do not retain legacy control names or data compatibility for `field/fields`, `Field*`, or `setField/setFields`, nor compatibility for the old `blocks` Prop, `defaultFields`, `inlineEdit`, or `render`. Internal `BlockDefinition` represents normalized runtime definitions only and is not publicly exported.
 - `renderEmail(ctx)` uses `mode: canvas` or `mode: email`. Canvas mode displays editing aids; email mode generates deliverable HTML.
 - HTML blocks may contain Go template syntax such as `{{.customer_name}}` and `{{range .products}}`. Export preserves templates; resolve their values only for preview or an explicit request. Each `variables` entry has `name`, optional `description`, and `value`. `name` is the original text, such as `{{  store_name }}`, and appears unchanged in editing UI. `value` is the preview replacement text. Do not render secondary text when `description` is empty or omitted. HTML export adds a dot only to listed variable expressions while preserving spaces, for example converting `{{  store_name }}` to `{{  .store_name }}`. Go template expressions outside the list remain unchanged.
 - Public APIs such as `getData()`, `getDocument()`, `getJson()`, and `getHtml()` return independent data snapshots. Mutating a returned snapshot must not inadvertently change internal editor state.
@@ -77,6 +77,7 @@ Determine ownership before adding files. Components or utilities serving only on
 - Entry components handle composition and forwarding only. Argument parsing, state sessions, rendering, and field conversion belong in their respective modules.
 - Fixed block lists, field metadata, defaults, option mappings, and constants must not be scattered through component JSX. Place them in the nearest appropriate `constants.ts`, configuration file, or block definition.
 - Do not add layers for speculative abstraction. Abstract only to remove actual duplication, reduce complexity, or match existing module boundaries.
+- Avoid compatibility-driven development. Fix the owning data model and primary flow directly; do not add legacy aliases, fallback adapters, parallel implementations, or downstream patches unless the user explicitly requests a defined compatibility scope. Carry required metadata with its owning declarations through normal composition and snapshot copying instead of reconstructing it through object-identity registries or side tables. When replacing an approach, remove its obsolete branches and bookkeeping in the same change. This does not remove intentional product behavior such as translation fallback or input validation.
 
 ## TypeScript Rules
 
@@ -124,7 +125,7 @@ Determine ownership before adding files. Components or utilities serving only on
 
 Block definitions normally belong in `src/blocks/<type>.ts`. Shared field configuration belongs in `style-controls.ts` or another file with the corresponding responsibility. Follow this sequence:
 
-1. Declare the plugin with `defineBlock()`, including `type`, `title`, field objects/defaults, style capabilities, necessary `defaultData`, and `renderEmail`. Use optional Canvas/Inspector/field components for complex editing.
+1. Declare integrator plugins with `defineBlock()`; builtin declarations call the shared internal `createBlockPlugin()` normalizer to retain library-owned style translation metadata. Include `type`, `title`, field objects/defaults, style capabilities, necessary `defaultData`, and `renderEmail`. Use optional Canvas/Inspector/field components for complex editing.
 2. Register builtin blocks in `src/blocks/registry.ts`. Register external blocks through `useEmailEditorConfig({ plugins })` and use the same configuration for the editor and standalone export. Builtin overrides require explicit `override: true`.
 3. Verify that `createBlockNode()` produces a complete, independent node.
 4. Verify inspector field/style reads and writes, canvas editing/selection, and correct email HTML in preview and `documentToHtml()`.
@@ -162,6 +163,7 @@ Validation requirements:
 - If only some checks ran, the final report must list the actual commands and results. Never claim an unexecuted check passed.
 - If browser or cross-origin iframe restrictions prevent interaction, explicitly record limitations and uncovered interactions. Do not claim click-level verification.
 - Tests should validate public behavior and actual regression risks. Do not write tests that merely mirror implementation details for small reversible changes. Do not repeat or broaden passing checks without a reason.
+- Browser regression pages under `playground/regressions/` run against built `dist/` artifacts and are type-checked with the playground. After `npm run build`, reuse the existing development service and open `/regressions/locale-history.html` to run the five-language rich-text history regression; it must report every locale as passed. This real-browser check is separate from `npm run check` and requires no additional browser-test dependency or service.
 - Before finishing, remove temporary test files, type declarations, screenshots, and intermediate artifacts created only for debugging this task and no longer needed. Retain formal regression tests, deliverables, and build artifacts still needed for integration. Do not delete pre-existing project files.
 
 ## READMEs and Public Contracts
@@ -182,6 +184,7 @@ Validation requirements:
 
 - Did you read and follow this file rather than rely on personal Skills or editor settings?
 - Are existing module boundaries, public exports, data models, and rendering contracts preserved?
+- Does the implementation fix the primary data flow, carry required metadata with its owning data, and remove obsolete compatibility paths or side bookkeeping?
 - Do new object shapes use `interface`, with `type` reserved for appropriate unions and utility types?
 - Have canvas, email, preview, and consumer API effects been considered?
 - Have necessary README, test, and main CSS-entry updates been made?

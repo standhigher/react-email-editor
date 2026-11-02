@@ -1,41 +1,8 @@
-import { validateControls } from "./validation";
-import { bindPluginComponent } from "./components/bind-plugin-component";
-import { WRAPPER_STYLE_CONTROLS } from "../blocks/style-controls";
-import { createEmailTools, emailMarkup } from "./email-tools";
-import { readControlValues } from "./controls";
-import { snapshotValue } from "../utils/snapshot";
-import { esc } from "../utils/html";
-import type { BlockPlugin, BlockPluginOptions, ControlSchema, ControlValues } from "./types";
+import { explicitStyleControl } from "../i18n/style-control-metadata";
+import { createBlockPlugin } from "./create-block-plugin";
+import type { BlockPlugin, BlockPluginOptions, ControlSchema } from "./types";
 
+/** 集成方显式声明的文案归集成方管理，其余归一化使用公共流程。 */
 export function defineBlock<Schema extends ControlSchema, const Type extends string>(input: BlockPluginOptions<Schema, Type>): BlockPlugin<Schema, Type> {
-  const options = snapshotValue(input);
-  if (!options.type.trim() || !options.title.trim()) throw new Error("Block type and title are required.");
-  const schema = options.controls ?? {} as Schema;
-  const readControls = (source: Record<string, unknown>) => {
-    const snapshot = structuredClone(source);
-    return { ...snapshot, ...readControlValues(schema, snapshot) };
-  };
-  const container = options.containerStyles;
-  const standard = container === false ? [] : WRAPPER_STYLE_CONTROLS.filter((item) => item.group === "dimension" ? container === undefined || container === true || container.spacing !== false : container === undefined || container === true || container.appearance !== false);
-  const styles = new Map(standard.map((item) => [item.id, item]));
-  for (const item of options.styleControls ?? []) styles.set(item.id, item);
-  const inline = Object.entries(schema).filter(([, spec]) => spec.kind === "richText" && spec.inline);
-  if (inline.length > 1 && !options.Canvas) throw new Error(`${options.type}: multiple inline controls require a Canvas component.`);
-  return snapshotValue({
-    type: options.type, title: options.title, description: options.description,
-    icon: options.icon ?? esc(Array.from(options.title.trim())[0]),
-    override: options.override, schema,
-    controls: Object.entries(schema).map(([name, spec]) => ({ ...spec, name })),
-    readControls,
-    styleControls: [...styles.values()],
-    inspectorSections: options.inspectorSections,
-    defaultStyle: options.defaultStyle, defaultData: options.defaultData,
-    inlineControl: options.Canvas ? undefined : inline[0]?.[0],
-    canvas: bindPluginComponent(options.Canvas), inspector: bindPluginComponent(options.Inspector),
-    renderEmail: (ctx) => {
-      const controls = ctx.controls as ControlValues<Schema>;
-      if (ctx.mode === "email") validateControls(schema, controls);
-      return emailMarkup(options.renderEmail({ ...ctx, controls, email: createEmailTools(ctx.body) }));
-    },
-  });
+  return createBlockPlugin({ ...input, styleControls: input.styleControls?.map(explicitStyleControl) });
 }

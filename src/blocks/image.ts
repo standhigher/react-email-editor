@@ -1,18 +1,16 @@
 import { safeEmailUrl } from "../plugins/email-tools";
 import { IMAGE_SECTIONS } from "./inspector-sections";
 import { BLOCK_TYPES } from "../constants/block-types";
-import { defineBlock } from "../plugins/define-block";
+import { createBlockPlugin } from "../plugins/create-block-plugin";
 import { EmailControls } from "../plugins/controls";
 import { esc } from "../utils/html";
 import { cssLength } from "../utils/css-values";
 import { decorationStyle, styleToCss } from "../utils/style";
 import { imageBox, pixelLength, renderAligned } from "../render/align";
 import { ICON_IMAGE } from "./icons";
-import { WRAPPER_STYLE_CONTROLS } from "./style-controls";
 import { ELEMENT_ALIGN, IMAGE_STYLE_CONTROLS } from "./element-controls";
 
-export const imageBlock = defineBlock({
-  containerStyles: false,
+export const imageBlock = createBlockPlugin({
   inspectorSections: IMAGE_SECTIONS,
   type: BLOCK_TYPES.image, title: "Image", icon: ICON_IMAGE, description: "Insert an image",
   controls: {
@@ -21,7 +19,7 @@ export const imageBlock = defineBlock({
     link: EmailControls.url({ label: "Link", placeholder: "https://example.com" }),
   },
   defaultStyle: { dimension: { padding: "8px" } },
-  styleControls: [...WRAPPER_STYLE_CONTROLS, ELEMENT_ALIGN, ...IMAGE_STYLE_CONTROLS],
+  styleControls: [ELEMENT_ALIGN, ...IMAGE_STYLE_CONTROLS],
   renderEmail: ({ controls, style }) => {
     const element = style.element ?? {};
     const width = cssLength(element.width, "auto", true);

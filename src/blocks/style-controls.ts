@@ -1,6 +1,7 @@
 import { BORDER_STYLES, FONT_WEIGHTS, LINK_DECORATIONS, TEXT_ALIGNS, type BorderStyle } from "../constants/style-values";
 import { copyFontFamilies } from "../document/constants";
 import type { StyleControlConfig } from "../types/block";
+import type { TranslatableControlOption, TranslatableStyleControl } from "../i18n/types";
 
 const BORDER_STYLE_LABELS = {
   none: "None",
@@ -8,6 +9,10 @@ const BORDER_STYLE_LABELS = {
   dashed: "Dashed",
   dotted: "Dotted",
 } as const satisfies Record<BorderStyle, string>;
+
+export const BORDER_STYLE_OPTIONS: TranslatableControlOption[] = (Object.keys(BORDER_STYLES) as BorderStyle[]).map((key) => ({
+  label: BORDER_STYLE_LABELS[key], value: BORDER_STYLES[key], labelKey: `common.${key}`,
+}));
 
 export const PADDING: StyleControlConfig = { id: "dimension.padding", group: "dimension", label: "Padding", control: "spacing", defaultValue: "0px" };
 export const MARGIN: StyleControlConfig = { id: "dimension.margin", group: "dimension", label: "Outer spacing", control: "spacing", defaultValue: "0px" };
@@ -28,10 +33,7 @@ export const BORDER_STYLE: StyleControlConfig = {
   label: "Block border style",
   control: "select",
   defaultValue: BORDER_STYLES.solid,
-  options: (Object.keys(BORDER_STYLES) as BorderStyle[]).map((key) => ({
-    label: BORDER_STYLE_LABELS[key],
-    value: BORDER_STYLES[key],
-  })),
+  options: BORDER_STYLE_OPTIONS.map(({ label, value }) => ({ label, value })),
 };
 const PARAGRAPH_SPACING: StyleControlConfig = { id: "typography.paragraphSpacing", group: "typography", label: "Paragraph spacing", control: "range", unit: "px", min: 0, max: 48 };
 const LIST_SPACING: StyleControlConfig = { id: "typography.listSpacing", group: "typography", label: "List spacing", control: "range", unit: "px", min: 0, max: 48 };
@@ -74,9 +76,18 @@ export const TYPOGRAPHY_CONTROLS: StyleControlConfig[] = [
 ];
 
 /** 内置区块按需声明，不包含固定高度或文字排版。 */
-export const WRAPPER_STYLE_CONTROLS: StyleControlConfig[] = [
-  { ...PADDING, label: "Block padding" }, MARGIN,
-  { ...BG_COLOR, label: "Block background" }, BORDER_WIDTH, BORDER_STYLE, { ...BORDER_COLOR, label: "Block border" }, BORDER_RADIUS,
+export const WRAPPER_STYLE_CONTROLS: TranslatableStyleControl[] = [
+  { ...PADDING, label: "Block padding", labelKey: "inspector.blockPadding" },
+  { ...MARGIN, labelKey: "inspector.margin" },
+  { ...BG_COLOR, label: "Block background", labelKey: "inspector.blockBackground" },
+  { ...BORDER_WIDTH, labelKey: "inspector.blockBorderWidth" },
+  {
+    ...BORDER_STYLE,
+    labelKey: "inspector.blockBorderStyle",
+    options: BORDER_STYLE_OPTIONS,
+  },
+  { ...BORDER_COLOR, label: "Block border", labelKey: "inspector.blockBorder" },
+  { ...BORDER_RADIUS, labelKey: "inspector.blockRadius" },
 ];
 
 function copyStyleControl(control: StyleControlConfig, overrides?: Partial<StyleControlConfig>): StyleControlConfig {

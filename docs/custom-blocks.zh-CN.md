@@ -178,6 +178,8 @@ const banner = defineBlock({
 
 默认容器控件包含 padding、margin、背景色及边框颜色、宽度、样式、圆角，不包含固定高度或文字排版。`containerStyles: false` 只关闭自动添加，仍可通过 `styleControls` 显式添加所需能力。
 
+自动添加的公共控件标签与边框样式选项跟随编辑器 `locale`。通过 `styleControls` 显式添加或同 `id` 替换的控件保留自定义标签和选项，不自动翻译；其余自动继承的控件继续跟随语言。区块标题、业务字段及自定义分组文案由集成方管理。切换语言不会改变文档、编辑历史或导出 HTML。
+
 `inspectorSections` 显式设置后，只展示其中列出的默认内容和样式控件；未列出的控件不自动追加，但仍属于区块 schema。
 
 ### 返回值：BlockPlugin

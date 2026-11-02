@@ -19,38 +19,6 @@ export const BODY_STYLE_KEYS: Partial<Record<string, MessageKey>> = {
   "borderStyle": "common.borderStyle"
 };
 
-export const BLOCK_STYLE_KEYS: Partial<Record<string, MessageKey>> = {
-  "dimension.padding": "inspector.blockPadding",
-  "dimension.margin": "inspector.margin",
-  "decorations.backgroundColor": "inspector.blockBackground",
-  "decorations.borderWidth": "inspector.blockBorderWidth",
-  "decorations.borderStyle": "inspector.blockBorderStyle",
-  "decorations.borderColor": "inspector.blockBorder",
-  "decorations.borderRadius": "inspector.blockRadius",
-  "element.align": "common.align",
-  "element.width": "common.width",
-  "element.height": "common.height",
-  "element.borderWidth": "common.borderWidth",
-  "element.borderStyle": "common.borderStyle",
-  "element.borderColor": "common.outline",
-  "element.borderRadius": "common.radius"
-};
-
-export const BLOCK_STYLE_OVERRIDES: Partial<Record<string, Partial<Record<string, MessageKey>>>> = {
-  "button": {
-    "element.padding": "inspector.buttonPadding",
-    "element.backgroundColor": "inspector.buttonFill"
-  },
-  "divider": {
-    "element.borderWidth": "inspector.lineWidth",
-    "element.borderStyle": "inspector.lineStyle",
-    "element.borderColor": "inspector.line"
-  },
-  "spacer": {
-    "decorations.backgroundColor": "common.background"
-  }
-};
-
 export const CONTROL_KEYS: Partial<Record<string, MessageKey>> = {
   "html": "common.content",
   "href": "common.link",

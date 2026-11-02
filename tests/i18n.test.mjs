@@ -207,11 +207,14 @@ test("中文只改变内置展示元数据，插件覆盖、内容默认值及�
     }
   }
   const custom = defineBlock({ type: "shop.card", title: "Custom", controls: { href: EmailControls.url({ label: "Custom link" }) }, renderEmail: () => "<p>Custom content</p>" });
-  assert.equal(localizeDefinition(custom, t), custom);
+  assert.equal(localizeDefinition(custom, t).title, custom.title);
+  assert.equal(localizeDefinition(custom, t).controls, custom.controls);
   const copiedBuiltin = { ...DEFAULT_BLOCKS[0], title: "My heading", override: true };
-  assert.equal(localizeDefinition(copiedBuiltin, t), copiedBuiltin);
+  assert.equal(localizeDefinition(copiedBuiltin, t).title, "My heading");
+  assert.equal(localizeDefinition(copiedBuiltin, t).styleControls[0].label, "区块内边距");
   const override = defineBlock({ type: "text", override: true, title: "Overridden text", renderEmail: () => "<p>Custom text</p>" });
-  assert.equal(localizeDefinition(override, t), override);
+  assert.equal(localizeDefinition(override, t).title, override.title);
+  assert.equal(localizeDefinition(override, t).styleControls[0].label, "区块内边距");
   const button = DEFAULT_BLOCKS.find((block) => block.type === "button");
   assert.match(localizeDefinition(button, t).controls[0].defaultValue, /Buy now/);
 });

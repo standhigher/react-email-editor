@@ -102,7 +102,7 @@ A minimal internal function handles message lookup, English fallback and `{{name
 
 The optional `BlockInspectorSection.id` supplies a stable section identity so title changes preserve expansion and editing state.
 
-Integrators own titles, labels, options, sections and custom component text for custom blocks, including overrides of builtins. Library controls reused inside them still follow the editor UI language. Language packs, internal message keys, Providers and translation functions are not public APIs.
+Integrators own titles, business fields, sections and custom component text for custom blocks, including overrides of builtins. Common container style controls automatically inherited through `defineBlock()`, including border style options, follow the editor UI language. Controls explicitly supplied or replaced through `styleControls` retain integrator-provided labels and options, even when their IDs or text match library defaults. Library base controls reused inside them still follow the editor UI language. Language packs, internal message keys, Providers and translation functions are not public APIs.
 
 Subjects, body content, variable names/descriptions/preview values and default content for new blocks remain unchanged. UI language does not affect `EmailDocument.version` or exported HTML. Email content language is independent; the existing exported `lang="en"` behavior is unchanged. External resource, plugin validation and template engine errors keep their original messages. Validation and export API diagnostics retain their existing behavior.
 

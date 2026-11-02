@@ -179,6 +179,8 @@ const banner = defineBlock({
 
 Default container controls include padding, margin, background color, border color/width/style, and corner radius. They exclude fixed height and typography. `containerStyles: false` disables automatic controls; explicitly supplied styleControls can still enable individual capabilities.
 
+Automatically added common control labels and border style options follow the editor `locale`. Controls explicitly added or replaced by matching ID through `styleControls` retain their custom labels and options without automatic translation; other inherited controls continue to follow the locale. Integrators own block titles, business fields and custom section text. Switching language preserves the document, edit history and exported HTML.
+
 When inspectorSections is specified, only listed default content and style controls appear. Omitted controls remain in the schema but are not appended automatically.
 
 ### Return value: BlockPlugin

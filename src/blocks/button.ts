@@ -2,7 +2,7 @@ import { ButtonCanvas } from "./ButtonCanvas";
 import { safeEmailUrl } from "../plugins/email-tools";
 import { BUTTON_SECTIONS } from "./inspector-sections";
 import { BLOCK_TYPES } from "../constants/block-types";
-import { defineBlock } from "../plugins/define-block";
+import { createBlockPlugin } from "../plugins/create-block-plugin";
 import { EmailControls } from "../plugins/controls";
 import { esc } from "../utils/html";
 import { styleToCss } from "../utils/style";
@@ -10,11 +10,9 @@ import { pixelLength, renderAligned } from "../render/align";
 import { buttonContent, buttonStyles } from "../render/button";
 import { buttonInlineHtml } from "../render/button-content";
 import { ICON_BUTTON } from "./icons";
-import { WRAPPER_STYLE_CONTROLS } from "./style-controls";
 import { BUTTON_BOX_DEFAULTS, BUTTON_STYLE_CONTROLS } from "./element-controls";
 
-export const buttonBlock = defineBlock({
-  containerStyles: false,
+export const buttonBlock = createBlockPlugin({
   Canvas: ButtonCanvas,
   inspectorSections: BUTTON_SECTIONS,
   type: BLOCK_TYPES.button, title: "Button", icon: ICON_BUTTON, description: "Clickable CTA button",
@@ -25,7 +23,7 @@ export const buttonBlock = defineBlock({
   defaultStyle: {
     element: { ...BUTTON_BOX_DEFAULTS },
   },
-  styleControls: [...WRAPPER_STYLE_CONTROLS, ...BUTTON_STYLE_CONTROLS],
+  styleControls: BUTTON_STYLE_CONTROLS,
   renderEmail: ({ block, body }) => {
     const { element, width, text, box } = buttonStyles(block, body);
     const px = pixelLength(width);
