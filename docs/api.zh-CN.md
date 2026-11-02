@@ -184,6 +184,8 @@ export const coupon = defineBlock({
 | `createDecorationControls` / `DecorationControlName` | `backgroundColor/borderWidth/borderStyle/borderColor/borderRadius`。 |
 | `createTypographyControls` / `TypographyControlName` | `fontFamily/fontSize/fontWeight/lineHeight/color/textAlign/paragraphSpacing/listSpacing/listIndent/linkColor/linkDecoration`。 |
 
+默认检查器中，主体、区块容器与元素的边框宽度始终可编辑；同一层宽度为 `0` 时隐藏边框颜色和线型，大于 `0` 时显示。隐藏不会清除已配置的值，也不会自动修改宽度。圆角始终显示，因为它也影响背景和图片。自定义区块未声明对应宽度控件时，其颜色和线型控件保持显示。
+
 ## 文档模型与创建
 
 | API | 参数 | 返回与边界 |

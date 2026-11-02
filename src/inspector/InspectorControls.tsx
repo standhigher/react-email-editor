@@ -7,7 +7,7 @@ import { PluginEditorContext } from "../plugins/editor-context";
 import { BlockErrorBoundary } from "../plugins/components/BlockErrorBoundary";
 import { STYLE_GROUPS } from "../constants/style-groups";
 import { BlockIcon } from "../components/BlockIcon";
-import { inheritedStyleValue, styleReset } from "./utils";
+import { inheritedStyleValue, styleReset, visibleStyleControls } from "./utils";
 import { readStyleValue } from "../utils/style";
 import { ControlRenderer } from "./ControlRenderer";
 import { InspectorSection } from "./components/InspectorSection";
@@ -67,10 +67,14 @@ export function InspectorControls({
     controlNames: group.group === "general" && !CustomInspector ? contentControls.map((control) => control.name) : [],
     styleIds: styleControls.filter((control) => control.group === group.group).map((control) => control.id),
   }));
-  const resolveStyles = (ids: string[] = []) => ids.flatMap((id) => {
+  const readValue = (id: string) => {
+    const control = styleControls.find((item) => item.id === id);
+    return control ? readStyleValue(block.style, id) || inheritedStyleValue(id, body) || control.defaultValue || "" : undefined;
+  };
+  const resolveStyles = (ids: string[] = []) => visibleStyleControls(ids.flatMap((id) => {
     const control = styleControls.find((item) => item.id === id);
     return control ? [control] : [];
-  });
+  }), readValue);
 
   return (
     <div className="ree-inspector">

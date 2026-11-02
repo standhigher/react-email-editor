@@ -6,6 +6,7 @@ import { LINK_DECORATIONS } from "../constants/style-values";
 import { CheckboxControl } from "../components/CheckboxControl";
 import { resolveEmailBody } from "../document/create-document";
 import { BODY_CONTROL_SECTIONS } from "./body-constants";
+import { visibleStyleControls } from "./utils";
 import { InspectorSection } from "./components/InspectorSection";
 import { StyleControlStack } from "./components/StyleControlStack";
 import { StyleControl } from "./StyleControl";
@@ -20,6 +21,7 @@ interface BodyControlsProps {
 export function BodyControls({ body, onChange }: BodyControlsProps) {
   const t = useEditorTranslation();
   const settings = resolveEmailBody(body);
+  const readValue = (id: string) => String(settings[id as keyof EmailBodySettings]);
   const renderControl = (control: StyleControlConfig) => {
     const key = control.id as keyof EmailBodySettings;
     const current = String(settings[key]);
@@ -41,7 +43,7 @@ export function BodyControls({ body, onChange }: BodyControlsProps) {
     <div className="ree-inspector ree-inspector-body">
       {BODY_CONTROL_SECTIONS.map((section) => (
         <InspectorSection key={section.id} title={translateMetadata(t, SECTION_KEYS[section.id], section.title)}>
-          <StyleControlStack controls={section.controls} renderControl={renderControl} />
+          <StyleControlStack controls={visibleStyleControls(section.controls, readValue)} renderControl={renderControl} />
           {section.id === "general" ? (
             <CheckboxControl
               variant="switch"
@@ -54,7 +56,7 @@ export function BodyControls({ body, onChange }: BodyControlsProps) {
             <details className="ree-inspector-advanced">
               <summary>{t("inspector.advancedBorder")}</summary>
               <div className="ree-inspector-section-body">
-                <StyleControlStack controls={section.advancedControls} renderControl={renderControl} />
+                <StyleControlStack controls={visibleStyleControls(section.advancedControls, readValue)} renderControl={renderControl} />
               </div>
             </details>
           ) : null}

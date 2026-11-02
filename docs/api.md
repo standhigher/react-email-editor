@@ -184,6 +184,8 @@ Use these components only within a plugin Canvas or Inspector.
 | `createDecorationControls` / `DecorationControlName` | backgroundColor/borderWidth/borderStyle/borderColor/borderRadius. |
 | `createTypographyControls` / `TypographyControlName` | fontFamily/fontSize/fontWeight/lineHeight/color/textAlign/paragraphSpacing/listSpacing/listIndent/linkColor/linkDecoration. |
 
+In the default inspector, body, block container and element border widths remain editable. Border color and style are hidden when the corresponding width is `0` and shown when it is greater than `0`. Hiding controls preserves their values and never changes the width automatically. Corner radius remains visible because it also affects backgrounds and images. Custom blocks without a corresponding width control keep their color and style controls visible.
+
 ## Document model and creation
 
 | API | Arguments | Return and limitations |

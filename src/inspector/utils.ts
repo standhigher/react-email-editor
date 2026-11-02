@@ -1,6 +1,23 @@
 import { typographyWithBody } from "../utils/typography";
+import { cssLength } from "../utils/css-values";
 
+import type { StyleControlConfig } from "../types/block";
 import type { EmailBodySettings } from "../types/document";
+
+/** 同一层边框没有宽度时收起颜色和线型；圆角仍可影响背景与图片。 */
+export function visibleStyleControls(
+  controls: StyleControlConfig[],
+  readValue: (id: string) => string | undefined,
+): StyleControlConfig[] {
+  return controls.filter((control) => {
+    const prefix = control.id.slice(0, control.id.lastIndexOf(".") + 1);
+    const name = control.id.slice(prefix.length);
+    if (name !== "borderColor" && name !== "borderStyle") return true;
+    const width = readValue(`${prefix}borderWidth`);
+    // 未声明宽度的自定义控件保留原有展示，不推断其渲染方式。
+    return width === undefined || parseFloat(cssLength(width)) > 0;
+  });
+}
 
 export interface StyleResetState {
   resetTo: string;
