@@ -67,8 +67,18 @@ export function CanvasBlock({
     const ownerWindow = event?.currentTarget.ownerDocument.defaultView;
     // Portal 菜单属于 React 子树，但不是画布区块的 DOM 内容。
     if (ownerWindow && target instanceof ownerWindow.Node && !event?.currentTarget.contains(target)) return;
-    if (ownerWindow && target instanceof ownerWindow.Element && !target.closest(".ree-rte")) {
-      richTextFocus.activate(null);
+    if (ownerWindow && target instanceof ownerWindow.Element) {
+      const region = target.closest(".ree-rte");
+      const interactive = target.closest("button, a, input, textarea, select, [role='button']");
+      const editable = !interactive
+        ? (region ?? event.currentTarget).querySelector<HTMLElement>(".ree-rte [contenteditable='true']")
+        : null;
+      if (editable && !editable.contains(target)) {
+        // 留白点击也进入文字编辑；文字内点击仍由浏览器定位光标和选区。
+        editable.focus({ preventScroll: true });
+      } else if (!region) {
+        richTextFocus.activate(null);
+      }
     }
     onSelect();
   };

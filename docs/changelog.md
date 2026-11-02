@@ -11,6 +11,8 @@ English | [简体中文](./changelog.zh-CN.md)
 
 ### Fixes
 
+- Clicking blank space or padding in a canvas block containing rich text immediately focuses its text and activates the rich-text toolbar. Clicks within text preserve native cursor placement and selection; buttons, links, input controls and portal menus retain their existing interactions. Keep the toolbar collapsed when the user has explicitly collapsed it.
+- This focus fix has patch-level impact; public APIs, document format `4` and email export remain unchanged. Record it under `Unreleased` alongside existing pending changes; the npm package version stays at `0.7.2`.
 - Hide border color and style in the inspector when the corresponding body, block container or element border width is `0`, and show them again above `0`. Width remains editable, hidden settings retain their values, and width is never set automatically. Keep corner radius visible and preserve existing controls for custom blocks without a corresponding width control.
 - Update both API references and add regression coverage for border visibility, retained color and style, independent container and element borders, resets and custom inspector sections. Public APIs, document format `4` and email output rules remain unchanged. Record this patch-level fix under `Unreleased` alongside existing pending changes; the npm package version stays at `0.7.2`.
 - Fix overlapping type badges on adjacent short blocks: show the bottom-right badge only while hovering an unselected block, and keep it hidden when a selected block is hovered. Remove the hovered block's stacking context and raise the badge above adjacent selection outlines.
@@ -18,6 +20,7 @@ English | [简体中文](./changelog.zh-CN.md)
 
 ### Validation
 
+- Before committing the focus fix, rerun `npm run check`: type checking, Oxlint, the build and all 167 Node tests pass; `git diff --check` passes. This session reused the existing Chrome page and service on port 5173 to verify focus from text and heading block padding, immediate keyboard input, block switching, and toolbar collapse and expansion. Remove the temporary input character afterward.
 - Before committing the border fix, run `npm run check`: type checking, Oxlint, the build and all 167 Node tests pass; `git diff --check` passes. This session reused the existing Chrome page and service on port 5173 to verify expanding and hiding body and block border controls, the color picker, style selection, retained settings after hiding and restoring controls, and canvas computed styles. Restore values used for verification.
 - `npm run check` passes type checking, Oxlint, the build and all 164 Node tests, including direct component locale selection, precedence and fallback, five-language switching, instance isolation, loading failures and retries, snapshots and export preservation; `git diff --check` passes.
 - Reuse the existing Chrome tab and restore the playground service after confirming port 5173 was no longer served. Verify Chinese and French switching, inspector expansion state, preview mode and iframe content preservation, and identical exported HTML before and after switching.
