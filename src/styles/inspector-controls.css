@@ -6,6 +6,19 @@
   line-height: 1.5;
 }
 
+.ree-html-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ree-html-info .ree-btn-tooltip {
+  width: 240px;
+  max-width: calc(100vw - 80px);
+  white-space: normal;
+  text-align: left;
+}
+
 .ree-html-editor {
   --ree-html-editor-min: 220px;
   border: 1px solid var(--ree-border);

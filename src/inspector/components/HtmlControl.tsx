@@ -3,6 +3,7 @@ import { Button } from "../../components/Button";
 import { useEditorTranslation } from "../../i18n/context";
 import { HtmlCodeEditor, type HtmlCodeEditorHandle } from "../HtmlCodeEditor";
 import { HtmlEditorDialog } from "./HtmlEditorDialog";
+import { HtmlCompatibilityHint } from "./HtmlCompatibilityHint";
 import type { ControlRendererProps } from "../ControlRenderer";
 
 export function HtmlControl({ control, value, variables, onChange }: ControlRendererProps) {
@@ -20,7 +21,10 @@ export function HtmlControl({ control, value, variables, onChange }: ControlRend
   return (
     <div className="ree-field">
       <div className="ree-field-label">
-        <span id={id}>{control.label}</span>
+        <span className="ree-html-label">
+          <span id={id}>{control.label}</span>
+          <HtmlCompatibilityHint />
+        </span>
         <Button
           variant="icon"
           className="ree-html-expand"

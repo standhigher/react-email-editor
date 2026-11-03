@@ -40,8 +40,9 @@ test("主体边框按宽度展开，收起与重新展开保留颜色和线型",
 
 test("区块和元素边框独立展开，圆角保留，重置宽度按默认值显示", (t) => {
   const config = renderConfig();
-  let block = config.createBlock("button");
-  const definition = config.definitions.find((item) => item.type === "button");
+  let block = config.createBlock("image");
+  block.style.element.borderWidth = "1px";
+  const definition = config.definitions.find((item) => item.type === "image");
   let renderer;
   const render = () => createElement(InspectorControls, {
     block, definition, body: resolveEmailBody(), variables: [],
@@ -57,6 +58,7 @@ test("区块和元素边框独立展开，圆角保留，重置宽度按默认�
   };
   assert.equal(find("decorations.borderColor"), undefined);
   assert.ok(find("element.borderColor"));
+  assert.equal(find("element.borderColor").props.value, "#000000");
   assert.ok(find("decorations.borderRadius"));
   assert.ok(find("element.borderRadius"));
   change("element.borderColor", "#123456");
@@ -69,6 +71,9 @@ test("区块和元素边框独立展开，圆角保留，重置宽度按默认�
   assert.ok(find("decorations.borderColor"));
   assert.equal(find("element.borderColor"), undefined);
   change("element.borderWidth", find("element.borderWidth").props.resetTo);
+  assert.equal(find("element.borderColor"), undefined);
+  assert.equal(block.style.element.borderWidth, "0px");
+  change("element.borderWidth", "1px");
   assert.equal(find("element.borderColor").props.value, "#123456");
   assert.equal(find("element.borderStyle").props.value, "dashed");
   assert.equal(block.style.element.borderWidth, "1px");
@@ -76,6 +81,28 @@ test("区块和元素边框独立展开，圆角保留，重置宽度按默认�
   change("decorations.borderWidth", find("decorations.borderWidth").props.resetTo);
   assert.equal(find("decorations.borderColor"), undefined);
   assert.ok(find("element.borderColor"));
+  change("element.borderColor", find("element.borderColor").props.resetTo);
+  assert.equal(block.style.element.borderColor, "#000000");
+  assert.match(config.toHtml(createEmailDocument([block])), /border-width:1px;border-style:dashed;border-color:#000000/);
+});
+
+test("按钮移除元素边框控件，保留填充、圆角和区块容器边框", (t) => {
+  const config = renderConfig();
+  const block = config.createBlock("button");
+  const definition = config.definitions.find((item) => item.type === "button");
+  let renderer;
+  act(() => { renderer = create(createElement(InspectorControls, {
+    block, definition, body: resolveEmailBody(), variables: [],
+    onCommitControl: () => {}, onCommitControls: () => {}, onCommitStyle: () => {},
+  })); });
+  t.after(() => act(() => renderer.unmount()));
+  const ids = renderer.root.findAllByType(StyleControl).map((node) => node.props.config.id);
+  for (const id of ["element.borderWidth", "element.borderStyle", "element.borderColor"]) {
+    assert.equal(ids.includes(id), false, id);
+  }
+  for (const id of ["element.backgroundColor", "element.borderRadius", "decorations.borderWidth"]) {
+    assert.ok(ids.includes(id), id);
+  }
 });
 
 test("自定义区块的宽度跨检查器分组生效，未声明宽度的边框控件保持显示", (t) => {

@@ -159,7 +159,7 @@ test('自定义区块按声明覆盖容器槽位，样式工厂返回独立副�
   const buttonPadding = button.styleControls.find((control) => control.id === 'element.padding');
   assert.equal(buttonPadding.label, 'Button padding');
   assert.equal(buttonPadding.defaultValue, '12px 32px');
-  assert.equal(button.styleControls.find((control) => control.id === 'element.borderColor').label, 'Outline');
+  assert.equal(button.styleControls.find((control) => control.id === 'element.borderColor'), undefined);
 });
 
 test('圆角可分四角，内置区块忽略容器高度，段落支持间距和行高', () => {

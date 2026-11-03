@@ -1,5 +1,5 @@
 import { CANVAS_DEVICE_WIDTH } from "../constants/editor";
-import { BORDER_STYLES, FONT_WEIGHTS, LINK_DECORATIONS } from "../constants/style-values";
+import { BORDER_STYLES, DEFAULT_BORDER_COLOR, FONT_WEIGHTS, LINK_DECORATIONS } from "../constants/style-values";
 import type { ControlOption } from "../types/block";
 import type { EmailBodySettings } from "../types/document";
 
@@ -49,5 +49,5 @@ export const DEFAULT_EMAIL_BODY: EmailBodySettings = {
   blockGap: "4px",
   borderWidth: "0px",
   borderStyle: BORDER_STYLES.solid,
-  borderColor: "transparent",
+  borderColor: DEFAULT_BORDER_COLOR,
 };

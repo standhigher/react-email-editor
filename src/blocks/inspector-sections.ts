@@ -7,9 +7,6 @@ const BLOCK_BORDERS = ["decorations.borderWidth", "decorations.borderStyle", "de
 const BLOCK_APPEARANCE: BlockInspectorSection = {
   id: "blockAppearance", title: "Block appearance", styleIds: ["decorations.backgroundColor", ...BLOCK_BORDERS],
 };
-const ADVANCED_BLOCK_APPEARANCE: BlockInspectorSection = {
-  id: "blockAppearance", title: "Block appearance", styleIds: ["decorations.backgroundColor"], advancedStyleIds: BLOCK_BORDERS,
-};
 const ELEMENT_BORDERS = ["element.borderWidth", "element.borderStyle", "element.borderColor", "element.borderRadius"];
 
 export const HEADING_SECTIONS: BlockInspectorSection[] = [SPACING, BLOCK_APPEARANCE];
@@ -19,13 +16,13 @@ export const HTML_SECTIONS: BlockInspectorSection[] = [
 ];
 export const BUTTON_SECTIONS: BlockInspectorSection[] = [
   { id: "link", title: "Link", controlNames: ["href"] },
-  { id: "button", title: "Button", styleIds: ["element.align", "element.width", "element.padding", "element.backgroundColor", ...ELEMENT_BORDERS] },
-  SPACING, ADVANCED_BLOCK_APPEARANCE,
+  { id: "button", title: "Button", styleIds: ["element.align", "element.width", "element.padding", "element.backgroundColor", "element.borderRadius"] },
+  SPACING, BLOCK_APPEARANCE,
 ];
 export const IMAGE_SECTIONS: BlockInspectorSection[] = [
   { id: "image", title: "Image", controlNames: ["src", "link"] },
   { id: "sizePosition", title: "Size & position", styleIds: ["element.width", "element.height", "element.align"] },
-  { id: "imageAppearance", title: "Image appearance", styleIds: ELEMENT_BORDERS }, SPACING, ADVANCED_BLOCK_APPEARANCE,
+  { id: "imageAppearance", title: "Image appearance", styleIds: ELEMENT_BORDERS }, SPACING, BLOCK_APPEARANCE,
 ];
 export const DIVIDER_SECTIONS: BlockInspectorSection[] = [
   { id: "line", title: "Line", styleIds: ["element.borderColor", "element.borderWidth", "element.borderStyle", "element.width", "element.align"] },

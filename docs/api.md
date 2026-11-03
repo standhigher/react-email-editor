@@ -186,6 +186,8 @@ Use these components only within a plugin Canvas or Inspector.
 
 In the default inspector, body, block container and element border widths remain editable. Border color and style are hidden when the corresponding width is `0` and shown when it is greater than `0`. Hiding controls preserves their values and never changes the width automatically. Corner radius remains visible because it also affects backgrounds and images. Custom blocks without a corresponding width control keep their color and style controls visible.
 
+Shared block container controls and images default to `#000000` borders with a width of `0px`. Button elements have no Outline controls (border color, width or style) and ignore supplied element borders; fill, corner radius and block container borders remain configurable. Body borders also default to `#000000` with a width of `0px`; divider lines default to `#e3e3e5`. Explicit colors on supported borders, including `transparent`, are preserved.
+
 ## Document model and creation
 
 | API | Arguments | Return and limitations |
@@ -212,7 +214,7 @@ Canvas, preview and email HTML share body settings:
 | linkColor / linkDecoration | #005bd3 / underline. |
 | contentPadding | 0px; CSS padding inside the border. |
 | blockGap | 4px; spacing between adjacent blocks. |
-| borderWidth / borderStyle / borderColor | 0px / solid / transparent. |
+| borderWidth / borderStyle / borderColor | 0px / solid / #000000. |
 
 The body is centered without body radius or extra outer padding. Explicit rich-text formats override body defaults; internal defaults provide 16px font size and 1.5 line height. HTML blocks retain their internal links/lists. Block container styles live in dimension/decorations, inner elements in element, and custom blocks can enable typography. Only enabled styles are read.
 

@@ -35,6 +35,8 @@ export const BORDER_STYLES = {
 /** Border style: none, solid, dashed, dotted. */
 export type BorderStyle = (typeof BORDER_STYLES)[keyof typeof BORDER_STYLES];
 
+export const DEFAULT_BORDER_COLOR = "#000000";
+
 export const LINK_DECORATIONS = {
   underline: "underline",
   none: "none",

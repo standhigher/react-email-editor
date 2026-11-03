@@ -52,14 +52,6 @@ export function BodyControls({ body, onChange }: BodyControlsProps) {
               onChange={(checked) => onChange({ linkDecoration: checked ? LINK_DECORATIONS.underline : LINK_DECORATIONS.none })}
             />
           ) : null}
-          {section.advancedControls?.length ? (
-            <details className="ree-inspector-advanced">
-              <summary>{t("inspector.advancedBorder")}</summary>
-              <div className="ree-inspector-section-body">
-                <StyleControlStack controls={visibleStyleControls(section.advancedControls, readValue)} renderControl={renderControl} />
-              </div>
-            </details>
-          ) : null}
         </InspectorSection>
       ))}
     </div>

@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { Button } from "../../components/Button";
 import { PersonalizationMenu } from "../../components/PersonalizationMenu";
+import { HtmlCompatibilityHint } from "./HtmlCompatibilityHint";
 import { useEditorTranslation } from "../../i18n/context";
 import type { HtmlCodeEditorHandle } from "../HtmlCodeEditor";
 import { HTML_SAVE_TOAST_DURATION } from "../constants";
@@ -66,7 +67,10 @@ export function HtmlEditorDialog({ label, variables, editorRef, onClose }: HtmlE
       onClick={(event) => event.stopPropagation()}
     >
       <div className="ree-html-dialog-header">
-        <h2 id={titleId}>{t("inspector.htmlEditor")}{label !== "HTML" ? <span>{label}</span> : null}</h2>
+        <div className="ree-html-dialog-title">
+          <h2 id={titleId}>{t("inspector.htmlEditor")}{label !== "HTML" ? <span>{label}</span> : null}</h2>
+          <HtmlCompatibilityHint />
+        </div>
         <div className="ree-html-dialog-actions">
           <PersonalizationMenu variables={variables} onInsert={(name) => editorRef.current?.insertText(name)} />
           <Button variant="icon" aria-label={t("inspector.closeHtmlEditor")} tooltip={t("inspector.closeHtmlEditor")} onClick={close}>

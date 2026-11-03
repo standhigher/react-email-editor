@@ -14,8 +14,6 @@ export const BUTTON_BOX_DEFAULTS = {
   align: HORIZONTAL_ALIGNS.center,
   backgroundColor: "#000000",
   borderRadius: "8px",
-  borderWidth: "1px",
-  borderColor: "transparent",
   padding: "12px 32px",
 } as const satisfies EmailElementStyle;
 
@@ -31,13 +29,7 @@ export const BUTTON_STYLE_CONTROLS: TranslatableStyleControl[] = [
   ELEMENT_ALIGN, ELEMENT_WIDTH,
   { ...createDimensionControls({ padding: { id: "element.padding", label: "Button padding", defaultValue: BUTTON_BOX_DEFAULTS.padding } }).padding, labelKey: "inspector.buttonPadding" },
   { ...createDecorationControls({ backgroundColor: { id: "element.backgroundColor", label: "Button fill", defaultValue: BUTTON_BOX_DEFAULTS.backgroundColor } }).backgroundColor, labelKey: "inspector.buttonFill" },
-  ...ELEMENT_BORDER_CONTROLS.map((control) => ({
-    ...control,
-    defaultValue: control.id === "element.borderWidth" ? BUTTON_BOX_DEFAULTS.borderWidth
-      : control.id === "element.borderColor" ? BUTTON_BOX_DEFAULTS.borderColor
-        : control.id === "element.borderRadius" ? BUTTON_BOX_DEFAULTS.borderRadius
-          : control.defaultValue,
-  })),
+  { ...elementDecoration.borderRadius, labelKey: "common.radius", defaultValue: BUTTON_BOX_DEFAULTS.borderRadius },
 ];
 export const IMAGE_STYLE_CONTROLS: TranslatableStyleControl[] = [
   ELEMENT_WIDTH,

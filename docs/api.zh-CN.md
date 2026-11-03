@@ -186,6 +186,8 @@ export const coupon = defineBlock({
 
 默认检查器中，主体、区块容器与元素的边框宽度始终可编辑；同一层宽度为 `0` 时隐藏边框颜色和线型，大于 `0` 时显示。隐藏不会清除已配置的值，也不会自动修改宽度。圆角始终显示，因为它也影响背景和图片。自定义区块未声明对应宽度控件时，其颜色和线型控件保持显示。
 
+区块公共容器控件和图片的默认边框颜色为 `#000000`，默认宽度为 `0px`。按钮元素不提供 Outline（边框颜色、宽度和线型），也不渲染传入的元素边框；仍可设置填充、圆角及区块容器边框。主体边框同样默认黑色，宽度为 `0px`，分隔线默认线条颜色为 `#e3e3e5`。支持的边框显式设置颜色（包括 `transparent`）保持不变。
+
 ## 文档模型与创建
 
 | API | 参数 | 返回与边界 |
@@ -212,7 +214,7 @@ export const coupon = defineBlock({
 | `linkColor` / `linkDecoration` | `#005bd3` / `underline`。 |
 | `contentPadding` | `0px`，边框内部 CSS padding。 |
 | `blockGap` | `4px`，相邻区块间距。 |
-| `borderWidth` / `borderStyle` / `borderColor` | `0px` / `solid` / `transparent`。 |
+| `borderWidth` / `borderStyle` / `borderColor` | `0px` / `solid` / `#000000`。 |
 
 主体固定居中，无主体圆角或额外外层 padding。显式富文本格式优先于主体默认值；基础字号 16px、行高 1.5 由内部默认排版提供。HTML 区块不重写内部链接和列表。区块容器样式存于 `dimension/decorations`，元素样式存于 `element`，自定义区块可启用 `typography`；只读取已启用的样式。
 

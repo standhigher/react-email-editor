@@ -156,17 +156,61 @@ test('按钮和图片的链接默认留空，空白链接在画布、邮件及�
   }
 });
 
-test('低频边框颜色默认为透明，显式颜色仍正常导出', () => {
-  assert.equal(resolveEmailBody().borderColor, 'transparent');
+test('主体和区块边框默认为黑色，显式颜色和透明色仍正常导出', () => {
+  assert.equal(resolveEmailBody().borderColor, '#000000');
+  assert.equal(resolveEmailBody({ borderColor: 'transparent' }).borderColor, 'transparent');
+  const document = createEmailDocument();
+  document.body.borderWidth = '2px';
+  assert.match(documentToHtml(document), /border-width:2px;border-style:solid;border-color:#000000/);
+  document.body.borderColor = 'transparent';
+  assert.match(documentToHtml(document), /border-width:2px;border-style:solid;border-color:transparent/);
   for (const type of ['button', 'image', 'text']) {
     const definition = getBlockDefinition(type);
-    assert.equal(definition.styleControls.find((control) => control.id === 'decorations.borderColor').defaultValue, 'transparent');
+    assert.equal(definition.styleControls.find((control) => control.id === 'decorations.borderColor').defaultValue, '#000000');
     const block = createBlockNode(type);
-    if (type !== 'text') {
-      assert.equal(definition.styleControls.find((control) => control.id === 'element.borderColor').defaultValue, 'transparent');
-      assert.match(renderBlock(block), /border-color:transparent/);
-      block.style.element = { ...block.style.element, borderColor: '#123456' };
-      assert.match(renderBlock(block), /border-color:#123456/);
+    assert.equal(block.style.decorations.borderWidth, '0px');
+    assert.equal(block.style.decorations.borderColor, '#000000');
+    block.style.decorations.borderWidth = '2px';
+    for (const options of [{}, { resolveHtmlTemplates: true }]) {
+      assert.match(documentToHtml(createEmailDocument([block]), DEFAULT_BLOCKS, options), /border-width:2px;border-style:solid;border-color:#000000/);
     }
+    if (type === 'image') {
+      assert.equal(definition.styleControls.find((control) => control.id === 'element.borderColor').defaultValue, '#000000');
+      assert.equal(block.style.element.borderWidth, '0px');
+      block.style.element.borderWidth = '2px';
+      for (const mode of ['canvas', 'email']) {
+        assert.match(renderBlock(block, DEFAULT_BLOCKS, mode), /border-width:2px;border-style:solid;border-color:#000000/);
+      }
+      delete block.style.element.borderColor;
+      assert.match(renderBlock(block), /border-color:#000000/);
+      for (const color of ['#123456', 'transparent']) {
+        block.style.element.borderColor = color;
+        assert.ok(renderBlock(block).includes(`border-color:${color}`));
+      }
+    }
+    block.style.decorations.borderColor = 'transparent';
+    assert.match(documentToHtml(createEmailDocument([block])), /border-width:2px;border-style:solid;border-color:transparent/);
+  }
+});
+
+test('按钮元素不生成或读取边框，画布和邮件保留填充、圆角与容器边框', () => {
+  const definition = getBlockDefinition('button');
+  const block = createBlockNode('button');
+  for (const name of ['borderWidth', 'borderStyle', 'borderColor']) {
+    assert.equal(definition.styleControls.some((control) => control.id === `element.${name}`), false);
+    assert.equal(block.style.element[name], undefined);
+  }
+  block.style.element = { ...block.style.element, borderWidth: '9px', borderStyle: 'dashed', borderColor: '#123456' };
+  block.style.decorations.borderWidth = '2px';
+  for (const mode of ['canvas', 'email']) {
+    const html = renderBlock(block, DEFAULT_BLOCKS, mode);
+    assert.doesNotMatch(html, /border-(?:width|style|color):/);
+    assert.match(html, /background-color:#000000/);
+    assert.match(html, /border-radius:8px/);
+  }
+  for (const options of [{}, { resolveHtmlTemplates: true }]) {
+    const html = documentToHtml(createEmailDocument([block]), DEFAULT_BLOCKS, options);
+    assert.match(html, /border-width:2px;border-style:solid;border-color:#000000/);
+    assert.doesNotMatch(html, /border-width:9px|border-style:dashed|border-color:#123456/);
   }
 });

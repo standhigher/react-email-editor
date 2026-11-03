@@ -2,6 +2,21 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.10.0 — 2026-11-03
+
+### Improvements and compatibility changes
+
+- Default body, shared block-container and image border colors to `#000000` while keeping the default width at `0px`, so increasing the width makes borders visible. Preserve existing explicit colors, including `transparent`; divider lines still default to `#e3e3e5`.
+- Remove border color, width and style controls and rendering from built-in button elements. Treat supplied or previously saved `element.border*` values as absent, without compatibility handling or migration. Button fill, corner radius and block-container borders remain configurable.
+- Show body borders and button/image block-container borders directly in their inspector sections, removing the additional advanced disclosure. Continue showing color and style according to width while preserving configured values. Clarify background-color labels in all five languages.
+- Add email-client compatibility hints to HTML source controls and expanded dialogs in all five languages, explaining limitations of inline SVG, CSS animations and similar features. Position hints relative to the dialog title area to prevent clipping on narrow screens.
+- Update bilingual API documentation. Bump the pre-1.0 npm package from `0.9.0` to `0.10.0` for the removed built-in button configuration capability, synchronizing package metadata and the lockfile; `EmailDocument.version` stays at `4`.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build and all 179 Node tests, covering border defaults, explicit-color preservation, removal of button-element borders, inspector visibility and HTML dialogs; `git diff --check` passes.
+- Reuse the existing Chrome and port 5173 service to verify HTML compatibility hints at 320px, 375px and desktop widths, hover, keyboard focus, dialog opening/closing and sidebar display. The built-artifact `/regressions/locale-history.html` passes instance, selection, JSON, HTML and undo/redo checks for all five languages.
+
 ## 0.9.0 — 2026-11-03
 
 ### Behavior and compatibility changes

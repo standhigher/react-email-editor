@@ -7,7 +7,6 @@ interface BodyControlSection {
   id: string;
   title: string;
   controls: StyleControlConfig[];
-  advancedControls?: StyleControlConfig[];
 }
 
 export const BODY_CONTROL_SECTIONS: BodyControlSection[] = [
@@ -18,11 +17,10 @@ export const BODY_CONTROL_SECTIONS: BodyControlSection[] = [
     { ...FONT_WEIGHT, id: "fontWeight", label: "Font weight" },
   ] },
   { id: "content", title: "Content", controls: [
-    { id: "backgroundColor", group: "decorations", label: "Background", control: "color" },
+    { id: "backgroundColor", group: "decorations", label: "Background color", control: "color" },
     { id: "contentWidth", group: "general", label: "Content width", control: "range", min: CONTENT_WIDTH_MIN, max: CONTENT_WIDTH_MAX, step: CONTENT_WIDTH_STEP, unit: "px" },
     { id: "contentPadding", group: "dimension", label: "Padding", control: "spacing" },
     { id: "blockGap", group: "dimension", label: "Block gap", control: "range", min: 0, max: 80, unit: "px" },
-  ], advancedControls: [
     { id: "borderColor", group: "decorations", label: "Border color", control: "color" },
     { id: "borderWidth", group: "decorations", label: "Border width", control: "range", min: 0, max: 12, unit: "px" },
     { ...BORDER_STYLE, id: "borderStyle", label: "Border style" },

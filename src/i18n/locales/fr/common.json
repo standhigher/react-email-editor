@@ -36,7 +36,7 @@
   "outline": "Contour",
   "radius": "Rayon des angles",
   "height": "Hauteur",
-  "background": "Arrière-plan",
+  "background": "Couleur d’arrière-plan",
   "default": "Par défaut",
   "regular": "Normal",
   "padding": "Marge intérieure",

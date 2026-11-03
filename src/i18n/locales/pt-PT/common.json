@@ -36,7 +36,7 @@
   "outline": "Contorno",
   "radius": "Raio dos cantos",
   "height": "Altura",
-  "background": "Fundo",
+  "background": "Cor de fundo",
   "default": "Predefinido",
   "regular": "Normal",
   "padding": "Espaçamento interior",

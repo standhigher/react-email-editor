@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { FONT_WEIGHTS, isStyleValue, type FontWeight } from "../constants/style-values";
+import { DEFAULT_BORDER_COLOR, FONT_WEIGHTS, isStyleValue, type FontWeight } from "../constants/style-values";
 import type { EmailBlockStyle, EmailBodySettings, EmailDecorationStyle } from "../types/document";
 import { DEFAULT_TYPOGRAPHY } from "../constants/typography";
 import { typographyWithBody } from "./typography";
@@ -58,7 +58,7 @@ export function decorationStyle(decoration: EmailDecorationStyle = {}): CSSPrope
     backgroundColor: cssColor(decoration.backgroundColor),
     borderWidth: cssLength(decoration.borderWidth),
     borderStyle: cssBorderStyle(decoration.borderStyle),
-    borderColor: cssColor(decoration.borderColor, "transparent"),
+    borderColor: cssColor(decoration.borderColor, DEFAULT_BORDER_COLOR),
     ...radiusStyle(decoration.borderRadius),
   };
 }

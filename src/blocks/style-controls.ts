@@ -1,4 +1,4 @@
-import { BORDER_STYLES, FONT_WEIGHTS, LINK_DECORATIONS, TEXT_ALIGNS, type BorderStyle } from "../constants/style-values";
+import { BORDER_STYLES, DEFAULT_BORDER_COLOR, FONT_WEIGHTS, LINK_DECORATIONS, TEXT_ALIGNS, type BorderStyle } from "../constants/style-values";
 import { copyFontFamilies } from "../document/constants";
 import type { StyleControlConfig } from "../types/block";
 import type { TranslatableControlOption, TranslatableStyleControl } from "../i18n/types";
@@ -23,10 +23,10 @@ export const FONT_WEIGHT: StyleControlConfig = { id: "typography.fontWeight", gr
 export const LINE_HEIGHT: StyleControlConfig = { id: "typography.lineHeight", group: "typography", label: "Line height", control: "range", min: 1, max: 2.5, step: 0.05 };
 export const TEXT_COLOR: StyleControlConfig = { id: "typography.color", group: "typography", label: "Text", control: "color" };
 export const TEXT_ALIGN: StyleControlConfig = { id: "typography.textAlign", group: "typography", label: "Text alignment", control: "select", options: [{ label: "Left", value: TEXT_ALIGNS.left }, { label: "Center", value: TEXT_ALIGNS.center }, { label: "Right", value: TEXT_ALIGNS.right }, { label: "Justify", value: TEXT_ALIGNS.justify }] };
-export const BG_COLOR: StyleControlConfig = { id: "decorations.backgroundColor", group: "decorations", label: "Background", control: "color", defaultValue: "transparent" };
+export const BG_COLOR: StyleControlConfig = { id: "decorations.backgroundColor", group: "decorations", label: "Background color", control: "color", defaultValue: "transparent" };
 export const BORDER_RADIUS: StyleControlConfig = { id: "decorations.borderRadius", group: "decorations", label: "Block corner radius", control: "corners", max: 48, defaultValue: "0px" };
 export const BORDER_WIDTH: StyleControlConfig = { id: "decorations.borderWidth", group: "decorations", label: "Block border width", control: "range", unit: "px", min: 0, max: 12, defaultValue: "0px" };
-export const BORDER_COLOR: StyleControlConfig = { id: "decorations.borderColor", group: "decorations", label: "Border", control: "color", defaultValue: "transparent" };
+export const BORDER_COLOR: StyleControlConfig = { id: "decorations.borderColor", group: "decorations", label: "Border", control: "color", defaultValue: DEFAULT_BORDER_COLOR };
 export const BORDER_STYLE: StyleControlConfig = {
   id: "decorations.borderStyle",
   group: "decorations",
@@ -79,7 +79,7 @@ export const TYPOGRAPHY_CONTROLS: StyleControlConfig[] = [
 export const WRAPPER_STYLE_CONTROLS: TranslatableStyleControl[] = [
   { ...PADDING, label: "Block padding", labelKey: "inspector.blockPadding" },
   { ...MARGIN, labelKey: "inspector.margin" },
-  { ...BG_COLOR, label: "Block background", labelKey: "inspector.blockBackground" },
+  { ...BG_COLOR, label: "Block background color", labelKey: "inspector.blockBackground" },
   { ...BORDER_WIDTH, labelKey: "inspector.blockBorderWidth" },
   {
     ...BORDER_STYLE,

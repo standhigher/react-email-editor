@@ -81,7 +81,7 @@ test('画布和邮件主体使用一致的相对尺寸与基础排版', (t) => {
     const html = documentToHtml(doc, DEFAULT_BLOCKS, { resolveHtmlTemplates });
     const emailStyle = html.match(/<td style="box-sizing:border-box;([^"]*)"/)?.[1];
     assert.ok(emailStyle);
-    for (const css of ['font-size:16px', 'font-family:Georgia, serif', 'font-weight:bold', 'color:#123456', 'line-height:1.5', 'padding:1em', 'border-width:0.25em']) {
+    for (const css of ['font-size:16px', 'font-family:Georgia, serif', 'font-weight:bold', 'color:#123456', 'line-height:1.5', 'padding:1em', 'border-width:0.25em', 'border-color:#000000']) {
       assert.ok(canvasStyle.includes(css), `canvas: ${css}`);
       assert.ok(emailStyle.includes(css), `email: ${css}`);
     }

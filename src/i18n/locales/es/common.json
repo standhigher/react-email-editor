@@ -36,7 +36,7 @@
   "outline": "Contorno",
   "radius": "Radio de las esquinas",
   "height": "Alto",
-  "background": "Fondo",
+  "background": "Color de fondo",
   "default": "Predeterminado",
   "regular": "Normal",
   "padding": "Relleno",

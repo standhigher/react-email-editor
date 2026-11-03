@@ -47,6 +47,18 @@
   flex-wrap: wrap;
 }
 
+.ree-html-dialog-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ree-html-dialog-title .ree-html-info {
+  position: static;
+}
+
 .ree-html-dialog-actions {
   display: flex;
   align-items: center;
@@ -71,7 +83,7 @@
   font-weight: 400;
 }
 
-.ree-html-dialog-header .ree-btn-tooltip {
+.ree-html-dialog-actions .ree-btn-tooltip {
   right: 0;
   left: auto;
 }
