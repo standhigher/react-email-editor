@@ -2,6 +2,18 @@
 
 English | [简体中文](./changelog.zh-CN.md)
 
+## 0.9.0 — 2026-11-03
+
+### Behavior and compatibility changes
+
+- Remove the built-in image block's alt-text control, its `alt` default and corresponding text in all five languages, leaving image URL and link as its content controls. Canvas, preview and email export consistently output `alt=""`; existing documents' `controls.alt` values no longer affect rendering, without document migration.
+- Custom blocks' `email.image({ src, alt, width })` remains supported. Bump the pre-1.0 npm package from `0.8.0` to `0.9.0` for the removed built-in field, synchronizing package metadata and the lockfile; `EmailDocument.version` stays at `4`.
+
+### Validation
+
+- `npm run check` passes type checking, Oxlint, the build and all 177 Node tests. `npm pack --dry-run --ignore-scripts --json` confirms version `0.9.0` and excludes source, tests and the playground from package files; `git diff --check` passes.
+- Chrome built-artifact regression `/regressions/canvas-image.html` passes, covering removal of the alt-text control, character-by-character link editing and special-character escaping, image and iframe preservation, resource updates and preview switching. `/regressions/locale-history.html` passes instance, selection, JSON, HTML and undo/redo checks for all five languages.
+
 ## 0.8.0 — 2026-11-02
 
 ### Added and improved

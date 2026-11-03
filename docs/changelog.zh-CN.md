@@ -2,6 +2,18 @@
 
 [English](./changelog.md) | 简体中文
 
+## 0.9.0 — 2026-11-03
+
+### 行为与兼容性变更
+
+- 移除内置图片区块的替代文本配置、`alt` 默认值及五种语言的对应文案，图片内容配置仅保留地址与链接。画布、预览和邮件导出统一输出 `alt=""`；已有文档中的 `controls.alt` 不再参与渲染，不做文档迁移。
+- 自定义区块的 `email.image({ src, alt, width })` 保持有效。因移除内置字段，将尚处于 `0.x` 的 npm 包从 `0.8.0` 升至 `0.9.0`，同步包元数据与 lockfile；`EmailDocument.version` 仍为 `4`。
+
+### 验证
+
+- `npm run check` 通过类型检查、Oxlint、构建及全部 177 项 Node 测试；`npm pack --dry-run --ignore-scripts --json` 确认版本为 `0.9.0`，发布文件不含源码、测试或 playground；`git diff --check` 通过。
+- Chrome 构建产物回归 `/regressions/canvas-image.html` 全部通过，覆盖替代文本配置移除、链接逐字输入与特殊字符转义、图片节点和 iframe 保留、资源更新及预览切换；`/regressions/locale-history.html` 五种语言的实例、选区、JSON、HTML 与撤销重做全部通过。
+
 ## 0.8.0 — 2026-11-02
 
 ### 新增与改进

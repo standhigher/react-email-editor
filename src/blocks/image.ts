@@ -15,7 +15,6 @@ export const imageBlock = createBlockPlugin({
   type: BLOCK_TYPES.image, title: "Image", icon: ICON_IMAGE, description: "Insert an image",
   controls: {
     src: EmailControls.image({ label: "Image URL", defaultValue: "https://placehold.co/560x200?text=Image" }),
-    alt: EmailControls.text({ label: "Alt text", defaultValue: "Image" }),
     link: EmailControls.url({ label: "Link", placeholder: "https://example.com" }),
   },
   defaultStyle: { dimension: { padding: "8px" } },
@@ -35,7 +34,7 @@ export const imageBlock = createBlockPlugin({
     });
     const widthAttr = pixelLength(width);
     const heightAttr = pixelLength(height);
-    const image = `<img src="${esc(safeEmailUrl(String(controls.src ?? ""), true))}" alt="${esc(String(controls.alt ?? ""))}"${widthAttr ? ` width="${widthAttr}"` : ""}${heightAttr ? ` height="${heightAttr}"` : ""} border="0" style="outline:none;text-decoration:none;${css};" />`;
+    const image = `<img src="${esc(safeEmailUrl(String(controls.src ?? ""), true))}" alt=""${widthAttr ? ` width="${widthAttr}"` : ""}${heightAttr ? ` height="${heightAttr}"` : ""} border="0" style="outline:none;text-decoration:none;${css};" />`;
     const link = safeEmailUrl(String(controls.link ?? ""));
     const content = link ? `<a href="${esc(link)}" style="text-decoration:none;${box.display === "block" ? "display:block;" : ""}">${image}</a>` : image;
     return renderAligned("image", { align: element.align, width, content });

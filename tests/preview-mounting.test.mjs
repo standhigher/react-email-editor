@@ -24,8 +24,8 @@ function stageFixture(t) {
     frames: () => renderer.root.findAllByType(PreviewFrame),
     tick(ms) { act(() => t.mock.timers.tick(ms)); },
     switchTo(next) { mode = next; act(() => renderer.update(tree())); },
-    changeAlt(alt) {
-      session = { ...session, document: { ...session.document, blocks: [{ ...block, controls: { ...block.controls, alt } }] } };
+    changeLink(link) {
+      session = { ...session, document: { ...session.document, blocks: [{ ...block, controls: { ...block.controls, link } }] } };
       act(() => renderer.update(tree()));
     },
   };
@@ -35,12 +35,12 @@ test("后台存在旧快照时快速进入预览，只挂载当前文档的加�
   const view = stageFixture(t);
   view.tick(400);
   assert.equal(view.frames().length, 0);
-  view.changeAlt("Latest input");
+  view.changeLink("https://example.com/latest");
   view.switchTo("preview");
   assert.equal(view.frames().length, 0, "flush 前不能挂载旧快照");
   view.tick(0);
   assert.equal(view.frames().length, 1);
-  assert.match(view.frames()[0].props.snapshot.html, /alt="Latest input"/);
+  assert.match(view.frames()[0].props.snapshot.html, /href="https:\/\/example\.com\/latest"/);
 });
 
 test("预览失败后切换模式不重挂失败帧，Retry 创建新加载身份并恢复", (t) => {

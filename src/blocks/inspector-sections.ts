@@ -23,7 +23,7 @@ export const BUTTON_SECTIONS: BlockInspectorSection[] = [
   SPACING, ADVANCED_BLOCK_APPEARANCE,
 ];
 export const IMAGE_SECTIONS: BlockInspectorSection[] = [
-  { id: "image", title: "Image", controlNames: ["src", "alt", "link"] },
+  { id: "image", title: "Image", controlNames: ["src", "link"] },
   { id: "sizePosition", title: "Size & position", styleIds: ["element.width", "element.height", "element.align"] },
   { id: "imageAppearance", title: "Image appearance", styleIds: ELEMENT_BORDERS }, SPACING, ADVANCED_BLOCK_APPEARANCE,
 ];

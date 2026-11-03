@@ -55,35 +55,35 @@ async function run() {
   frame.addEventListener("load", onLoad);
   image.addEventListener("load", onLoad);
   host.querySelector<HTMLButtonElement>(".ree-html-canvas-hitbox")!.click();
-  const alt = await until(() => host.querySelector<HTMLInputElement>('input[value="Image"]') ?? undefined);
+  const link = await until(() => host.querySelector<HTMLInputElement>('input[value="https://example.com"]') ?? undefined);
+  check(!Array.from(host.querySelectorAll("label")).some((node) => node.textContent === "Alt text"), "仍展示替代文本配置");
+  check(!("alt" in editor.getDocument().blocks[0].controls), "新图片区块仍包含 alt 配置");
+  check(image.alt === "", "图片 alt 应为空");
   const reports: string[] = [];
 
-  const expected = 'Image 中文 "<&';
-  for (const character of expected.slice("Image".length)) {
-    const value = alt.value + character;
-    type(alt, value);
-    await until(() => image.alt === value || undefined);
-    check(frame.contentDocument === frameDocument, "输入 alt 导致 iframe 文档重载");
-    check(frameDocument.querySelector("img") === image, "输入 alt 导致图片节点重建");
-    check(image.src === src && loads === 0, "输入 alt 导致图片重新加载");
-    check(editor.getDocument().blocks[0].controls.alt === value, "alt 未实时写入文档");
+  const expected = 'https://example.com/中文?value="<&';
+  for (const character of expected.slice("https://example.com".length)) {
+    const value = link.value + character;
+    type(link, value);
+    await until(() => image.closest("a")?.getAttribute("href") === value || undefined);
+    check(frame.contentDocument === frameDocument, "输入链接导致 iframe 文档重载");
+    check(frameDocument.querySelector("img") === image, "输入链接导致图片节点重建");
+    check(image.src === src && loads === 0, "输入链接导致图片重新加载");
+    check(editor.getDocument().blocks[0].controls.link === value, "链接未实时写入文档");
   }
-  check(editor.getHtml().includes('alt="Image 中文 &quot;&lt;&amp;"'), "导出 alt 转义不正确");
-  check(editor.getRenderedHtml().includes('alt="Image 中文 &quot;&lt;&amp;"'), "预览 alt 不正确");
-  reports.push("PASS：逐字输入中文与特殊字符，iframe、图片节点不变，零 load，文档与导出同步");
+  check(editor.getHtml().includes('href="https://example.com/中文?value=&quot;&lt;&amp;"'), "导出链接转义不正确");
+  check(editor.getRenderedHtml().includes('href="https://example.com/中文?value=&quot;&lt;&amp;"'), "预览链接不正确");
+  reports.push("PASS：无替代文本配置，逐字输入链接中文与特殊字符，iframe、图片节点不变，零 load，文档与导出同步");
   // 超过后台预览的 2 秒 maxWait，覆盖停止输入后发生的延迟资源加载。
   await new Promise<void>((resolve) => setTimeout(resolve, 2300));
   check(host.querySelectorAll(".ree-preview-frame").length === 0, "停止输入后隐藏预览加载了图片");
   check(loads === 0, "停止输入后画布图片重新加载");
   reports.push("PASS：停止输入超过 2 秒，隐藏预览未创建 iframe 或加载资源");
 
-  type(alt, "");
-  await until(() => image.alt === "" || undefined);
-  check(editor.getHtml().includes('alt=""'), "空 alt 未导出");
-  type(input("Link"), "https://example.com/updated");
+  type(link, "https://example.com/updated");
   await until(() => image.closest("a")?.getAttribute("href") === "https://example.com/updated" || undefined);
   check(frameDocument.querySelector("img") === image && loads === 0, "修改已有链接重新加载图片");
-  reports.push("PASS：清空 alt、更新链接保留图片节点");
+  reports.push("PASS：更新链接保留图片节点");
 
   setBody({ textColor: "#123456", fontFamily: "Georgia, serif" });
   await until(() => frame.contentWindow?.getComputedStyle(frameDocument.body).color === "rgb(18, 52, 86)" || undefined);
@@ -122,16 +122,16 @@ async function run() {
   });
   await until(() => host.querySelector(".ree-stage-content")?.getAttribute("aria-busy") === "false" || undefined);
   host.querySelector<HTMLButtonElement>('button[aria-label="Edit"]')!.click();
-  type(alt, "After preview");
-  await until(() => image.alt === "After preview" || undefined);
+  type(link, "https://example.com/after-preview");
+  await until(() => image.closest("a")?.getAttribute("href") === "https://example.com/after-preview" || undefined);
   await new Promise<void>((resolve) => setTimeout(resolve, 2300));
   check(host.querySelectorAll(".ree-preview-frame").length === 1 && host.querySelector(".ree-preview-frame") === preview, "返回编辑后隐藏预览创建了新 iframe");
   host.querySelector<HTMLButtonElement>('button[aria-label="Preview"]')!.click();
   await until(() => {
     const stage = host.querySelector('.ree-preview-stage:not(.is-buffered)');
-    return stage?.querySelector<HTMLIFrameElement>("iframe")?.contentDocument?.querySelector("img")?.alt === "After preview" || undefined;
+    return stage?.querySelector<HTMLIFrameElement>("iframe")?.contentDocument?.querySelector("img")?.closest("a")?.getAttribute("href") === "https://example.com/after-preview" || undefined;
   });
-  reports.push("PASS：进入 Preview 加载最新内容，返回编辑不加载新预览，再次预览显示最新 alt");
+  reports.push("PASS：进入 Preview 加载最新内容，返回编辑不加载新预览，再次预览显示最新链接");
   frame.removeEventListener("load", onLoad);
   image.removeEventListener("load", onLoad);
   result.textContent = `${reports.join("\n")}\n全部通过`;

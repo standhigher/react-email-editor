@@ -23,7 +23,6 @@ export const CONTROL_KEYS: Partial<Record<string, MessageKey>> = {
   "html": "common.content",
   "href": "common.link",
   "src": "inspector.imageUrl",
-  "alt": "inspector.alt",
   "link": "common.link",
   "height": "common.height"
 };

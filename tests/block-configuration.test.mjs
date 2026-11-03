@@ -28,6 +28,19 @@ test('内置区块按各自能力声明分组，所有配置恰好出现一次',
   for (const type of ['heading', 'text', 'button']) assert.equal(getBlockDefinition(type).controls.find((control) => control.name === 'html').profile, type);
 });
 
+test('内置图片只配置地址和链接，画布、邮件及预览输出空 alt', () => {
+  const definition = getBlockDefinition('image');
+  assert.deepEqual(definition.controls.map((control) => control.name), ['src', 'link']);
+  const block = createBlockNode('image');
+  assert.equal('alt' in block.controls, false);
+  block.controls.alt = '旧替代文本';
+  for (const mode of ['canvas', 'email']) {
+    assert.match(renderBlock(block, DEFAULT_BLOCKS, mode), /<img\b[^>]* alt=""/);
+    assert.doesNotMatch(renderBlock(block, DEFAULT_BLOCKS, mode), /旧替代文本/);
+  }
+  assert.match(documentToHtml(createEmailDocument([block]), DEFAULT_BLOCKS, { resolveHtmlTemplates: true }), /<img\b[^>]* alt=""/);
+});
+
 test('按钮只使用 html，富文本仅导出基础行内格式和一个外层链接', () => {
   const block = createBlockNode('button');
   assert.equal('label' in block.controls, false);
